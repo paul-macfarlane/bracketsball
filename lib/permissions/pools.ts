@@ -6,13 +6,17 @@ export type PoolAction =
   | "update-settings"
   | "delete-pool"
   | "create-invite"
-  | "delete-invite";
+  | "delete-invite"
+  | "change-member-role"
+  | "remove-member";
 
 const poolActionPermissions: Record<PoolAction, Set<PoolMemberRole>> = {
   "update-settings": new Set(["leader"]),
   "delete-pool": new Set(["leader"]),
   "create-invite": new Set(["leader"]),
   "delete-invite": new Set(["leader"]),
+  "change-member-role": new Set(["leader"]),
+  "remove-member": new Set(["leader"]),
 };
 
 export function canPerformPoolAction(
