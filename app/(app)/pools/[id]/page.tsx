@@ -5,6 +5,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getPoolById } from "@/lib/db/queries/pools";
 import { getPoolInvitesByPoolId } from "@/lib/db/queries/pool-invites";
+import { getPoolMembers } from "@/lib/db/queries/pool-members";
 import {
   canAccessPoolPage,
   canPerformPoolAction,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InviteList } from "./invites/invite-list";
+import { MemberList } from "./members/member-list";
 
 export default async function PoolDetailPage({
   params,
@@ -45,6 +47,7 @@ export default async function PoolDetailPage({
     "create-invite",
   );
   const invites = isLeader ? await getPoolInvitesByPoolId(id) : [];
+  const members = await getPoolMembers(id);
   const remainingCapacity =
     poolData.pool.maxParticipants - poolData.memberCount;
 
@@ -100,6 +103,15 @@ export default async function PoolDetailPage({
           </div>
         </CardContent>
       </Card>
+      <div className="mt-6">
+        <MemberList
+          poolId={id}
+          members={members}
+          currentUserId={session.user.id}
+          isLeader={isLeader}
+          currentMembershipId={poolData.membership.id}
+        />
+      </div>
       {isLeader && (
         <div className="mt-6">
           <InviteList

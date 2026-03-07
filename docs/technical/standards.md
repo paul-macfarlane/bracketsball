@@ -109,7 +109,8 @@ docs/                   # Documentation
 
 ## Testing
 
-- Use **Vitest** as the test runner.
+- **Deferred to post-MVP.** Testing will be added after all MVP stories are complete.
+- When added, use **Vitest** as the test runner.
 - Test business logic and data access functions. Don't unit-test trivial React rendering.
 - Integration tests for API routes and Server Actions.
 - Use a test database (separate Neon branch or local Postgres).

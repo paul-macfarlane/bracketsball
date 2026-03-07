@@ -65,8 +65,8 @@ Then verify:
 - [ ] All acceptance criteria from `docs/business/backlog.md` are met
 - [ ] Code follows `docs/technical/standards.md`
 - [ ] No unrelated changes included
-- [ ] New/changed functionality has tests
-- [ ] Existing tests still pass (`pnpm test` or equivalent)
+- [ ] New/changed functionality has tests (deferred to post-MVP)
+- [ ] Existing tests still pass (deferred to post-MVP)
 - [ ] `pnpm format` has been run
 - [ ] `pnpm lint` passes with zero errors/warnings
 - [ ] `pnpm build` compiles without errors

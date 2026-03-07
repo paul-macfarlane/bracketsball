@@ -139,11 +139,32 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Expired or maxed-out links show an appropriate error
 - Users who follow a valid link and are authenticated are added to the pool
 
+### 8. Manage Pool Members (MVP)
+
+**As a** pool leader, **I want to** manage pool members' roles and remove members **so that** I can control who participates in my pool.
+
+**As a** pool member, **I want to** view the member list and leave a pool **so that** I can see who I'm competing with and opt out if I choose.
+
+**Acceptance Criteria:**
+
+- All pool members can view the full member list (name, role)
+- Pool leaders can change a member's role between "member" and "leader"
+- Pool leaders can remove any member (including other leaders and the original pool creator)
+- Removing a member hard-deletes all of their bracket entries from the pool
+- Removal requires a confirmation dialog
+- Regular members cannot edit roles or remove other members
+- Any member (including leaders) can leave a pool voluntarily
+  - Leaving hard-deletes all of the member's bracket entries from the pool
+  - Members are warned that their brackets will be removed before confirming
+  - A leader cannot leave if they are the last leader in the pool — they must promote another member to leader first
+  - If a member is the only person in the pool, leaving deletes the pool entirely
+- Only pool leaders see role edit and remove controls in the UI
+
 ---
 
 ## Epic: Bracket Creation
 
-### 8. Create Bracket Entry (MVP)
+### 9. Create Bracket Entry (MVP)
 
 **As a** pool member, **I want to** create a bracket entry with my tournament picks **so that** I can compete in the pool.
 
@@ -157,7 +178,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Only brackets with all games picked and a tiebreaker entered can be submitted
 - Incomplete brackets are clearly indicated as drafts
 
-### 9. Edit Bracket Entry (MVP)
+### 10. Edit Bracket Entry (MVP)
 
 **As a** pool member, **I want to** edit my bracket entry **so that** I can change my picks before the tournament starts.
 
@@ -171,7 +192,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Bracket Visibility
 
-### 10. View Own Brackets (MVP)
+### 11. View Own Brackets (MVP)
 
 **As a** user, **I want to** view a list of my brackets **so that** I can track my performance across pools.
 
@@ -181,7 +202,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Each entry shows: bracket name, pool name, current points, and potential remaining points
 - User can click into an individual bracket for detail
 
-### 11. View Other Members' Brackets (MVP)
+### 12. View Other Members' Brackets (MVP)
 
 **As a** pool member, **I want to** view other members' brackets **so that** I can see how my competition is doing.
 
@@ -190,7 +211,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - User can view any other member's bracket list within a shared pool
 - Same summary info shown: bracket name, current points, potential remaining points
 
-### 12. View Pool Standings (MVP)
+### 13. View Pool Standings (MVP)
 
 **As a** pool member, **I want to** see the pool standings **so that** I know where I rank.
 
@@ -200,7 +221,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Each row shows: bracket name, owner, current points, potential remaining points
 - User can click into any bracket for detail
 
-### 13. View Individual Bracket Detail (MVP)
+### 14. View Individual Bracket Detail (MVP)
 
 **As a** user, **I want to** view an individual bracket in detail **so that** I can see every pick and its outcome.
 
@@ -215,7 +236,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Non-MVP Stories
 
-### 14. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
+### 15. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
 
 **As a** pool leader, **I want to** customize scoring per round **so that** I can tailor the pool's competitiveness.
 
@@ -225,7 +246,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Only pool leaders can edit scoring
 - Changes are locked once tournament games begin
 
-### 15. In-App User Invites (Non-MVP) — Epic: Pool Members
+### 16. In-App User Invites (Non-MVP) — Epic: Pool Members
 
 **As a** pool member, **I want to** invite existing users by searching for them **so that** I don't need to share a link externally.
 
@@ -235,7 +256,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Selected users receive an in-app invite notification
 - Invited users can accept or decline
 
-### 16. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
+### 17. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
 
 **As a** pool leader, **I want to** make my pool public or private **so that** I can control who can discover and join it.
 
@@ -246,7 +267,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Public pools appear in search results
 - Toggle available at creation and in settings
 
-### 17. Theme Toggle (Non-MVP) — Epic: UX
+### 18. Theme Toggle (Non-MVP) — Epic: UX
 
 **As a** user, **I want to** switch between light, dark, and system theme modes **so that** I can use the app comfortably in any lighting condition.
 
@@ -257,7 +278,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Toggle is accessible from the user dropdown menu (desktop) and mobile navigation menu
 - System mode automatically follows the user's OS preference
 
-### 18. Public Pool Search (Non-MVP) — Epic: Public Pools
+### 19. Public Pool Search (Non-MVP) — Epic: Public Pools
 
 **As a** user, **I want to** search for public pools **so that** I can find and join open competitions.
 
@@ -282,16 +303,17 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 5   | Manage Bracket Pool Settings       | Pool Settings      | Yes |
 | 6   | Sports Data Sync                   | Sports Data        | Yes |
 | 7   | Bracket Pool Invite Links          | Pool Members       | Yes |
-| 8   | Create Bracket Entry               | Bracket Creation   | Yes |
-| 9   | Edit Bracket Entry                 | Bracket Creation   | Yes |
-| 10  | View Own Brackets                  | Bracket Visibility | Yes |
-| 11  | View Other Members' Brackets       | Bracket Visibility | Yes |
-| 12  | View Pool Standings                | Bracket Visibility | Yes |
-| 13  | View Individual Bracket Detail     | Bracket Visibility | Yes |
-| 14  | Manage Bracket Scoring Settings    | Pool Settings      | No  |
-| 15  | In-App User Invites                | Pool Members       | No  |
-| 16  | Bracket Pool Public/Private Toggle | Public Pools       | No  |
-| 17  | Theme Toggle                       | UX                 | No  |
-| 18  | Public Pool Search                 | Public Pools       | No  |
+| 8   | Manage Pool Members                | Pool Members       | Yes |
+| 9   | Create Bracket Entry               | Bracket Creation   | Yes |
+| 10  | Edit Bracket Entry                 | Bracket Creation   | Yes |
+| 11  | View Own Brackets                  | Bracket Visibility | Yes |
+| 12  | View Other Members' Brackets       | Bracket Visibility | Yes |
+| 13  | View Pool Standings                | Bracket Visibility | Yes |
+| 14  | View Individual Bracket Detail     | Bracket Visibility | Yes |
+| 15  | Manage Bracket Scoring Settings    | Pool Settings      | No  |
+| 16  | In-App User Invites                | Pool Members       | No  |
+| 17  | Bracket Pool Public/Private Toggle | Public Pools       | No  |
+| 18  | Theme Toggle                       | UX                 | No  |
+| 19  | Public Pool Search                 | Public Pools       | No  |
 
-**MVP Total: 14 stories** | **Post-MVP: 5 stories**
+**MVP Total: 15 stories** | **Post-MVP: 5 stories**
