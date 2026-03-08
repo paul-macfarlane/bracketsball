@@ -13,10 +13,11 @@ import {
 } from "@/lib/db/queries/tournaments";
 import { hasTournamentStarted } from "@/lib/db/queries/pools";
 import { BracketEditor } from "@/components/bracket/bracket-editor";
+import { BracketViewer } from "@/components/bracket/bracket-viewer";
 import type { BracketTeam } from "@/components/bracket/types";
 import type { PoolScoring } from "@/lib/scoring";
 
-export default async function BracketEditorPage({
+export default async function BracketPage({
   params,
 }: {
   params: Promise<{ id: string; bracketId: string }>;
@@ -31,13 +32,21 @@ export default async function BracketEditorPage({
     notFound();
   }
 
+  // Must be a pool member to view any bracket
   const poolData = await getPoolById(poolId, session.user.id);
   if (!poolData) {
     notFound();
   }
 
   const entry = await getBracketEntryById(bracketId);
-  if (!entry || entry.userId !== session.user.id || entry.poolId !== poolId) {
+  if (!entry || entry.poolId !== poolId) {
+    notFound();
+  }
+
+  const isOwner = entry.userId === session.user.id;
+
+  // Non-owners cannot view draft (unsubmitted) brackets
+  if (!isOwner && entry.status !== "submitted") {
     notFound();
   }
 
@@ -50,7 +59,6 @@ export default async function BracketEditorPage({
       hasTournamentStarted(),
     ]);
 
-  // Map tournament teams to the shape our bracket components expect
   const tournamentTeams: BracketTeam[] = tournamentTeamsRaw.map((tt) => ({
     id: tt.teamId,
     name: tt.teamName,
@@ -79,6 +87,16 @@ export default async function BracketEditorPage({
         }
       : undefined;
 
+  const poolScoring: PoolScoring = {
+    scoringFirstFour: poolData.pool.scoringFirstFour,
+    scoringRound64: poolData.pool.scoringRound64,
+    scoringRound32: poolData.pool.scoringRound32,
+    scoringSweet16: poolData.pool.scoringSweet16,
+    scoringElite8: poolData.pool.scoringElite8,
+    scoringFinalFour: poolData.pool.scoringFinalFour,
+    scoringChampionship: poolData.pool.scoringChampionship,
+  };
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mb-4">
@@ -90,29 +108,33 @@ export default async function BracketEditorPage({
         </Link>
       </div>
 
-      <BracketEditor
-        bracketEntryId={bracketId}
-        bracketName={entry.name}
-        bracketStatus={entry.status}
-        tiebreakerScore={entry.tiebreakerScore}
-        games={games}
-        tournamentTeams={tournamentTeams}
-        initialPicks={bracketPicks}
-        poolId={poolId}
-        bracketPositions={bracketPositions}
-        tournamentStarted={tournamentStarted}
-        poolScoring={
-          {
-            scoringFirstFour: poolData.pool.scoringFirstFour,
-            scoringRound64: poolData.pool.scoringRound64,
-            scoringRound32: poolData.pool.scoringRound32,
-            scoringSweet16: poolData.pool.scoringSweet16,
-            scoringElite8: poolData.pool.scoringElite8,
-            scoringFinalFour: poolData.pool.scoringFinalFour,
-            scoringChampionship: poolData.pool.scoringChampionship,
-          } satisfies PoolScoring
-        }
-      />
+      {isOwner ? (
+        <BracketEditor
+          bracketEntryId={bracketId}
+          bracketName={entry.name}
+          bracketStatus={entry.status}
+          tiebreakerScore={entry.tiebreakerScore}
+          games={games}
+          tournamentTeams={tournamentTeams}
+          initialPicks={bracketPicks}
+          poolId={poolId}
+          bracketPositions={bracketPositions}
+          tournamentStarted={tournamentStarted}
+          poolScoring={poolScoring}
+        />
+      ) : (
+        <BracketViewer
+          bracketName={entry.name}
+          bracketStatus={entry.status}
+          totalPoints={entry.totalPoints}
+          potentialPoints={entry.potentialPoints}
+          games={games}
+          tournamentTeams={tournamentTeams}
+          picks={bracketPicks}
+          bracketPositions={bracketPositions}
+          poolScoring={poolScoring}
+        />
+      )}
     </div>
   );
 }

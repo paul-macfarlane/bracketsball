@@ -1,0 +1,125 @@
+"use client";
+
+import { useMemo } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { BracketFullView } from "./bracket-full-view";
+import type { BracketPositions } from "./bracket-full-view";
+import type { BracketGame, BracketTeam, BracketPick } from "./types";
+import { getPointsForRound, type PoolScoring } from "@/lib/scoring";
+
+interface BracketViewerProps {
+  bracketName: string;
+  bracketStatus: string;
+  totalPoints: number;
+  potentialPoints: number;
+  games: BracketGame[];
+  tournamentTeams: BracketTeam[];
+  picks: BracketPick[];
+  bracketPositions?: BracketPositions;
+  poolScoring: PoolScoring;
+}
+
+export function BracketViewer({
+  bracketName,
+  bracketStatus,
+  totalPoints,
+  potentialPoints,
+  games,
+  tournamentTeams,
+  picks: picksList,
+  bracketPositions,
+  poolScoring,
+}: BracketViewerProps) {
+  const picks = useMemo(
+    () => new Map(picksList.map((p) => [p.tournamentGameId, p.pickedTeamId])),
+    [picksList],
+  );
+
+  const teamsById = useMemo(
+    () => new Map(tournamentTeams.map((t) => [t.id, t])),
+    [tournamentTeams],
+  );
+
+  const gamesById = useMemo(
+    () => new Map(games.map((g) => [g.id, g])),
+    [games],
+  );
+
+  const roundPointsMap = useMemo(() => {
+    const map = new Map<string, number>();
+    const rounds = [
+      "first_four",
+      "round_of_64",
+      "round_of_32",
+      "sweet_16",
+      "elite_8",
+      "final_four",
+      "championship",
+    ];
+    for (const round of rounds) {
+      map.set(round, getPointsForRound(round, poolScoring));
+    }
+    return map;
+  }, [poolScoring]);
+
+  function getTeamsForGame(
+    gameId: string,
+  ): [BracketTeam | null, BracketTeam | null] {
+    const game = gamesById.get(gameId);
+    if (!game) return [null, null];
+
+    let team1: BracketTeam | null = null;
+    let team2: BracketTeam | null = null;
+
+    if (game.team1Id) {
+      team1 = teamsById.get(game.team1Id) ?? null;
+    } else if (game.sourceGame1Id) {
+      const pickedTeamId = picks.get(game.sourceGame1Id);
+      if (pickedTeamId) team1 = teamsById.get(pickedTeamId) ?? null;
+    }
+
+    if (game.team2Id) {
+      team2 = teamsById.get(game.team2Id) ?? null;
+    } else if (game.sourceGame2Id) {
+      const pickedTeamId = picks.get(game.sourceGame2Id);
+      if (pickedTeamId) team2 = teamsById.get(pickedTeamId) ?? null;
+    }
+
+    return [team1, team2];
+  }
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-bold">{bracketName}</h1>
+          <Badge
+            variant={bracketStatus === "submitted" ? "default" : "secondary"}
+          >
+            {bracketStatus === "submitted" ? "Submitted" : "Draft"}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="font-semibold">Points: {totalPoints}</span>
+          <span className="text-muted-foreground">|</span>
+          <span className="text-muted-foreground">
+            Potential: {potentialPoints}
+          </span>
+        </div>
+      </div>
+
+      {/* Bracket view — disabled (read-only) */}
+      <BracketFullView
+        games={games}
+        picks={picks}
+        getTeamsForGame={getTeamsForGame}
+        onPick={() => {}}
+        disabled={true}
+        bracketPositions={bracketPositions}
+        roundPointsMap={roundPointsMap}
+      />
+    </div>
+  );
+}

@@ -13,8 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getInitials } from "@/lib/utils";
+import { UserDisplay } from "@/components/user-display";
 import {
   Select,
   SelectContent,
@@ -117,39 +116,20 @@ export function MemberList({
                 className="flex items-center justify-between rounded-md border p-3"
               >
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={member.userImage ?? undefined}
-                      alt={member.userName}
-                    />
-                    <AvatarFallback>
-                      {getInitials(member.userName)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">
-                        {member.userName}
-                        {isCurrentUser && (
-                          <span className="text-muted-foreground"> (you)</span>
-                        )}
-                      </span>
-                      {!isLeader && (
-                        <Badge
-                          variant={
-                            member.role === "leader" ? "default" : "secondary"
-                          }
-                        >
-                          {member.role}
-                        </Badge>
-                      )}
-                    </div>
-                    {member.userUsername && (
-                      <p className="text-xs text-muted-foreground">
-                        @{member.userUsername}
-                      </p>
-                    )}
-                  </div>
+                  <UserDisplay
+                    name={member.userName + (isCurrentUser ? " (you)" : "")}
+                    image={member.userImage}
+                    username={member.userUsername}
+                  />
+                  {!isLeader && (
+                    <Badge
+                      variant={
+                        member.role === "leader" ? "default" : "secondary"
+                      }
+                    >
+                      {member.role}
+                    </Badge>
+                  )}
                 </div>
                 {isLeader && !isCurrentUser && (
                   <div className="flex items-center gap-2">
