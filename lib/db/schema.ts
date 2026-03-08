@@ -1,4 +1,5 @@
 export {
+  appRoleEnum,
   user,
   session,
   account,
@@ -16,3 +17,17 @@ export {
   poolMemberRelations,
   poolInviteRelations,
 } from "./pool-schema";
+
+export {
+  tournamentRoundEnum,
+  tournamentRegionEnum,
+  gameStatusEnum,
+  team,
+  tournament,
+  tournamentTeam,
+  tournamentGame,
+  teamRelations,
+  tournamentRelations,
+  tournamentTeamRelations,
+  tournamentGameRelations,
+} from "./tournament-schema";

@@ -39,6 +39,11 @@ const navLinks = [
   { href: "/pools", label: "Pools" },
 ] as const;
 
+const adminNavLinks = [
+  ...navLinks,
+  { href: "/admin", label: "Admin" },
+] as const;
+
 export function AppHeader({ session }: AppHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -51,6 +56,8 @@ export function AppHeader({ session }: AppHeaderProps) {
 
   const user = session.user;
   const initials = getInitials(user.name);
+  const isAdmin = user.appRole === "admin";
+  const links = isAdmin ? adminNavLinks : navLinks;
 
   return (
     <header className="border-b">
@@ -61,7 +68,7 @@ export function AppHeader({ session }: AppHeaderProps) {
             BRacketiering
           </Link>
           <nav className="hidden items-center gap-4 md:flex">
-            {navLinks.map((link) => {
+            {links.map((link) => {
               const isActive =
                 pathname === link.href || pathname.startsWith(link.href + "/");
               return (
@@ -159,7 +166,7 @@ export function AppHeader({ session }: AppHeaderProps) {
 
                 {/* Nav links */}
                 <nav className="flex flex-col gap-1">
-                  {navLinks.map((link) => {
+                  {links.map((link) => {
                     const isActive =
                       pathname === link.href ||
                       pathname.startsWith(link.href + "/");
