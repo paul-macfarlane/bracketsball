@@ -14,11 +14,11 @@ export default async function AdminLayout({
   });
 
   if (!session || session.user.appRole !== "admin") {
-    redirect("/dashboard");
+    redirect("/pools");
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-5xl">
       <AdminNav />
       {children}
     </div>

@@ -65,7 +65,6 @@ export const updateGameSchema = z.object({
   team1Score: z.number().int().min(0).nullable().optional(),
   team2Score: z.number().int().min(0).nullable().optional(),
   status: z.enum(["scheduled", "in_progress", "final"]).optional(),
-  winnerTeamId: z.string().nullable().optional(),
 });
 
 export type UpdateGameFormValues = z.infer<typeof updateGameSchema>;

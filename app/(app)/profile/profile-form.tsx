@@ -75,7 +75,7 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
   const initials = watchedName ? getInitials(watchedName) : "";
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Edit Profile</CardTitle>
         <CardDescription>

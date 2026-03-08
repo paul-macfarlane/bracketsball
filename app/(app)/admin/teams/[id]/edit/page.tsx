@@ -25,7 +25,7 @@ export default async function EditTeamPage({
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div>
       <Link
         href="/admin/teams"
         className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"

@@ -12,7 +12,7 @@ export default function NewTeamPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div>
       <Link
         href="/admin/teams"
         className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"

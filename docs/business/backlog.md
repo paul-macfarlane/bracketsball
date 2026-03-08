@@ -354,6 +354,71 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ---
 
+## Epic: UX Cleanup
+
+### 22. Remove User Dashboard (Non-MVP) — Epic: UX Cleanup
+
+**As a** user, **I want** the app to default to the Pools page **so that** I land on the most useful page without an unnecessary dashboard.
+
+**Acceptance Criteria:**
+
+- Remove the user dashboard page
+- Default authenticated route (`/`) redirects to the Pools page
+- Navigation no longer shows a "Dashboard" link
+
+### 23. Remove Admin Dashboard (Non-MVP) — Epic: UX Cleanup
+
+**As an** admin, **I want** the admin area to default to the Teams tab **so that** I skip the unnecessary dashboard and land on actionable content.
+
+**Acceptance Criteria:**
+
+- Remove the admin dashboard tab/page
+- Admin area defaults to the Teams tab
+- Admin navigation no longer shows a "Dashboard" link
+
+### 24. Auto-Determine Game Winner from Scores (Non-MVP) — Epic: UX Cleanup
+
+**As an** admin, **I want** the winning team to be automatically determined when I enter game scores **so that** I don't have to redundantly select the winner.
+
+**Acceptance Criteria:**
+
+- When both team scores are entered and the game is marked as final, the team with the higher score is automatically set as the winner
+- Admin no longer needs to manually select the winning team
+- Edge case: if scores are tied, no winner is auto-set (admin must resolve)
+
+---
+
+## Epic: Auto-Fill Bracket
+
+### 25. Auto-Fill Bracket Picks (Non-MVP) — Epic: Auto-Fill Bracket
+
+**As a** pool member, **I want to** auto-fill my bracket with generated picks **so that** I can quickly create an entry without manually picking every game.
+
+**Acceptance Criteria:**
+
+- User can choose from two auto-fill strategies:
+  - **Chalk (Higher Seed Always)**: the higher-seeded team always wins
+  - **Weighted Random**: winners are randomly selected, weighted toward the higher seed based on the seed differential
+- Auto-fill populates all remaining unpicked games in the bracket
+- User can modify any auto-filled picks before submitting
+- Auto-fill is available during bracket creation and editing (before tournament lock)
+
+---
+
+## Epic: Bug Fixes
+
+### 26. Fix Bracket Submit Double-Click (Non-MVP) — Epic: Bug Fixes
+
+**As a** pool member, **I want** bracket submission to show a success indicator on the first click **so that** I don't have to click submit twice.
+
+**Acceptance Criteria:**
+
+- Clicking submit once successfully submits the bracket and shows a success indicator
+- Investigate and fix the root cause of requiring two clicks
+- Submit button shows loading/disabled state while submission is in progress
+
+---
+
 ## Summary
 
 | #   | Story                              | Epic                | MVP | Status      |
@@ -381,5 +446,10 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 19  | Theme Toggle                       | UX                  | No  | Not Started |
 | 20  | Public Pool Search                 | Public Pools        | No  | Not Started |
 | 21  | Transaction Audit                  | Tech Debt           | No  | Not Started |
+| 22  | Remove User Dashboard              | UX Cleanup          | No  | Not Started |
+| 23  | Remove Admin Dashboard             | UX Cleanup          | No  | Not Started |
+| 24  | Auto-Determine Game Winner         | UX Cleanup          | No  | Not Started |
+| 25  | Auto-Fill Bracket Picks            | Auto-Fill Bracket   | No  | Not Started |
+| 26  | Fix Bracket Submit Double-Click    | Bug Fixes           | No  | Not Started |
 
-**MVP Total: 17 stories (16 done, 1 remaining)** | **Post-MVP: 6 stories**
+**MVP Total: 17 stories (16 done, 1 remaining)** | **Post-MVP: 11 stories**

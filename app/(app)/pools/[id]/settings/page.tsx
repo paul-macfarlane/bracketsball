@@ -48,7 +48,7 @@ export default async function PoolSettingsPage({
   const maxBracketCountInPool = await getMaxBracketCountInPool(id);
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-5xl">
       <div className="mb-4">
         <Link
           href={`/pools/${id}`}

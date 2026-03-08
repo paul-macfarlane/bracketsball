@@ -34,10 +34,7 @@ interface AppHeaderProps {
   session: Session;
 }
 
-const navLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/pools", label: "Pools" },
-] as const;
+const navLinks = [{ href: "/pools", label: "Pools" }] as const;
 
 const adminNavLinks = [
   ...navLinks,
@@ -64,7 +61,7 @@ export function AppHeader({ session }: AppHeaderProps) {
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         {/* Left: logo + nav links */}
         <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="text-lg font-bold">
+          <Link href="/pools" className="text-lg font-bold">
             BRacketiering
           </Link>
           <nav className="hidden items-center gap-4 md:flex">

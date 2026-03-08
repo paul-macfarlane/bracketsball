@@ -16,7 +16,7 @@ export default async function LoginPage({
   const { callbackUrl } = await searchParams;
 
   if (session) {
-    redirect(callbackUrl ?? "/dashboard");
+    redirect(callbackUrl ?? "/pools");
   }
 
   return (

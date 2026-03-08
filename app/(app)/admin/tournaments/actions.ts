@@ -339,14 +339,43 @@ export async function updateGameAction(
     return { error: "Game not found" };
   }
 
+  // Auto-determine winner from scores when status is "final"
+  let winnerTeamId: string | null = null;
+  if (
+    parsed.data.status === "final" &&
+    parsed.data.team1Score !== null &&
+    parsed.data.team1Score !== undefined &&
+    parsed.data.team2Score !== null &&
+    parsed.data.team2Score !== undefined
+  ) {
+    if (parsed.data.team1Score > parsed.data.team2Score) {
+      winnerTeamId = currentGame.team1Id;
+    } else if (parsed.data.team2Score > parsed.data.team1Score) {
+      winnerTeamId = currentGame.team2Id;
+    }
+    // Tied scores: no winner auto-set
+  }
+
+  if (
+    parsed.data.status === "final" &&
+    !winnerTeamId &&
+    parsed.data.team1Score === parsed.data.team2Score
+  ) {
+    return {
+      error:
+        "Scores are tied — winner cannot be auto-determined. Please adjust scores.",
+    };
+  }
+
+  const updateData = { ...parsed.data, winnerTeamId };
+
   const nextGame = games.find(
     (g) => g.sourceGame1Id === gameId || g.sourceGame2Id === gameId,
   );
 
   // If resetting a completed game (changing status away from final, or clearing winner)
   const isResetting =
-    currentGame.status === "final" &&
-    (parsed.data.status !== "final" || parsed.data.winnerTeamId === null);
+    currentGame.status === "final" && parsed.data.status !== "final";
 
   if (isResetting && nextGame) {
     if (nextGame.status === "in_progress" || nextGame.status === "final") {
@@ -360,7 +389,7 @@ export async function updateGameAction(
   await db.transaction(async (tx) => {
     const [result] = await tx
       .update(tournamentGame)
-      .set(parsed.data)
+      .set(updateData)
       .where(eq(tournamentGame.id, gameId))
       .returning();
 
@@ -379,12 +408,12 @@ export async function updateGameAction(
           .update(tournamentGame)
           .set(update)
           .where(eq(tournamentGame.id, nextGame.id));
-      } else if (parsed.data.status === "final" && parsed.data.winnerTeamId) {
+      } else if (parsed.data.status === "final" && winnerTeamId) {
         // Advance the winner to the next round
         const update =
           nextGame.sourceGame1Id === gameId
-            ? { team1Id: parsed.data.winnerTeamId }
-            : { team2Id: parsed.data.winnerTeamId };
+            ? { team1Id: winnerTeamId }
+            : { team2Id: winnerTeamId };
         await tx
           .update(tournamentGame)
           .set(update)
