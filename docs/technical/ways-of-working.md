@@ -52,63 +52,33 @@ Keep entries short. Only log decisions where the "why" isn't obvious from the co
 
 ---
 
-## 3. Self-Code Review
+## 3. Pre-Review (Self-Code Review + Checklist)
 
-Before running the pre-review checklist, perform a self-code review using a **separate agent** to avoid bias. The implementing agent must not review its own code.
+Before marking a task `ready-for-review`, run the `/pre-review` skill:
 
-Launch a review agent with this prompt:
-
-> Read `docs/tasks/<task-file>.md` to understand what was done.
-> Read `docs/business/backlog.md` story #N for acceptance criteria.
-> Read `docs/technical/standards.md` for code standards.
-> Review all files listed in "Changes Made" against the criteria and standards.
-> Pay special attention to:
->
-> - **Transactions**: Any function with multiple DB writes must use a transaction. Any server action that calls multiple write functions must wrap them in a single transaction, passing `tx` to each.
-> - **Security**: Auth checks, input validation, ownership verification.
-> - **Standards compliance**: Naming, file organization, error handling patterns.
->   Report: criteria coverage, standards violations, and suggestions. Do not modify code.
-
-Fix all issues found before proceeding to the pre-review checklist.
-
----
-
-## 4. Pre-Review Checklist
-
-Before marking a task `ready-for-review`, run the following commands and fix any issues:
-
-1. `pnpm format` — auto-format all files with Prettier
-2. `pnpm lint` — must pass with zero errors and zero warnings
-3. `pnpm build` — must compile with zero TypeScript errors
-
-Then verify:
-
-- [ ] Self-code review has been run (section 3) and all issues resolved
-- [ ] All acceptance criteria from `docs/business/backlog.md` are met
-- [ ] Code follows `docs/technical/standards.md`
-- [ ] No unrelated changes included
-- [ ] New/changed functionality has tests (deferred to post-MVP)
-- [ ] Existing tests still pass (deferred to post-MVP)
-- [ ] `pnpm format` has been run
-- [ ] `pnpm lint` passes with zero errors/warnings
-- [ ] `pnpm build` compiles without errors
-
-Add the results to the task file:
-
-```markdown
-## Verification
-
-- Self-code review: done (issues found / no issues)
-- Tests: pass/fail (details)
-- Format: run
-- Lint: pass/fail
-- Build: pass/fail
-- Acceptance criteria: all met / <list gaps>
+```
+/pre-review <task-file-name>
 ```
 
+Example: `/pre-review 9-create-bracket-entry`
+
+This skill automates the full pre-review process:
+
+1. **Self-code review** — launches a separate agent to review changes against acceptance criteria and code standards (transactions, security, naming)
+2. **Automated checks** — runs `pnpm format`, `pnpm lint`, and `pnpm build`, fixing issues as needed
+3. **Acceptance criteria verification** — confirms all criteria from `docs/business/backlog.md` are met
+4. **Task file update** — adds a `## Verification` section with results
+
+If you need to run individual checks manually:
+- `pnpm format` — auto-format all files with Prettier
+- `pnpm lint` — must pass with zero errors and zero warnings
+- `pnpm build` — must compile with zero TypeScript errors
+
+> **Note:** The auto-format hook in `.claude/settings.json` runs Prettier automatically on every file Claude edits, so formatting issues should be rare.
+
 ---
 
-## 5. Human Review
+## 4. Human Review
 
 After automated checks pass and the task is marked `ready-for-review`:
 
@@ -121,7 +91,7 @@ Do not merge or mark `done` without human approval.
 
 ---
 
-## 6. Feedback Loop
+## 5. Feedback Loop
 
 When feedback is given during a Claude Code session (corrections, preferences, patterns to follow or avoid):
 

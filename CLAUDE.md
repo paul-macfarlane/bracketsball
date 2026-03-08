@@ -14,6 +14,12 @@ Next.js (TypeScript), Postgres (Neon), ShadCN + Tailwind, React Hook Form, Bette
 - `docs/technical/standards.md` — Codebase standards (WIP).
 - `docs/technical/ways-of-working.md` — How Claude Code should operate: task tracking, decision logging, review process, testing, and feedback loops. **Read this before starting any task.**
 
+## Claude Code Skills
+
+- **`/pre-review`** — Run this before marking any task `ready-for-review`. It automates self-code review, format/lint/build checks, acceptance criteria verification, and task file updates. See `docs/technical/ways-of-working.md` section 3.
+- **`/review-pr`** — Use for automated PR code reviews.
+- **Auto-format hook** — Prettier runs automatically on every file edit (configured in `.claude/settings.json`).
+
 ## Domain Concepts
 
 - **Pool**: A group competition with configurable scoring, max brackets per user (1-10), and max participants (2-100). Has leaders and members.
