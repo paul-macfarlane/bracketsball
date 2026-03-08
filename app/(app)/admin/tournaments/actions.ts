@@ -9,6 +9,7 @@ import {
   createTournamentSchema,
   addTournamentTeamSchema,
   updateGameSchema,
+  bracketPositionsSchema,
 } from "@/lib/validators/tournament";
 import { db } from "@/lib/db";
 import { tournamentGame } from "@/lib/db/schema";
@@ -48,9 +49,7 @@ async function requireAdmin() {
 
 async function hasAnyGameStarted(tournamentId: string) {
   const games = await getTournamentGames(tournamentId);
-  return games.some(
-    (g) => g.status === "in_progress" || g.status === "final",
-  );
+  return games.some((g) => g.status === "in_progress" || g.status === "final");
 }
 
 /**
@@ -253,6 +252,76 @@ export async function removeTeamFromTournamentAction(
   revalidatePath(`/admin/tournaments/${tournamentId}/games`);
 }
 
+export async function updateBracketPositionsAction(
+  tournamentId: string,
+  formData: unknown,
+) {
+  await requireAdmin();
+
+  if (await hasAnyGameStarted(tournamentId)) {
+    return {
+      error:
+        "Cannot modify bracket positions after a game has started. Reset all games to scheduled first.",
+    };
+  }
+
+  const parsed = bracketPositionsSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const result = await updateTournament(tournamentId, parsed.data);
+  if (!result) {
+    return { error: "Tournament not found" };
+  }
+
+  // Re-wire Final Four source game references to match the new positions
+  const games = await getTournamentGames(tournamentId);
+  if (games.length > 0) {
+    const elite8Games = games.filter((g) => g.round === "elite_8");
+    const finalFourGames = games.filter((g) => g.round === "final_four");
+
+    if (elite8Games.length === 4 && finalFourGames.length === 2) {
+      const e8ByRegion = new Map(elite8Games.map((g) => [g.region, g]));
+
+      const topLeftE8 = e8ByRegion.get(parsed.data.bracketTopLeftRegion);
+      const bottomLeftE8 = e8ByRegion.get(parsed.data.bracketBottomLeftRegion);
+      const topRightE8 = e8ByRegion.get(parsed.data.bracketTopRightRegion);
+      const bottomRightE8 = e8ByRegion.get(
+        parsed.data.bracketBottomRightRegion,
+      );
+
+      if (topLeftE8 && bottomLeftE8 && topRightE8 && bottomRightE8) {
+        // Sort FF games by gameNumber so assignment is stable
+        const sorted = [...finalFourGames].sort(
+          (a, b) => a.gameNumber - b.gameNumber,
+        );
+
+        // FF game 1 (left side): top-left vs bottom-left
+        await db
+          .update(tournamentGame)
+          .set({
+            sourceGame1Id: topLeftE8.id,
+            sourceGame2Id: bottomLeftE8.id,
+          })
+          .where(eq(tournamentGame.id, sorted[0].id));
+
+        // FF game 2 (right side): top-right vs bottom-right
+        await db
+          .update(tournamentGame)
+          .set({
+            sourceGame1Id: topRightE8.id,
+            sourceGame2Id: bottomRightE8.id,
+          })
+          .where(eq(tournamentGame.id, sorted[1].id));
+      }
+    }
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+}
+
 export async function updateGameAction(
   gameId: string,
   tournamentId: string,
@@ -310,10 +379,7 @@ export async function updateGameAction(
           .update(tournamentGame)
           .set(update)
           .where(eq(tournamentGame.id, nextGame.id));
-      } else if (
-        parsed.data.status === "final" &&
-        parsed.data.winnerTeamId
-      ) {
+      } else if (parsed.data.status === "final" && parsed.data.winnerTeamId) {
         // Advance the winner to the next round
         const update =
           nextGame.sourceGame1Id === gameId

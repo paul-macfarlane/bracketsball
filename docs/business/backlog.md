@@ -253,9 +253,26 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ---
 
+## Epic: Scoring & Standings
+
+### 15. Live Bracket Scoring & Standings (MVP)
+
+**As a** pool member, **I want** bracket standings to update automatically as game results are recorded **so that** I can track how I and others are performing in real time.
+
+**Acceptance Criteria:**
+
+- When a game result is recorded (via admin UI or ESPN sync), all bracket entries with picks for that game have their scores recalculated
+- Each pick is scored based on the pool's round-based scoring settings
+- Pool standings reflect current scores and are viewable by all pool members
+- Potential remaining points are calculated for each bracket entry (max points still achievable)
+- Standings are ordered by: points (desc), potential points (desc), tiebreaker accuracy, then alphabetical
+- Architecture decision needed: evaluate event-driven (recalculate on game update) vs. on-demand (recalculate on standings view) vs. periodic batch approach
+
+---
+
 ## Non-MVP Stories
 
-### 15. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
+### 16. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
 
 **As a** pool leader, **I want to** customize scoring per round **so that** I can tailor the pool's competitiveness.
 
@@ -265,7 +282,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Only pool leaders can edit scoring
 - Changes are locked once tournament games begin
 
-### 16. In-App User Invites (Non-MVP) — Epic: Pool Members
+### 17. In-App User Invites (Non-MVP) — Epic: Pool Members
 
 **As a** pool member, **I want to** invite existing users by searching for them **so that** I don't need to share a link externally.
 
@@ -275,7 +292,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Selected users receive an in-app invite notification
 - Invited users can accept or decline
 
-### 17. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
+### 18. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
 
 **As a** pool leader, **I want to** make my pool public or private **so that** I can control who can discover and join it.
 
@@ -286,7 +303,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Public pools appear in search results
 - Toggle available at creation and in settings
 
-### 18. Theme Toggle (Non-MVP) — Epic: UX
+### 19. Theme Toggle (Non-MVP) — Epic: UX
 
 **As a** user, **I want to** switch between light, dark, and system theme modes **so that** I can use the app comfortably in any lighting condition.
 
@@ -297,7 +314,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Toggle is accessible from the user dropdown menu (desktop) and mobile navigation menu
 - System mode automatically follows the user's OS preference
 
-### 19. Public Pool Search (Non-MVP) — Epic: Public Pools
+### 20. Public Pool Search (Non-MVP) — Epic: Public Pools
 
 **As a** user, **I want to** search for public pools **so that** I can find and join open competitions.
 
@@ -310,30 +327,49 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ---
 
+## Epic: Tech Debt
+
+### 21. Transaction Audit (Non-MVP) — Epic: Tech Debt
+
+**As a** developer, **I want to** audit all existing query functions and server actions for missing transactions **so that** data integrity is guaranteed across the app.
+
+**Acceptance Criteria:**
+
+- Audit all files in `lib/db/queries/` for functions that perform multiple DB writes without a transaction
+- Audit all server actions for action functions that call multiple write query functions without wrapping in a transaction
+- All query functions that perform multiple writes use `db.transaction()`
+- All server actions that call multiple write functions accept/pass a `DbClient` parameter and wrap writes in a single transaction
+- Add `DbClient` optional parameter to query functions that need to participate in action-level transactions
+- Document any functions that were fixed
+
+---
+
 ## Summary
 
-| #   | Story                              | Epic               | MVP |
-| --- | ---------------------------------- | ------------------ | --- |
-| 0   | Tech Stack Setup                   | Tech Stack Setup   | Yes |
-| 1   | Social Login                       | Auth               | Yes |
-| 2   | Profile Management                 | Profile            | Yes |
-| 3   | Account Deletion                   | Account            | Yes |
-| 4   | Create Bracket Pool                | Pools Setup        | Yes |
-| 5   | Manage Bracket Pool Settings       | Pool Settings      | Yes |
-| 6a  | Admin Tournament Management        | Sports Data        | Yes |
-| 6b  | ESPN Data Sync                     | Sports Data        | Yes |
-| 7   | Bracket Pool Invite Links          | Pool Members       | Yes |
-| 8   | Manage Pool Members                | Pool Members       | Yes |
-| 9   | Create Bracket Entry               | Bracket Creation   | Yes |
-| 10  | Edit Bracket Entry                 | Bracket Creation   | Yes |
-| 11  | View Own Brackets                  | Bracket Visibility | Yes |
-| 12  | View Other Members' Brackets       | Bracket Visibility | Yes |
-| 13  | View Pool Standings                | Bracket Visibility | Yes |
-| 14  | View Individual Bracket Detail     | Bracket Visibility | Yes |
-| 15  | Manage Bracket Scoring Settings    | Pool Settings      | No  |
-| 16  | In-App User Invites                | Pool Members       | No  |
-| 17  | Bracket Pool Public/Private Toggle | Public Pools       | No  |
-| 18  | Theme Toggle                       | UX                 | No  |
-| 19  | Public Pool Search                 | Public Pools       | No  |
+| #   | Story                              | Epic                 | MVP |
+| --- | ---------------------------------- | -------------------- | --- |
+| 0   | Tech Stack Setup                   | Tech Stack Setup     | Yes |
+| 1   | Social Login                       | Auth                 | Yes |
+| 2   | Profile Management                 | Profile              | Yes |
+| 3   | Account Deletion                   | Account              | Yes |
+| 4   | Create Bracket Pool                | Pools Setup          | Yes |
+| 5   | Manage Bracket Pool Settings       | Pool Settings        | Yes |
+| 6a  | Admin Tournament Management        | Sports Data          | Yes |
+| 6b  | ESPN Data Sync                     | Sports Data          | Yes |
+| 7   | Bracket Pool Invite Links          | Pool Members         | Yes |
+| 8   | Manage Pool Members                | Pool Members         | Yes |
+| 9   | Create Bracket Entry               | Bracket Creation     | Yes |
+| 10  | Edit Bracket Entry                 | Bracket Creation     | Yes |
+| 11  | View Own Brackets                  | Bracket Visibility   | Yes |
+| 12  | View Other Members' Brackets       | Bracket Visibility   | Yes |
+| 13  | View Pool Standings                | Bracket Visibility   | Yes |
+| 14  | View Individual Bracket Detail     | Bracket Visibility   | Yes |
+| 15  | Live Bracket Scoring & Standings   | Scoring & Standings  | Yes |
+| 16  | Manage Bracket Scoring Settings    | Pool Settings        | No  |
+| 17  | In-App User Invites                | Pool Members         | No  |
+| 18  | Bracket Pool Public/Private Toggle | Public Pools         | No  |
+| 19  | Theme Toggle                       | UX                   | No  |
+| 20  | Public Pool Search                 | Public Pools         | No  |
+| 21  | Transaction Audit                  | Tech Debt            | No  |
 
-**MVP Total: 16 stories** | **Post-MVP: 5 stories**
+**MVP Total: 17 stories** | **Post-MVP: 6 stories**

@@ -1,7 +1,7 @@
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, or, ne } from "drizzle-orm";
 
 import { db } from "@/lib/db";
-import { pool, poolMember } from "@/lib/db/schema";
+import { pool, poolMember, tournament, tournamentGame } from "@/lib/db/schema";
 
 interface CreatePoolData {
   name: string;
@@ -119,15 +119,32 @@ export async function deletePool(poolId: string) {
   await db.delete(pool).where(eq(pool.id, poolId));
 }
 
-// TODO: Implement once bracket entries exist (Story #8)
 export async function getMaxBracketCountInPool(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   poolId: string,
 ): Promise<number> {
-  return 0;
+  const { getMaxBracketCountForPool } = await import("./bracket-entries");
+  return getMaxBracketCountForPool(poolId);
 }
 
-// TODO: Implement once sports data sync exists (Story #6)
 export async function hasTournamentStarted(): Promise<boolean> {
-  return false;
+  const [activeTournament] = await db
+    .select({ id: tournament.id })
+    .from(tournament)
+    .where(eq(tournament.isActive, true))
+    .limit(1);
+
+  if (!activeTournament) return false;
+
+  const [startedGame] = await db
+    .select({ id: tournamentGame.id })
+    .from(tournamentGame)
+    .where(
+      and(
+        eq(tournamentGame.tournamentId, activeTournament.id),
+        or(ne(tournamentGame.status, "scheduled")),
+      ),
+    )
+    .limit(1);
+
+  return !!startedGame;
 }

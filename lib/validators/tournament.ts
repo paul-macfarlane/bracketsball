@@ -69,3 +69,25 @@ export const updateGameSchema = z.object({
 });
 
 export type UpdateGameFormValues = z.infer<typeof updateGameSchema>;
+
+export const bracketPositionsSchema = z
+  .object({
+    bracketTopLeftRegion: z.enum(TOURNAMENT_REGIONS),
+    bracketBottomLeftRegion: z.enum(TOURNAMENT_REGIONS),
+    bracketTopRightRegion: z.enum(TOURNAMENT_REGIONS),
+    bracketBottomRightRegion: z.enum(TOURNAMENT_REGIONS),
+  })
+  .refine(
+    (data) => {
+      const regions = new Set([
+        data.bracketTopLeftRegion,
+        data.bracketBottomLeftRegion,
+        data.bracketTopRightRegion,
+        data.bracketBottomRightRegion,
+      ]);
+      return regions.size === 4;
+    },
+    { message: "All four regions must be different" },
+  );
+
+export type BracketPositionsFormValues = z.infer<typeof bracketPositionsSchema>;
