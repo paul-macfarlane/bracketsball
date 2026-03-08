@@ -108,19 +108,38 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Sports Data
 
-### 6. Sports Data Sync (MVP)
+### 6a. Admin Tournament Management (MVP)
 
-**As the** system, **I need to** sync live tournament data **so that** brackets can be scored accurately and users have game data to make their picks.
+**As an** admin, **I want to** manage teams, tournaments, and game data via an admin UI **so that** tournament data can be entered and corrected manually, serving as both a primary data entry method for testing and a fallback/override for automated sync.
 
 **Acceptance Criteria:**
 
-- Sync bracket/game structure (regions, seeds, matchups)
+- Users have an `appRole` field (default: "user", can be set to "admin" via database)
+- Admin-only routes are protected — non-admin users are redirected
+- Admin can CRUD teams (name, short name, abbreviation, logo URL)
+- Admin can CRUD tournaments (name, year, active status); only one tournament can be active at a time
+- Admin can assign teams to a tournament with seed and region
+- Admin can manage tournament games (create matchups, set round/region, assign teams)
+- Admin can update game results (scores, status: scheduled/in_progress/final)
+- Admin can advance winners to the next round
+- Seed scripts exist to populate 68 real 2025 NCAA tournament teams and a mock tournament bracket for testing
+- Data model supports: persistent teams, tournaments, tournament_team assignments, tournament games with bracket tree structure (source game references)
+
+### 6b. ESPN Data Sync (MVP — separate implementation)
+
+**As the** system, **I need to** sync live tournament data from ESPN **so that** brackets are scored automatically without manual data entry.
+
+**Acceptance Criteria:**
+
+- Sync bracket/game structure (regions, seeds, matchups) from ESPN scoreboard API
 - Sync team info (name, seed, logo/abbreviation)
-- Sync game scoring (team scores, period, time remaining, game status)
+- Sync game scoring (team scores, game status)
 - Sync game schedule (date, time, location)
-- Data source: ESPN API via [this reference](https://gist.github.com/akeaswaran/b48b02f1c94f873c6655e7129910fc3b)
+- Data source: ESPN hidden API (see [research doc](../technical/sports-data-source-research.md))
 - Sync runs on a scheduled cron (via cron-job.org)
 - Handles in-progress, completed, and upcoming game states
+- Built behind an adapter interface so NCAA API can be swapped in as backup
+- Admin UI can override any synced data
 
 ---
 
@@ -301,7 +320,8 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 3   | Account Deletion                   | Account            | Yes |
 | 4   | Create Bracket Pool                | Pools Setup        | Yes |
 | 5   | Manage Bracket Pool Settings       | Pool Settings      | Yes |
-| 6   | Sports Data Sync                   | Sports Data        | Yes |
+| 6a  | Admin Tournament Management        | Sports Data        | Yes |
+| 6b  | ESPN Data Sync                     | Sports Data        | Yes |
 | 7   | Bracket Pool Invite Links          | Pool Members       | Yes |
 | 8   | Manage Pool Members                | Pool Members       | Yes |
 | 9   | Create Bracket Entry               | Bracket Creation   | Yes |
@@ -316,4 +336,4 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 18  | Theme Toggle                       | UX                 | No  |
 | 19  | Public Pool Search                 | Public Pools       | No  |
 
-**MVP Total: 15 stories** | **Post-MVP: 5 stories**
+**MVP Total: 16 stories** | **Post-MVP: 5 stories**

@@ -1,0 +1,331 @@
+"use server";
+
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+
+import { auth } from "@/lib/auth";
+import {
+  createTournamentSchema,
+  addTournamentTeamSchema,
+  updateGameSchema,
+} from "@/lib/validators/tournament";
+import { db } from "@/lib/db";
+import { tournamentGame } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import {
+  createTournament,
+  updateTournament,
+  deleteTournament,
+  addTeamToTournament,
+  updateTournamentTeam,
+  removeTeamFromTournament,
+  getTournamentTeams,
+  getTournamentGames,
+} from "@/lib/db/queries/tournaments";
+
+// Standard NCAA bracket seeding matchups for R64
+const R64_SEED_MATCHUPS: [number, number][] = [
+  [1, 16],
+  [8, 9],
+  [5, 12],
+  [4, 13],
+  [6, 11],
+  [3, 14],
+  [7, 10],
+  [2, 15],
+];
+
+async function requireAdmin() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session || session.user.appRole !== "admin") {
+    throw new Error("Unauthorized");
+  }
+  return session;
+}
+
+async function hasAnyGameStarted(tournamentId: string) {
+  const games = await getTournamentGames(tournamentId);
+  return games.some(
+    (g) => g.status === "in_progress" || g.status === "final",
+  );
+}
+
+/**
+ * After team roster or seed changes, re-sync team placements in R64 games.
+ * Only updates games that are still in "scheduled" status.
+ */
+async function syncBracketTeams(tournamentId: string) {
+  const [teams, games] = await Promise.all([
+    getTournamentTeams(tournamentId),
+    getTournamentGames(tournamentId),
+  ]);
+
+  if (games.length === 0) return;
+
+  // Build lookup: region -> seed -> teamId
+  const teamLookup = new Map<string, Map<number, string>>();
+  for (const tt of teams) {
+    if (!teamLookup.has(tt.region)) {
+      teamLookup.set(tt.region, new Map());
+    }
+    // For duplicate seeds (First Four), the first one wins in the map.
+    // First Four games handle these separately — R64 games with sourceGame
+    // references won't use the lookup anyway.
+    const regionMap = teamLookup.get(tt.region)!;
+    if (!regionMap.has(tt.seed)) {
+      regionMap.set(tt.seed, tt.teamId);
+    }
+  }
+
+  // Find seeds that have duplicates (First Four play-in seeds)
+  const firstFourSeeds = new Map<string, Set<number>>();
+  for (const tt of teams) {
+    if (!firstFourSeeds.has(tt.region)) {
+      firstFourSeeds.set(tt.region, new Set());
+    }
+    const count = teams.filter(
+      (t) => t.region === tt.region && t.seed === tt.seed,
+    ).length;
+    if (count > 1) {
+      firstFourSeeds.get(tt.region)!.add(tt.seed);
+    }
+  }
+
+  const r64Games = games.filter((g) => g.round === "round_of_64");
+
+  for (const game of r64Games) {
+    if (game.status !== "scheduled") continue;
+    if (!game.region) continue;
+
+    const region = game.region;
+    const matchup = R64_SEED_MATCHUPS[game.gameNumber - 1];
+    if (!matchup) continue;
+
+    const [highSeed, lowSeed] = matchup;
+    const seeds = teamLookup.get(region);
+    const ffSeeds = firstFourSeeds.get(region) ?? new Set();
+
+    // If this seed has a First Four game feeding into it, don't override the team
+    // (it comes from a sourceGame reference instead)
+    const team1Id =
+      game.sourceGame1Id || ffSeeds.has(highSeed)
+        ? game.team1Id
+        : (seeds?.get(highSeed) ?? null);
+    const team2Id =
+      game.sourceGame2Id || ffSeeds.has(lowSeed)
+        ? game.team2Id
+        : (seeds?.get(lowSeed) ?? null);
+
+    if (team1Id !== game.team1Id || team2Id !== game.team2Id) {
+      await db
+        .update(tournamentGame)
+        .set({ team1Id, team2Id })
+        .where(eq(tournamentGame.id, game.id));
+    }
+  }
+}
+
+export async function createTournamentAction(formData: unknown) {
+  await requireAdmin();
+  const parsed = createTournamentSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const result = await createTournament(parsed.data);
+  redirect(`/admin/tournaments/${result.id}`);
+}
+
+export async function updateTournamentAction(id: string, formData: unknown) {
+  await requireAdmin();
+  const parsed = createTournamentSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const result = await updateTournament(id, parsed.data);
+  if (!result) {
+    return { error: "Tournament not found" };
+  }
+
+  revalidatePath(`/admin/tournaments/${id}`);
+  revalidatePath("/admin/tournaments");
+}
+
+export async function deleteTournamentAction(id: string) {
+  await requireAdmin();
+  await deleteTournament(id);
+  redirect("/admin/tournaments");
+}
+
+export async function toggleTournamentActiveAction(
+  id: string,
+  isActive: boolean,
+) {
+  await requireAdmin();
+  await updateTournament(id, { isActive });
+  revalidatePath(`/admin/tournaments/${id}`);
+  revalidatePath("/admin/tournaments");
+}
+
+export async function addTeamToTournamentAction(
+  tournamentId: string,
+  formData: unknown,
+) {
+  await requireAdmin();
+
+  if (await hasAnyGameStarted(tournamentId)) {
+    return {
+      error:
+        "Cannot modify teams after a game has started. Reset all games to scheduled first.",
+    };
+  }
+
+  const parsed = addTournamentTeamSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  try {
+    await addTeamToTournament({
+      tournamentId,
+      ...parsed.data,
+    });
+  } catch {
+    return { error: "Team may already be in this tournament" };
+  }
+
+  await syncBracketTeams(tournamentId);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+}
+
+export async function updateTournamentTeamAction(
+  tournamentId: string,
+  tournamentTeamId: string,
+  formData: unknown,
+) {
+  await requireAdmin();
+
+  if (await hasAnyGameStarted(tournamentId)) {
+    return {
+      error:
+        "Cannot modify teams after a game has started. Reset all games to scheduled first.",
+    };
+  }
+
+  const parsed = addTournamentTeamSchema
+    .pick({ seed: true, region: true })
+    .safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const result = await updateTournamentTeam(tournamentTeamId, parsed.data);
+  if (!result) {
+    return { error: "Tournament team not found" };
+  }
+
+  await syncBracketTeams(tournamentId);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+}
+
+export async function removeTeamFromTournamentAction(
+  tournamentId: string,
+  tournamentTeamId: string,
+) {
+  await requireAdmin();
+
+  if (await hasAnyGameStarted(tournamentId)) {
+    return {
+      error:
+        "Cannot modify teams after a game has started. Reset all games to scheduled first.",
+    };
+  }
+
+  await removeTeamFromTournament(tournamentTeamId);
+  await syncBracketTeams(tournamentId);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+}
+
+export async function updateGameAction(
+  gameId: string,
+  tournamentId: string,
+  formData: unknown,
+) {
+  await requireAdmin();
+  const parsed = updateGameSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const games = await getTournamentGames(tournamentId);
+  const currentGame = games.find((g) => g.id === gameId);
+  if (!currentGame) {
+    return { error: "Game not found" };
+  }
+
+  const nextGame = games.find(
+    (g) => g.sourceGame1Id === gameId || g.sourceGame2Id === gameId,
+  );
+
+  // If resetting a completed game (changing status away from final, or clearing winner)
+  const isResetting =
+    currentGame.status === "final" &&
+    (parsed.data.status !== "final" || parsed.data.winnerTeamId === null);
+
+  if (isResetting && nextGame) {
+    if (nextGame.status === "in_progress" || nextGame.status === "final") {
+      return {
+        error:
+          "Cannot reset this game because the next round game is already in progress or completed. Undo that game first.",
+      };
+    }
+  }
+
+  await db.transaction(async (tx) => {
+    const [result] = await tx
+      .update(tournamentGame)
+      .set(parsed.data)
+      .where(eq(tournamentGame.id, gameId))
+      .returning();
+
+    if (!result) {
+      throw new Error("Game not found");
+    }
+
+    if (nextGame) {
+      if (isResetting) {
+        // Remove this game's winner from the next round game
+        const update =
+          nextGame.sourceGame1Id === gameId
+            ? { team1Id: null }
+            : { team2Id: null };
+        await tx
+          .update(tournamentGame)
+          .set(update)
+          .where(eq(tournamentGame.id, nextGame.id));
+      } else if (
+        parsed.data.status === "final" &&
+        parsed.data.winnerTeamId
+      ) {
+        // Advance the winner to the next round
+        const update =
+          nextGame.sourceGame1Id === gameId
+            ? { team1Id: parsed.data.winnerTeamId }
+            : { team2Id: parsed.data.winnerTeamId };
+        await tx
+          .update(tournamentGame)
+          .set(update)
+          .where(eq(tournamentGame.id, nextGame.id));
+      }
+    }
+  });
+
+  revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+}
