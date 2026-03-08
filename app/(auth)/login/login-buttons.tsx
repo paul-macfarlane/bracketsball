@@ -7,7 +7,7 @@ export function LoginButtons({ callbackUrl }: { callbackUrl?: string }) {
   const handleSignIn = (provider: "google" | "discord") => {
     authClient.signIn.social({
       provider,
-      callbackURL: callbackUrl ?? "/dashboard",
+      callbackURL: callbackUrl ?? "/pools",
     });
   };
 

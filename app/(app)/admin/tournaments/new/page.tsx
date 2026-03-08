@@ -6,7 +6,7 @@ import { TournamentForm } from "./tournament-form";
 
 export default function NewTournamentPage() {
   return (
-    <div className="mx-auto max-w-2xl">
+    <div>
       <Link
         href="/admin/tournaments"
         className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"

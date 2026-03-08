@@ -40,7 +40,7 @@ export function DeleteAccountForm() {
   }
 
   return (
-    <Card className="border-destructive w-full max-w-md">
+    <Card className="border-destructive w-full">
       <CardHeader>
         <CardTitle className="text-destructive">Delete Account</CardTitle>
         <CardDescription>

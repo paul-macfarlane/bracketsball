@@ -9,7 +9,7 @@ export default async function ProfilePage() {
   });
 
   return (
-    <div className="flex flex-col items-center py-10">
+    <div className="mx-auto max-w-2xl py-10">
       <ProfileForm
         defaultValues={{
           name: session!.user.name,

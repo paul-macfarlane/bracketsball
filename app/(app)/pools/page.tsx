@@ -22,7 +22,7 @@ export default async function PoolsPage() {
   const pools = session ? await getPoolsByUserId(session.user.id) : [];
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">My Pools</h1>
         <Button asChild>

@@ -60,15 +60,13 @@ export function GameRow({
     game.team2Score?.toString() ?? "",
   );
   const [status, setStatus] = useState(game.status);
-  const [winnerId, setWinnerId] = useState(game.winnerTeamId ?? "");
-
   async function handleSave() {
     setIsPending(true);
+
     const result = await updateGameAction(game.id, tournamentId, {
       team1Score: team1Score ? parseInt(team1Score, 10) : null,
       team2Score: team2Score ? parseInt(team2Score, 10) : null,
       status,
-      winnerTeamId: winnerId && winnerId !== "none" ? winnerId : null,
     });
     if (result?.error) {
       toast.error(result.error);
@@ -130,40 +128,21 @@ export function GameRow({
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-          <div>
-            <label className="mb-1 block text-xs font-medium">Status</label>
-            <Select
-              value={status}
-              onValueChange={(v) => setStatus(v as typeof status)}
-            >
-              <SelectTrigger className="h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="final">Final</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium">Winner</label>
-            <Select value={winnerId} onValueChange={setWinnerId}>
-              <SelectTrigger className="h-8 truncate">
-                <SelectValue placeholder="Select winner" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                {game.team1Id && team1 && (
-                  <SelectItem value={game.team1Id}>{team1.name}</SelectItem>
-                )}
-                {game.team2Id && team2 && (
-                  <SelectItem value={game.team2Id}>{team2.name}</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium">Status</label>
+          <Select
+            value={status}
+            onValueChange={(v) => setStatus(v as typeof status)}
+          >
+            <SelectTrigger className="h-8 w-full sm:w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="final">Final</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex gap-2">
           <Button size="sm" onClick={handleSave} disabled={isPending}>

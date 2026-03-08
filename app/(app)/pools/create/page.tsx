@@ -9,7 +9,7 @@ import { CreatePoolForm } from "./create-pool-form";
 
 export default function CreatePoolPage() {
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-5xl">
       <Card>
         <CardHeader>
           <CardTitle>Create a Bracket Pool</CardTitle>
