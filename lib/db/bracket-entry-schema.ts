@@ -35,6 +35,8 @@ export const bracketEntry = pgTable(
     name: text("name").notNull(),
     tiebreakerScore: integer("tiebreaker_score"),
     status: bracketEntryStatusEnum("status").notNull().default("draft"),
+    totalPoints: integer("total_points").notNull().default(0),
+    potentialPoints: integer("potential_points").notNull().default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

@@ -9,6 +9,8 @@ export interface BracketGame {
   sourceGame2Id: string | null;
   winnerTeamId: string | null;
   status: string;
+  team1Score: number | null;
+  team2Score: number | null;
 }
 
 export interface BracketTeam {

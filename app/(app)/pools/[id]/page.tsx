@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { getPoolById } from "@/lib/db/queries/pools";
@@ -11,6 +12,7 @@ import {
   getBracketEntryCountForUser,
 } from "@/lib/db/queries/bracket-entries";
 import { getActiveTournament } from "@/lib/db/queries/tournaments";
+import { hasTournamentStarted } from "@/lib/db/queries/pools";
 import {
   canAccessPoolPage,
   canPerformPoolAction,
@@ -58,7 +60,10 @@ export default async function PoolDetailPage({
   const remainingCapacity =
     poolData.pool.maxParticipants - poolData.memberCount;
 
-  const activeTournament = await getActiveTournament();
+  const [activeTournament, tournamentStarted] = await Promise.all([
+    getActiveTournament(),
+    hasTournamentStarted(),
+  ]);
   const bracketEntries = activeTournament
     ? await getBracketEntriesByPoolAndUser(id, session.user.id)
     : [];
@@ -66,7 +71,9 @@ export default async function PoolDetailPage({
     ? await getBracketEntryCountForUser(id, session.user.id)
     : 0;
   const canCreateBracket =
-    !!activeTournament && bracketCount < poolData.pool.maxBracketsPerUser;
+    !!activeTournament &&
+    !tournamentStarted &&
+    bracketCount < poolData.pool.maxBracketsPerUser;
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -127,7 +134,7 @@ export default async function PoolDetailPage({
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>My Brackets</CardTitle>
-              {activeTournament && (
+              {activeTournament && !tournamentStarted && (
                 <CreateBracketDialog
                   poolId={id}
                   canCreate={canCreateBracket}
@@ -153,13 +160,16 @@ export default async function PoolDetailPage({
                     className="flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-muted"
                   >
                     <span className="font-medium">{entry.name}</span>
-                    <Badge
-                      variant={
-                        entry.status === "submitted" ? "default" : "secondary"
-                      }
-                    >
-                      {entry.status === "submitted" ? "Submitted" : "Draft"}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          entry.status === "submitted" ? "default" : "secondary"
+                        }
+                      >
+                        {entry.status === "submitted" ? "Submitted" : "Draft"}
+                      </Badge>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
                   </Link>
                 ))}
               </div>
@@ -177,7 +187,7 @@ export default async function PoolDetailPage({
           currentMembershipId={poolData.membership.id}
         />
       </div>
-      {isLeader && (
+      {isLeader && !tournamentStarted && (
         <div className="mt-6">
           <InviteList
             poolId={id}
