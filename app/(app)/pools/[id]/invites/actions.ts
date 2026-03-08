@@ -6,7 +6,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { createPoolInviteSchema } from "@/lib/validators/pool-invite";
 import { canPerformPoolAction } from "@/lib/permissions/pools";
-import { getPoolById } from "@/lib/db/queries/pools";
+import { getPoolById, hasTournamentStarted } from "@/lib/db/queries/pools";
 import {
   createPoolInvite,
   deletePoolInvite,
@@ -41,6 +41,11 @@ export async function createInviteAction(poolId: string, formData: unknown) {
 
   if (!canPerformPoolAction(poolData.membership.role, "create-invite")) {
     return { error: "You do not have permission to create invites" };
+  }
+
+  const started = await hasTournamentStarted();
+  if (started) {
+    return { error: "Cannot create invites after the tournament has started" };
   }
 
   const { formData: data } = inputParsed.data;

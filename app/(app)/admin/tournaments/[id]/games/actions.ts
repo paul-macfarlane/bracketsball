@@ -11,6 +11,7 @@ import {
   getTournamentTeams,
   getTournamentGames,
 } from "@/lib/db/queries/tournaments";
+import { syncStandingsForTournament } from "@/lib/db/queries/standings";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({
@@ -196,4 +197,18 @@ export async function generateBracketAction(tournamentId: string) {
   });
 
   revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+}
+
+export async function syncStandingsAction(tournamentId: string) {
+  await requireAdmin();
+
+  const tournament = await getTournamentById(tournamentId);
+  if (!tournament) {
+    return { error: "Tournament not found." };
+  }
+
+  const { updatedCount } = await syncStandingsForTournament(tournamentId);
+
+  revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+  return { success: true, updatedCount };
 }

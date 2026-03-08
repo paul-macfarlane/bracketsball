@@ -26,6 +26,7 @@ interface BracketFullViewProps {
   onPick: (gameId: string, teamId: string) => void;
   disabled?: boolean;
   bracketPositions?: BracketPositions;
+  roundPointsMap?: Map<string, number>;
 }
 
 // Bracket converges from both sides toward the center:
@@ -49,6 +50,7 @@ export function BracketFullView({
   onPick,
   disabled = false,
   bracketPositions = DEFAULT_BRACKET_POSITIONS,
+  roundPointsMap,
 }: BracketFullViewProps) {
   const LEFT_REGIONS = useMemo(
     () => [bracketPositions.topLeft, bracketPositions.bottomLeft],
@@ -58,6 +60,7 @@ export function BracketFullView({
     () => [bracketPositions.topRight, bracketPositions.bottomRight],
     [bracketPositions.topRight, bracketPositions.bottomRight],
   );
+
   const gamesByRegionAndRound = useMemo(() => {
     const map = new Map<string, BracketGame[]>();
     for (const game of games) {
@@ -152,6 +155,23 @@ export function BracketFullView({
     return { left: check(LEFT_REGIONS), right: check(RIGHT_REGIONS) };
   }, [gamesByRegionAndRound, firstFourByR64Game, LEFT_REGIONS, RIGHT_REGIONS]);
 
+  function renderMatchup(game: BracketGame) {
+    const [team1, team2] = getTeamsForGame(game.id);
+    return (
+      <MatchupCard
+        gameId={game.id}
+        team1={team1}
+        team2={team2}
+        pickedTeamId={picks.get(game.id) ?? null}
+        onPick={onPick}
+        disabled={disabled}
+        winnerTeamId={game.winnerTeamId}
+        gameStatus={game.status}
+        roundPoints={roundPointsMap?.get(game.round) ?? 0}
+      />
+    );
+  }
+
   return (
     <div className="overflow-x-auto pb-4">
       <div className="flex min-w-[1400px] items-stretch gap-0">
@@ -170,6 +190,7 @@ export function BracketFullView({
               disabled={disabled}
               direction="ltr"
               sideHasFirstFour={sideHasFirstFour.left}
+              roundPointsMap={roundPointsMap}
             />
           ))}
         </div>
@@ -180,19 +201,7 @@ export function BracketFullView({
             <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
               {ROUND_LABELS.final_four}
             </div>
-            {(() => {
-              const [team1, team2] = getTeamsForGame(leftFinalFour.id);
-              return (
-                <MatchupCard
-                  gameId={leftFinalFour.id}
-                  team1={team1}
-                  team2={team2}
-                  pickedTeamId={picks.get(leftFinalFour.id) ?? null}
-                  onPick={onPick}
-                  disabled={disabled}
-                />
-              );
-            })()}
+            {renderMatchup(leftFinalFour)}
           </div>
         )}
 
@@ -202,19 +211,7 @@ export function BracketFullView({
             <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
               {ROUND_LABELS.championship}
             </div>
-            {(() => {
-              const [team1, team2] = getTeamsForGame(championshipGame.id);
-              return (
-                <MatchupCard
-                  gameId={championshipGame.id}
-                  team1={team1}
-                  team2={team2}
-                  pickedTeamId={picks.get(championshipGame.id) ?? null}
-                  onPick={onPick}
-                  disabled={disabled}
-                />
-              );
-            })()}
+            {renderMatchup(championshipGame)}
           </div>
         )}
 
@@ -224,19 +221,7 @@ export function BracketFullView({
             <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
               {ROUND_LABELS.final_four}
             </div>
-            {(() => {
-              const [team1, team2] = getTeamsForGame(rightFinalFour.id);
-              return (
-                <MatchupCard
-                  gameId={rightFinalFour.id}
-                  team1={team1}
-                  team2={team2}
-                  pickedTeamId={picks.get(rightFinalFour.id) ?? null}
-                  onPick={onPick}
-                  disabled={disabled}
-                />
-              );
-            })()}
+            {renderMatchup(rightFinalFour)}
           </div>
         )}
 
@@ -255,6 +240,7 @@ export function BracketFullView({
               disabled={disabled}
               direction="rtl"
               sideHasFirstFour={sideHasFirstFour.right}
+              roundPointsMap={roundPointsMap}
             />
           ))}
         </div>
@@ -274,6 +260,7 @@ interface RegionBracketProps {
   disabled: boolean;
   direction: "ltr" | "rtl";
   sideHasFirstFour: boolean;
+  roundPointsMap?: Map<string, number>;
 }
 
 function RegionBracket({
@@ -287,6 +274,7 @@ function RegionBracket({
   disabled,
   direction,
   sideHasFirstFour,
+  roundPointsMap,
 }: RegionBracketProps) {
   const orderedRounds = direction === "rtl" ? [...rounds].reverse() : rounds;
 
@@ -303,6 +291,7 @@ function RegionBracket({
       getTeamsForGame={getTeamsForGame}
       onPick={onPick}
       disabled={disabled}
+      roundPointsMap={roundPointsMap}
     />
   ) : sideHasFirstFour ? (
     <FirstFourPlaceholder gameCount={r64Games.length} />
@@ -330,6 +319,7 @@ function RegionBracket({
                 getTeamsForGame={getTeamsForGame}
                 onPick={onPick}
                 disabled={disabled}
+                roundPointsMap={roundPointsMap}
               />
               {direction === "rtl" && isR64 && firstFourOrPlaceholder}
             </div>
@@ -361,6 +351,7 @@ interface FirstFourColumnProps {
   getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
   onPick: (gameId: string, teamId: string) => void;
   disabled: boolean;
+  roundPointsMap?: Map<string, number>;
 }
 
 function FirstFourColumn({
@@ -370,6 +361,7 @@ function FirstFourColumn({
   getTeamsForGame,
   onPick,
   disabled,
+  roundPointsMap,
 }: FirstFourColumnProps) {
   return (
     <div className="flex flex-col items-center justify-around px-1">
@@ -390,6 +382,9 @@ function FirstFourColumn({
                 pickedTeamId={picks.get(ffGame.id) ?? null}
                 onPick={onPick}
                 disabled={disabled}
+                winnerTeamId={ffGame.winnerTeamId}
+                gameStatus={ffGame.status}
+                roundPoints={roundPointsMap?.get("first_four") ?? 0}
               />
             );
           }
@@ -407,6 +402,7 @@ interface RoundColumnProps {
   getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
   onPick: (gameId: string, teamId: string) => void;
   disabled: boolean;
+  roundPointsMap?: Map<string, number>;
 }
 
 function RoundColumn({
@@ -416,6 +412,7 @@ function RoundColumn({
   getTeamsForGame,
   onPick,
   disabled,
+  roundPointsMap,
 }: RoundColumnProps) {
   return (
     <div className="flex flex-col items-center justify-around px-1">
@@ -437,6 +434,9 @@ function RoundColumn({
               pickedTeamId={picks.get(game.id) ?? null}
               onPick={onPick}
               disabled={disabled}
+              winnerTeamId={game.winnerTeamId}
+              gameStatus={game.status}
+              roundPoints={roundPointsMap?.get(round) ?? 0}
             />
           );
         })}

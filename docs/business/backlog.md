@@ -255,18 +255,26 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Scoring & Standings
 
-### 15. Live Bracket Scoring & Standings (MVP)
+### 15. Live Bracket Scoring & Standings (MVP) — In Progress
 
 **As a** pool member, **I want** bracket standings to update automatically as game results are recorded **so that** I can track how I and others are performing in real time.
 
 **Acceptance Criteria:**
 
-- When a game result is recorded (via admin UI or ESPN sync), all bracket entries with picks for that game have their scores recalculated
-- Each pick is scored based on the pool's round-based scoring settings
-- Pool standings reflect current scores and are viewable by all pool members
-- Potential remaining points are calculated for each bracket entry (max points still achievable)
-- Standings are ordered by: points (desc), potential points (desc), tiebreaker accuracy, then alphabetical
-- Architecture decision needed: evaluate event-driven (recalculate on game update) vs. on-demand (recalculate on standings view) vs. periodic batch approach
+- [x] When a game result is recorded (via admin UI or ESPN sync), all bracket entries with picks for that game have their scores recalculated — admin "Sync Standings" button triggers bulk recalculation
+- [x] Each pick is scored based on the pool's round-based scoring settings
+- [ ] Pool standings reflect current scores and are viewable by all pool members — standings page not yet built (Story 13)
+- [x] Potential remaining points are calculated for each bracket entry (max points still achievable)
+- [ ] Standings are ordered by: points (desc), potential points (desc), tiebreaker accuracy, then alphabetical — ordering logic exists in scoring, standings page pending
+- [x] Architecture decision: admin-triggered batch sync stores `totalPoints` and `potentialPoints` on `bracketEntry` table for fast reads
+
+**Additional work completed in this PR:**
+
+- Bracket view shows correct/incorrect pick indicators (green/red) with points earned per pick
+- Bracket view header shows live "Points: X | Potential: Y" summary
+- Success/failure CSS variables added to design system
+- Create bracket and create invite locked after tournament starts (backend + UI)
+- Mobile navigation affordance on bracket list items
 
 ---
 
@@ -364,7 +372,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 12  | View Other Members' Brackets       | Bracket Visibility  | Yes | Not Started |
 | 13  | View Pool Standings                | Bracket Visibility  | Yes | Not Started |
 | 14  | View Individual Bracket Detail     | Bracket Visibility  | Yes | Not Started |
-| 15  | Live Bracket Scoring & Standings   | Scoring & Standings | Yes | Not Started |
+| 15  | Live Bracket Scoring & Standings   | Scoring & Standings | Yes | In Progress |
 | 16  | Manage Bracket Scoring Settings    | Pool Settings       | No  | Not Started |
 | 17  | In-App User Invites                | Pool Members        | No  | Not Started |
 | 18  | Bracket Pool Public/Private Toggle | Public Pools        | No  | Not Started |

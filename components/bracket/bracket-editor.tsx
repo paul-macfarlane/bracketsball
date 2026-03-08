@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -29,6 +29,11 @@ import {
   unsubmitBracketAction,
   deleteBracketEntryAction,
 } from "@/app/(app)/pools/[id]/brackets/actions";
+import {
+  getPointsForRound,
+  calculateBracketScores,
+  type PoolScoring,
+} from "@/lib/scoring";
 
 interface BracketEditorProps {
   bracketEntryId: string;
@@ -41,6 +46,7 @@ interface BracketEditorProps {
   poolId: string;
   bracketPositions?: BracketPositions;
   tournamentStarted: boolean;
+  poolScoring?: PoolScoring;
 }
 
 export function BracketEditor({
@@ -54,6 +60,7 @@ export function BracketEditor({
   poolId,
   bracketPositions,
   tournamentStarted,
+  poolScoring,
 }: BracketEditorProps) {
   const router = useRouter();
   const [name, setName] = useState(bracketName);
@@ -80,6 +87,37 @@ export function BracketEditor({
   const isSubmitted = status === "submitted";
   const isLocked = tournamentStarted;
   const isDisabled = isSubmitted || isLocked;
+
+  // Build round -> points map for the bracket view
+  const roundPointsMap = useMemo(() => {
+    if (!poolScoring) return undefined;
+    const map = new Map<string, number>();
+    const rounds = [
+      "first_four",
+      "round_of_64",
+      "round_of_32",
+      "sweet_16",
+      "elite_8",
+      "final_four",
+      "championship",
+    ];
+    for (const round of rounds) {
+      map.set(round, getPointsForRound(round, poolScoring));
+    }
+    return map;
+  }, [poolScoring]);
+
+  // Calculate live scores from current picks and game results
+  const scores = useMemo(() => {
+    if (!poolScoring) return null;
+    const currentPicks = Array.from(picks.entries()).map(
+      ([tournamentGameId, pickedTeamId]) => ({
+        tournamentGameId,
+        pickedTeamId,
+      }),
+    );
+    return calculateBracketScores(games, currentPicks, poolScoring);
+  }, [poolScoring, picks, games]);
 
   function handleUnsubmit() {
     startTransition(async () => {
@@ -165,6 +203,17 @@ export function BracketEditor({
           </Badge>
         </div>
         <div className="flex items-center gap-3">
+          {scores && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-semibold">
+                Points: {scores.totalPoints}
+              </span>
+              <span className="text-muted-foreground">|</span>
+              <span className="text-muted-foreground">
+                Potential: {scores.potentialPoints}
+              </span>
+            </div>
+          )}
           <span className="text-sm text-muted-foreground">
             {pickedGames}/{totalGames} picks
           </span>
@@ -213,6 +262,7 @@ export function BracketEditor({
         onPick={handlePick}
         disabled={isDisabled}
         bracketPositions={bracketPositions}
+        roundPointsMap={roundPointsMap}
       />
 
       {/* Tiebreaker + Submit */}

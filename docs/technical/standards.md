@@ -70,6 +70,7 @@ docs/                   # Documentation
 - Responsive design: mobile-first. Use Tailwind breakpoints (`sm:`, `md:`, `lg:`).
 - Dark mode: support it via Tailwind's `dark:` variant. Use CSS variables from ShadCN's theme for colors.
 - **No arbitrary color values.** Always use CSS variable-based Tailwind classes (`text-muted-foreground`, `bg-destructive`, `border-border`, etc.) instead of raw color classes (`text-yellow-500`, `bg-red-500/10`, etc.). This ensures consistency across light/dark themes and keeps the design system centralized.
+- **New semantic colors require CSS variables.** When you need a color not covered by the existing theme (e.g., success/failure states), define new CSS variables in `globals.css` for both `:root` and `.dark`, register them in the `@theme inline` block, and use the resulting Tailwind classes (`bg-success`, `text-failure-foreground`, etc.). Never use hardcoded Tailwind color classes like `bg-green-600` or `text-red-700` — always go through the CSS variable system.
 - Avoid magic numbers in class names. Use Tailwind's spacing/sizing scale.
 
 ## Database
