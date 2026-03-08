@@ -11,6 +11,14 @@ export type CreateBracketEntryFormValues = z.infer<
   typeof createBracketEntrySchema
 >;
 
+export const updateBracketNameSchema = z.object({
+  bracketEntryId: z.string().min(1),
+  name: z
+    .string()
+    .min(1, "Bracket name is required")
+    .max(100, "Bracket name must be 100 characters or less"),
+});
+
 export const savePickSchema = z.object({
   bracketEntryId: z.string().min(1),
   tournamentGameId: z.string().min(1),

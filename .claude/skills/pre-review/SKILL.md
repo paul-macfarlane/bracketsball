@@ -43,6 +43,7 @@ If any check fails, fix the issue and re-run until all pass.
 Compare the implementation against all acceptance criteria from the backlog story. List each criterion and confirm it's met.
 
 Verify:
+
 - No unrelated changes are included
 - Code follows `docs/technical/standards.md`
 
@@ -63,6 +64,7 @@ Add a `## Verification` section to the task file:
 ## Step 6: Summary
 
 Provide a summary to the user of:
+
 - What was reviewed
 - Any issues found and fixed
 - Final status of all checks

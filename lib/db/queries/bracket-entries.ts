@@ -141,6 +141,18 @@ export async function updateTiebreaker(
   return updated;
 }
 
+export async function updateBracketEntryName(
+  bracketEntryId: string,
+  name: string,
+) {
+  const [updated] = await db
+    .update(bracketEntry)
+    .set({ name })
+    .where(eq(bracketEntry.id, bracketEntryId))
+    .returning();
+  return updated;
+}
+
 export async function submitBracketEntry(bracketEntryId: string) {
   const [updated] = await db
     .update(bracketEntry)

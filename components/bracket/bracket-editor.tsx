@@ -23,8 +23,10 @@ import type { BracketPositions } from "./bracket-full-view";
 import { useBracketPicks } from "./use-bracket-picks";
 import type { BracketGame, BracketTeam, BracketPick } from "./types";
 import {
+  updateBracketNameAction,
   updateTiebreakerAction,
   submitBracketAction,
+  unsubmitBracketAction,
   deleteBracketEntryAction,
 } from "@/app/(app)/pools/[id]/brackets/actions";
 
@@ -38,6 +40,7 @@ interface BracketEditorProps {
   initialPicks: BracketPick[];
   poolId: string;
   bracketPositions?: BracketPositions;
+  tournamentStarted: boolean;
 }
 
 export function BracketEditor({
@@ -50,8 +53,10 @@ export function BracketEditor({
   initialPicks,
   poolId,
   bracketPositions,
+  tournamentStarted,
 }: BracketEditorProps) {
   const router = useRouter();
+  const [name, setName] = useState(bracketName);
   const [tiebreaker, setTiebreaker] = useState<string>(
     initialTiebreaker?.toString() ?? "",
   );
@@ -73,6 +78,33 @@ export function BracketEditor({
     !isNaN(tiebreakerValue) &&
     tiebreakerValue >= 0;
   const isSubmitted = status === "submitted";
+  const isLocked = tournamentStarted;
+  const isDisabled = isSubmitted || isLocked;
+
+  function handleUnsubmit() {
+    startTransition(async () => {
+      const result = await unsubmitBracketAction(bracketEntryId);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        setStatus("draft");
+        toast.success("Bracket unsubmitted — you can now edit your picks.");
+      }
+    });
+  }
+
+  function handleNameBlur() {
+    const trimmed = name.trim();
+    if (!trimmed || trimmed === bracketName) return;
+
+    startTransition(async () => {
+      const result = await updateBracketNameAction(bracketEntryId, trimmed);
+      if (result.error) {
+        toast.error(result.error);
+        setName(bracketName);
+      }
+    });
+  }
 
   function handleTiebreakerBlur() {
     const value = parseInt(tiebreaker, 10);
@@ -112,10 +144,22 @@ export function BracketEditor({
 
   return (
     <div>
+      {/* Locked banner */}
+      {isLocked && (
+        <div className="mb-4 rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
+          The tournament has started. Bracket editing is locked.
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold">{bracketName}</h1>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={handleNameBlur}
+            maxLength={100}
+          />
           <Badge variant={isSubmitted ? "default" : "secondary"}>
             {isSubmitted ? "Submitted" : "Draft"}
           </Badge>
@@ -124,28 +168,40 @@ export function BracketEditor({
           <span className="text-sm text-muted-foreground">
             {pickedGames}/{totalGames} picks
           </span>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm" disabled={isPending}>
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete bracket?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete &quot;{bracketName}&quot; and all
-                  its picks. This cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>
+          {isSubmitted && !isLocked && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isPending}
+              onClick={handleUnsubmit}
+            >
+              Edit Picks
+            </Button>
+          )}
+          {!isLocked && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" disabled={isPending}>
                   Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete bracket?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete &quot;{name}&quot; and all its
+                    picks. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
 
@@ -155,7 +211,7 @@ export function BracketEditor({
         picks={picks}
         getTeamsForGame={getTeamsForGame}
         onPick={handlePick}
-        disabled={isSubmitted}
+        disabled={isDisabled}
         bracketPositions={bracketPositions}
       />
 
@@ -182,22 +238,20 @@ export function BracketEditor({
               value={tiebreaker}
               onChange={(e) => setTiebreaker(e.target.value)}
               onBlur={handleTiebreakerBlur}
-              disabled={isSubmitted}
+              disabled={isDisabled}
               className="w-32"
             />
           </div>
-          <Button
-            onClick={handleSubmit}
-            disabled={!isComplete || isPending || isSubmitted}
-          >
-            {isPending
-              ? "Submitting..."
-              : isSubmitted
-                ? "Submitted"
-                : "Submit Bracket"}
-          </Button>
+          {!isLocked && (
+            <Button
+              onClick={handleSubmit}
+              disabled={!isComplete || isPending || isSubmitted}
+            >
+              {isPending ? "Submitting..." : "Submit Bracket"}
+            </Button>
+          )}
         </div>
-        {!isComplete && !isSubmitted && (
+        {!isComplete && !isDisabled && (
           <p className="mt-2 text-xs text-muted-foreground">
             {pickedGames < totalGames && `Pick all ${totalGames} games. `}
             {(tiebreakerValue === null || isNaN(tiebreakerValue)) &&

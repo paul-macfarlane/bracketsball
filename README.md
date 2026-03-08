@@ -39,15 +39,15 @@ pnpm dev
 
 ### Scripts
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start dev server |
-| `pnpm build` | Production build |
-| `pnpm lint` | Run ESLint |
-| `pnpm format` | Run Prettier |
+| Command            | Description                 |
+| ------------------ | --------------------------- |
+| `pnpm dev`         | Start dev server            |
+| `pnpm build`       | Production build            |
+| `pnpm lint`        | Run ESLint                  |
+| `pnpm format`      | Run Prettier                |
 | `pnpm db:generate` | Generate Drizzle migrations |
-| `pnpm db:migrate` | Run migrations |
-| `pnpm db:studio` | Open Drizzle Studio |
+| `pnpm db:migrate`  | Run migrations              |
+| `pnpm db:studio`   | Open Drizzle Studio         |
 
 ## Documentation
 

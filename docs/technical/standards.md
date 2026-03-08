@@ -69,6 +69,7 @@ docs/                   # Documentation
 - Use **Tailwind utility classes** for styling. No CSS modules, no inline `style` props.
 - Responsive design: mobile-first. Use Tailwind breakpoints (`sm:`, `md:`, `lg:`).
 - Dark mode: support it via Tailwind's `dark:` variant. Use CSS variables from ShadCN's theme for colors.
+- **No arbitrary color values.** Always use CSS variable-based Tailwind classes (`text-muted-foreground`, `bg-destructive`, `border-border`, etc.) instead of raw color classes (`text-yellow-500`, `bg-red-500/10`, etc.). This ensures consistency across light/dark themes and keeps the design system centralized.
 - Avoid magic numbers in class names. Use Tailwind's spacing/sizing scale.
 
 ## Database

@@ -70,6 +70,7 @@ This skill automates the full pre-review process:
 4. **Task file update** — adds a `## Verification` section with results
 
 If you need to run individual checks manually:
+
 - `pnpm format` — auto-format all files with Prettier
 - `pnpm lint` — must pass with zero errors and zero warnings
 - `pnpm build` — must compile with zero TypeScript errors

@@ -11,6 +11,7 @@ import {
   getTournamentGames,
   getTournamentTeams,
 } from "@/lib/db/queries/tournaments";
+import { hasTournamentStarted } from "@/lib/db/queries/pools";
 import { BracketEditor } from "@/components/bracket/bracket-editor";
 import type { BracketTeam } from "@/components/bracket/types";
 
@@ -39,12 +40,14 @@ export default async function BracketEditorPage({
     notFound();
   }
 
-  const [tournamentData, games, tournamentTeamsRaw, picks] = await Promise.all([
-    getTournamentById(entry.tournamentId),
-    getTournamentGames(entry.tournamentId),
-    getTournamentTeams(entry.tournamentId),
-    getPicksForEntry(bracketId),
-  ]);
+  const [tournamentData, games, tournamentTeamsRaw, picks, tournamentStarted] =
+    await Promise.all([
+      getTournamentById(entry.tournamentId),
+      getTournamentGames(entry.tournamentId),
+      getTournamentTeams(entry.tournamentId),
+      getPicksForEntry(bracketId),
+      hasTournamentStarted(),
+    ]);
 
   // Map tournament teams to the shape our bracket components expect
   const tournamentTeams: BracketTeam[] = tournamentTeamsRaw.map((tt) => ({
@@ -96,6 +99,7 @@ export default async function BracketEditorPage({
         initialPicks={bracketPicks}
         poolId={poolId}
         bracketPositions={bracketPositions}
+        tournamentStarted={tournamentStarted}
       />
     </div>
   );
