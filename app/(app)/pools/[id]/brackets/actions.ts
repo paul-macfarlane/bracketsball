@@ -15,6 +15,7 @@ import {
   getPicksForEntry,
   savePick as savePickQuery,
   deletePicksForGames,
+  updateBracketEntryName,
   updateTiebreaker as updateTiebreakerQuery,
   submitBracketEntry,
   unsubmitBracketEntry,
@@ -23,6 +24,7 @@ import {
 import { getTournamentGames } from "@/lib/db/queries/tournaments";
 import {
   createBracketEntrySchema,
+  updateBracketNameSchema,
   savePickSchema,
   updateTiebreakerSchema,
   submitBracketSchema,
@@ -76,6 +78,34 @@ export async function createBracketEntryAction(
   });
 
   redirect(`/pools/${poolId}/brackets/${entry.id}`);
+}
+
+export async function updateBracketNameAction(
+  bracketEntryId: string,
+  name: string,
+) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Not authenticated" };
+  }
+
+  const parsed = updateBracketNameSchema.safeParse({ bracketEntryId, name });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const entry = await getBracketEntryById(parsed.data.bracketEntryId);
+  if (!entry || entry.userId !== session.user.id) {
+    return { error: "Bracket entry not found" };
+  }
+
+  await updateBracketEntryName(parsed.data.bracketEntryId, parsed.data.name);
+
+  revalidatePath(`/pools/${entry.poolId}/brackets/${entry.id}`);
+  return { success: true };
 }
 
 export async function savePickAction(
@@ -237,6 +267,40 @@ export async function submitBracketAction(bracketEntryId: string) {
   }
 
   await submitBracketEntry(parsed.data.bracketEntryId);
+
+  revalidatePath(`/pools/${entry.poolId}/brackets/${entry.id}`);
+  return { success: true };
+}
+
+export async function unsubmitBracketAction(bracketEntryId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Not authenticated" };
+  }
+
+  const parsed = submitBracketSchema.safeParse({ bracketEntryId });
+  if (!parsed.success) {
+    return { error: "Invalid input" };
+  }
+
+  const entry = await getBracketEntryById(parsed.data.bracketEntryId);
+  if (!entry || entry.userId !== session.user.id) {
+    return { error: "Bracket entry not found" };
+  }
+
+  if (entry.status !== "submitted") {
+    return { error: "Bracket is not submitted" };
+  }
+
+  const started = await hasTournamentStarted();
+  if (started) {
+    return { error: "Cannot edit bracket after tournament has started" };
+  }
+
+  await unsubmitBracketEntry(parsed.data.bracketEntryId);
 
   revalidatePath(`/pools/${entry.poolId}/brackets/${entry.id}`);
   return { success: true };

@@ -6,7 +6,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Tech Stack Setup
 
-### 0. Tech Stack Setup (MVP)
+### 0. Tech Stack Setup (MVP) ✅
 
 **As a** developer, **I want to** set up the core tech stack **so that** I have a working local development environment to build features on.
 
@@ -25,7 +25,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Auth
 
-### 1. Social Login (MVP)
+### 1. Social Login (MVP) ✅
 
 **As a** user, **I want to** sign up and log in with Google or Discord **so that** I can quickly access the app without creating a new password.
 
@@ -41,7 +41,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Profile
 
-### 2. Profile Management (MVP)
+### 2. Profile Management (MVP) ✅
 
 **As a** user, **I want to** edit my username, name, and profile picture URL **so that** I can personalize my identity in the app.
 
@@ -56,7 +56,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Account
 
-### 3. Account Deletion (MVP)
+### 3. Account Deletion (MVP) ✅
 
 **As a** user, **I want to** delete my account **so that** my data is removed from the platform.
 
@@ -72,7 +72,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Pools Setup
 
-### 4. Create Bracket Pool (MVP)
+### 4. Create Bracket Pool (MVP) ✅
 
 **As a** user, **I want to** create a bracket pool **so that** my friends and I can compete.
 
@@ -92,7 +92,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Creator becomes a pool leader
 - Pool visibility defaults to private (design should support public toggle later)
 
-### 5. Manage Bracket Pool Settings (MVP)
+### 5. Manage Bracket Pool Settings (MVP) ✅
 
 **As a** pool leader, **I want to** edit pool settings **so that** I can adjust the pool before games start.
 
@@ -108,7 +108,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Sports Data
 
-### 6a. Admin Tournament Management (MVP)
+### 6a. Admin Tournament Management (MVP) ✅
 
 **As an** admin, **I want to** manage teams, tournaments, and game data via an admin UI **so that** tournament data can be entered and corrected manually, serving as both a primary data entry method for testing and a fallback/override for automated sync.
 
@@ -145,7 +145,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Pool Members
 
-### 7. Bracket Pool Invite Links (MVP)
+### 7. Bracket Pool Invite Links (MVP) ✅
 
 **As a** pool member, **I want to** share an invite link **so that** others can join my pool.
 
@@ -158,7 +158,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Expired or maxed-out links show an appropriate error
 - Users who follow a valid link and are authenticated are added to the pool
 
-### 8. Manage Pool Members (MVP)
+### 8. Manage Pool Members (MVP) ✅
 
 **As a** pool leader, **I want to** manage pool members' roles and remove members **so that** I can control who participates in my pool.
 
@@ -183,7 +183,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Bracket Creation
 
-### 9. Create Bracket Entry (MVP)
+### 9. Create Bracket Entry (MVP) ✅
 
 **As a** pool member, **I want to** create a bracket entry with my tournament picks **so that** I can compete in the pool.
 
@@ -346,30 +346,30 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Summary
 
-| #   | Story                              | Epic                 | MVP |
-| --- | ---------------------------------- | -------------------- | --- |
-| 0   | Tech Stack Setup                   | Tech Stack Setup     | Yes |
-| 1   | Social Login                       | Auth                 | Yes |
-| 2   | Profile Management                 | Profile              | Yes |
-| 3   | Account Deletion                   | Account              | Yes |
-| 4   | Create Bracket Pool                | Pools Setup          | Yes |
-| 5   | Manage Bracket Pool Settings       | Pool Settings        | Yes |
-| 6a  | Admin Tournament Management        | Sports Data          | Yes |
-| 6b  | ESPN Data Sync                     | Sports Data          | Yes |
-| 7   | Bracket Pool Invite Links          | Pool Members         | Yes |
-| 8   | Manage Pool Members                | Pool Members         | Yes |
-| 9   | Create Bracket Entry               | Bracket Creation     | Yes |
-| 10  | Edit Bracket Entry                 | Bracket Creation     | Yes |
-| 11  | View Own Brackets                  | Bracket Visibility   | Yes |
-| 12  | View Other Members' Brackets       | Bracket Visibility   | Yes |
-| 13  | View Pool Standings                | Bracket Visibility   | Yes |
-| 14  | View Individual Bracket Detail     | Bracket Visibility   | Yes |
-| 15  | Live Bracket Scoring & Standings   | Scoring & Standings  | Yes |
-| 16  | Manage Bracket Scoring Settings    | Pool Settings        | No  |
-| 17  | In-App User Invites                | Pool Members         | No  |
-| 18  | Bracket Pool Public/Private Toggle | Public Pools         | No  |
-| 19  | Theme Toggle                       | UX                   | No  |
-| 20  | Public Pool Search                 | Public Pools         | No  |
-| 21  | Transaction Audit                  | Tech Debt            | No  |
+| #   | Story                              | Epic                | MVP | Status      |
+| --- | ---------------------------------- | ------------------- | --- | ----------- |
+| 0   | Tech Stack Setup                   | Tech Stack Setup    | Yes | Done        |
+| 1   | Social Login                       | Auth                | Yes | Done        |
+| 2   | Profile Management                 | Profile             | Yes | Done        |
+| 3   | Account Deletion                   | Account             | Yes | Done        |
+| 4   | Create Bracket Pool                | Pools Setup         | Yes | Done        |
+| 5   | Manage Bracket Pool Settings       | Pool Settings       | Yes | Done        |
+| 6a  | Admin Tournament Management        | Sports Data         | Yes | Done        |
+| 6b  | ESPN Data Sync                     | Sports Data         | Yes | Not Started |
+| 7   | Bracket Pool Invite Links          | Pool Members        | Yes | Done        |
+| 8   | Manage Pool Members                | Pool Members        | Yes | Done        |
+| 9   | Create Bracket Entry               | Bracket Creation    | Yes | Done        |
+| 10  | Edit Bracket Entry                 | Bracket Creation    | Yes | Not Started |
+| 11  | View Own Brackets                  | Bracket Visibility  | Yes | Not Started |
+| 12  | View Other Members' Brackets       | Bracket Visibility  | Yes | Not Started |
+| 13  | View Pool Standings                | Bracket Visibility  | Yes | Not Started |
+| 14  | View Individual Bracket Detail     | Bracket Visibility  | Yes | Not Started |
+| 15  | Live Bracket Scoring & Standings   | Scoring & Standings | Yes | Not Started |
+| 16  | Manage Bracket Scoring Settings    | Pool Settings       | No  | Not Started |
+| 17  | In-App User Invites                | Pool Members        | No  | Not Started |
+| 18  | Bracket Pool Public/Private Toggle | Public Pools        | No  | Not Started |
+| 19  | Theme Toggle                       | UX                  | No  | Not Started |
+| 20  | Public Pool Search                 | Public Pools        | No  | Not Started |
+| 21  | Transaction Audit                  | Tech Debt           | No  | Not Started |
 
-**MVP Total: 17 stories** | **Post-MVP: 6 stories**
+**MVP Total: 17 stories (10 done, 7 remaining)** | **Post-MVP: 6 stories**
