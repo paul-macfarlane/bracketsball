@@ -211,36 +211,37 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Bracket Visibility
 
-### 11. View Own Brackets (MVP)
+### 11. View Own Brackets (MVP) ✅
 
-**As a** user, **I want to** view a list of my brackets **so that** I can track my performance across pools.
+**As a** user, **I want to** view a list of my brackets within a pool **so that** I can track my performance.
 
 **Acceptance Criteria:**
 
-- User sees a list of all their bracket entries across pools
-- Each entry shows: bracket name, pool name, current points, and potential remaining points
+- User sees a list of their bracket entries in the pool detail page with current points and potential remaining points (after tournament starts)
 - User can click into an individual bracket for detail
+- Pool standings page shows all brackets including the user's own
 
-### 12. View Other Members' Brackets (MVP)
+### 12. View Other Members' Brackets (MVP) ✅
 
 **As a** pool member, **I want to** view other members' brackets **so that** I can see how my competition is doing.
 
 **Acceptance Criteria:**
 
-- User can view any other member's bracket list within a shared pool
+- User can view any other member's bracket within a shared pool (read-only)
 - Same summary info shown: bracket name, current points, potential remaining points
+- Accessible via pool standings page links
 
-### 13. View Pool Standings (MVP)
+### 13. View Pool Standings (MVP) ✅
 
 **As a** pool member, **I want to** see the pool standings **so that** I know where I rank.
 
 **Acceptance Criteria:**
 
-- Standings show all brackets in the pool ordered by: points (desc), then potential points (desc), then alphabetical (asc)
-- Each row shows: bracket name, owner, current points, potential remaining points
+- Standings show all brackets in the pool ordered by: points (desc), then potential points (desc), then tiebreaker accuracy, then alphabetical (asc)
+- Each row shows: rank, bracket name, owner (with avatar), champion pick (team logo), current points, potential remaining points
 - User can click into any bracket for detail
 
-### 14. View Individual Bracket Detail (MVP)
+### 14. View Individual Bracket Detail (MVP) ✅
 
 **As a** user, **I want to** view an individual bracket in detail **so that** I can see every pick and its outcome.
 
@@ -250,12 +251,13 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Each pick shows: teams, winner selected, actual result (if game is played)
 - Visual indicators for correct picks, incorrect picks, and pending games
 - Points earned per pick are visible
+- Any pool member can view any bracket in the pool (read-only for non-owners)
 
 ---
 
 ## Epic: Scoring & Standings
 
-### 15. Live Bracket Scoring & Standings (MVP) — In Progress
+### 15. Live Bracket Scoring & Standings (MVP) ✅
 
 **As a** pool member, **I want** bracket standings to update automatically as game results are recorded **so that** I can track how I and others are performing in real time.
 
@@ -263,9 +265,9 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 - [x] When a game result is recorded (via admin UI or ESPN sync), all bracket entries with picks for that game have their scores recalculated — admin "Sync Standings" button triggers bulk recalculation
 - [x] Each pick is scored based on the pool's round-based scoring settings
-- [ ] Pool standings reflect current scores and are viewable by all pool members — standings page not yet built (Story 13)
+- [x] Pool standings reflect current scores and are viewable by all pool members
 - [x] Potential remaining points are calculated for each bracket entry (max points still achievable)
-- [ ] Standings are ordered by: points (desc), potential points (desc), tiebreaker accuracy, then alphabetical — ordering logic exists in scoring, standings page pending
+- [x] Standings are ordered by: points (desc), potential points (desc), tiebreaker accuracy, then alphabetical
 - [x] Architecture decision: admin-triggered batch sync stores `totalPoints` and `potentialPoints` on `bracketEntry` table for fast reads
 
 **Additional work completed in this PR:**
@@ -367,12 +369,12 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 7   | Bracket Pool Invite Links          | Pool Members        | Yes | Done        |
 | 8   | Manage Pool Members                | Pool Members        | Yes | Done        |
 | 9   | Create Bracket Entry               | Bracket Creation    | Yes | Done        |
-| 10  | Edit Bracket Entry                 | Bracket Creation    | Yes | Not Started |
-| 11  | View Own Brackets                  | Bracket Visibility  | Yes | Not Started |
-| 12  | View Other Members' Brackets       | Bracket Visibility  | Yes | Not Started |
-| 13  | View Pool Standings                | Bracket Visibility  | Yes | Not Started |
-| 14  | View Individual Bracket Detail     | Bracket Visibility  | Yes | Not Started |
-| 15  | Live Bracket Scoring & Standings   | Scoring & Standings | Yes | In Progress |
+| 10  | Edit Bracket Entry                 | Bracket Creation    | Yes | Done        |
+| 11  | View Own Brackets                  | Bracket Visibility  | Yes | Done        |
+| 12  | View Other Members' Brackets       | Bracket Visibility  | Yes | Done        |
+| 13  | View Pool Standings                | Bracket Visibility  | Yes | Done        |
+| 14  | View Individual Bracket Detail     | Bracket Visibility  | Yes | Done        |
+| 15  | Live Bracket Scoring & Standings   | Scoring & Standings | Yes | Done        |
 | 16  | Manage Bracket Scoring Settings    | Pool Settings       | No  | Not Started |
 | 17  | In-App User Invites                | Pool Members        | No  | Not Started |
 | 18  | Bracket Pool Public/Private Toggle | Public Pools        | No  | Not Started |
@@ -380,4 +382,4 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 20  | Public Pool Search                 | Public Pools        | No  | Not Started |
 | 21  | Transaction Audit                  | Tech Debt           | No  | Not Started |
 
-**MVP Total: 17 stories (10 done, 7 remaining)** | **Post-MVP: 6 stories**
+**MVP Total: 17 stories (16 done, 1 remaining)** | **Post-MVP: 6 stories**
