@@ -1,7 +1,7 @@
 import { eq, and, count } from "drizzle-orm";
 
 import { db } from "@/lib/db";
-import { pool, poolMember, user } from "@/lib/db/schema";
+import { pool, poolMember, user, bracketEntry } from "@/lib/db/schema";
 
 export async function getPoolMembers(poolId: string) {
   return db
@@ -34,8 +34,25 @@ export async function updatePoolMemberRole(
 }
 
 export async function removePoolMember(memberId: string) {
-  // TODO: Also delete bracket entries for this member when bracket_entry table exists (Story #9)
-  await db.delete(poolMember).where(eq(poolMember.id, memberId));
+  const [member] = await db
+    .select()
+    .from(poolMember)
+    .where(eq(poolMember.id, memberId))
+    .limit(1);
+
+  if (member) {
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(bracketEntry)
+        .where(
+          and(
+            eq(bracketEntry.poolId, member.poolId),
+            eq(bracketEntry.userId, member.userId),
+          ),
+        );
+      await tx.delete(poolMember).where(eq(poolMember.id, memberId));
+    });
+  }
 }
 
 export async function getLeaderCount(poolId: string) {
@@ -102,7 +119,11 @@ export async function leavePool(
       }
     }
 
-    // TODO: Also delete bracket entries for this member when bracket_entry table exists (Story #9)
+    await tx
+      .delete(bracketEntry)
+      .where(
+        and(eq(bracketEntry.poolId, poolId), eq(bracketEntry.userId, userId)),
+      );
     await tx
       .delete(poolMember)
       .where(and(eq(poolMember.poolId, poolId), eq(poolMember.userId, userId)));

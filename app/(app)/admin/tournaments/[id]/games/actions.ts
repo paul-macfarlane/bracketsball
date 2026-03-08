@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { tournamentGame } from "@/lib/db/schema";
 import {
+  getTournamentById,
   getTournamentTeams,
   getTournamentGames,
 } from "@/lib/db/queries/tournaments";
@@ -42,6 +43,23 @@ export async function generateBracketAction(tournamentId: string) {
   const existingGames = await getTournamentGames(tournamentId);
   if (existingGames.length > 0) {
     return { error: "Bracket already has games. Delete existing games first." };
+  }
+
+  const tournamentData = await getTournamentById(tournamentId);
+  if (!tournamentData) {
+    return { error: "Tournament not found." };
+  }
+
+  if (
+    !tournamentData.bracketTopLeftRegion ||
+    !tournamentData.bracketBottomLeftRegion ||
+    !tournamentData.bracketTopRightRegion ||
+    !tournamentData.bracketBottomRightRegion
+  ) {
+    return {
+      error:
+        "Bracket region positions must be configured before generating the bracket.",
+    };
   }
 
   const tournamentTeams = await getTournamentTeams(tournamentId);
@@ -139,13 +157,18 @@ export async function generateBracketAction(tournamentId: string) {
       gameIdMap.set(`${region}-elite_8-1`, game.id);
     }
 
-    // Create Final Four (2 games: South vs East, West vs Midwest)
+    // Create Final Four (2 games based on configured bracket positions)
+    // Left side regions play each other, right side regions play each other
     const ff1 = await insertGame({
       tournamentId,
       round: "final_four",
       gameNumber: 1,
-      sourceGame1Id: gameIdMap.get("south-elite_8-1") ?? null,
-      sourceGame2Id: gameIdMap.get("east-elite_8-1") ?? null,
+      sourceGame1Id:
+        gameIdMap.get(`${tournamentData.bracketTopLeftRegion}-elite_8-1`) ??
+        null,
+      sourceGame2Id:
+        gameIdMap.get(`${tournamentData.bracketBottomLeftRegion}-elite_8-1`) ??
+        null,
     });
     gameIdMap.set("final_four-1", ff1.id);
 
@@ -153,8 +176,12 @@ export async function generateBracketAction(tournamentId: string) {
       tournamentId,
       round: "final_four",
       gameNumber: 2,
-      sourceGame1Id: gameIdMap.get("west-elite_8-1") ?? null,
-      sourceGame2Id: gameIdMap.get("midwest-elite_8-1") ?? null,
+      sourceGame1Id:
+        gameIdMap.get(`${tournamentData.bracketTopRightRegion}-elite_8-1`) ??
+        null,
+      sourceGame2Id:
+        gameIdMap.get(`${tournamentData.bracketBottomRightRegion}-elite_8-1`) ??
+        null,
     });
     gameIdMap.set("final_four-2", ff2.id);
 

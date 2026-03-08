@@ -36,6 +36,20 @@
       "when": 1772932286426,
       "tag": "0004_hesitant_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1772937573388,
+      "tag": "0005_wandering_the_order",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1772984749504,
+      "tag": "0006_low_bedlam",
+      "breakpoints": true
     }
   ]
 }

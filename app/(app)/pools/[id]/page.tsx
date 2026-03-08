@@ -7,6 +7,11 @@ import { getPoolById } from "@/lib/db/queries/pools";
 import { getPoolInvitesByPoolId } from "@/lib/db/queries/pool-invites";
 import { getPoolMembers } from "@/lib/db/queries/pool-members";
 import {
+  getBracketEntriesByPoolAndUser,
+  getBracketEntryCountForUser,
+} from "@/lib/db/queries/bracket-entries";
+import { getActiveTournament } from "@/lib/db/queries/tournaments";
+import {
   canAccessPoolPage,
   canPerformPoolAction,
 } from "@/lib/permissions/pools";
@@ -17,9 +22,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InviteList } from "./invites/invite-list";
 import { MemberList } from "./members/member-list";
+import { CreateBracketDialog } from "./brackets/create-bracket-dialog";
 
 export default async function PoolDetailPage({
   params,
@@ -50,6 +57,16 @@ export default async function PoolDetailPage({
   const members = await getPoolMembers(id);
   const remainingCapacity =
     poolData.pool.maxParticipants - poolData.memberCount;
+
+  const activeTournament = await getActiveTournament();
+  const bracketEntries = activeTournament
+    ? await getBracketEntriesByPoolAndUser(id, session.user.id)
+    : [];
+  const bracketCount = activeTournament
+    ? await getBracketEntryCountForUser(id, session.user.id)
+    : 0;
+  const canCreateBracket =
+    !!activeTournament && bracketCount < poolData.pool.maxBracketsPerUser;
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -103,6 +120,54 @@ export default async function PoolDetailPage({
           </div>
         </CardContent>
       </Card>
+
+      {/* Bracket Entries */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>My Brackets</CardTitle>
+              {activeTournament && (
+                <CreateBracketDialog
+                  poolId={id}
+                  canCreate={canCreateBracket}
+                  maxBrackets={poolData.pool.maxBracketsPerUser}
+                  currentCount={bracketCount}
+                />
+              )}
+            </div>
+            {!activeTournament && (
+              <CardDescription>
+                No active tournament. Brackets can be created once a tournament
+                is active.
+              </CardDescription>
+            )}
+          </CardHeader>
+          {bracketEntries.length > 0 && (
+            <CardContent>
+              <div className="space-y-2">
+                {bracketEntries.map((entry) => (
+                  <Link
+                    key={entry.id}
+                    href={`/pools/${id}/brackets/${entry.id}`}
+                    className="flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-muted"
+                  >
+                    <span className="font-medium">{entry.name}</span>
+                    <Badge
+                      variant={
+                        entry.status === "submitted" ? "default" : "secondary"
+                      }
+                    >
+                      {entry.status === "submitted" ? "Submitted" : "Draft"}
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      </div>
+
       <div className="mt-6">
         <MemberList
           poolId={id}

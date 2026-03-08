@@ -52,7 +52,28 @@ Keep entries short. Only log decisions where the "why" isn't obvious from the co
 
 ---
 
-## 3. Pre-Review Checklist
+## 3. Self-Code Review
+
+Before running the pre-review checklist, perform a self-code review using a **separate agent** to avoid bias. The implementing agent must not review its own code.
+
+Launch a review agent with this prompt:
+
+> Read `docs/tasks/<task-file>.md` to understand what was done.
+> Read `docs/business/backlog.md` story #N for acceptance criteria.
+> Read `docs/technical/standards.md` for code standards.
+> Review all files listed in "Changes Made" against the criteria and standards.
+> Pay special attention to:
+>
+> - **Transactions**: Any function with multiple DB writes must use a transaction. Any server action that calls multiple write functions must wrap them in a single transaction, passing `tx` to each.
+> - **Security**: Auth checks, input validation, ownership verification.
+> - **Standards compliance**: Naming, file organization, error handling patterns.
+>   Report: criteria coverage, standards violations, and suggestions. Do not modify code.
+
+Fix all issues found before proceeding to the pre-review checklist.
+
+---
+
+## 4. Pre-Review Checklist
 
 Before marking a task `ready-for-review`, run the following commands and fix any issues:
 
@@ -62,6 +83,7 @@ Before marking a task `ready-for-review`, run the following commands and fix any
 
 Then verify:
 
+- [ ] Self-code review has been run (section 3) and all issues resolved
 - [ ] All acceptance criteria from `docs/business/backlog.md` are met
 - [ ] Code follows `docs/technical/standards.md`
 - [ ] No unrelated changes included
@@ -76,26 +98,13 @@ Add the results to the task file:
 ```markdown
 ## Verification
 
+- Self-code review: done (issues found / no issues)
 - Tests: pass/fail (details)
 - Format: run
 - Lint: pass/fail
 - Build: pass/fail
 - Acceptance criteria: all met / <list gaps>
 ```
-
----
-
-## 4. Automated Review Setup
-
-A separate Claude Code agent can review work by following this prompt pattern:
-
-> Read `docs/tasks/<task-file>.md` to understand what was done.
-> Read `docs/business/backlog.md` story #N for acceptance criteria.
-> Read `docs/technical/standards.md` for code standards.
-> Review all files listed in "Changes Made" against the criteria and standards.
-> Report: criteria coverage, standards violations, test gaps, and suggestions.
-
-The reviewer agent should not modify code — only produce a review report.
 
 ---
 

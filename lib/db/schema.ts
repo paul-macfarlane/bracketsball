@@ -31,3 +31,11 @@ export {
   tournamentTeamRelations,
   tournamentGameRelations,
 } from "./tournament-schema";
+
+export {
+  bracketEntryStatusEnum,
+  bracketEntry,
+  bracketPick,
+  bracketEntryRelations,
+  bracketPickRelations,
+} from "./bracket-entry-schema";

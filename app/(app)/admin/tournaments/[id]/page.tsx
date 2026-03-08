@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ToggleActiveButton } from "./toggle-active-button";
 import { DeleteTournamentButton } from "./delete-tournament-button";
+import { BracketPositionsForm } from "./bracket-positions-form";
 
 export default async function TournamentDetailPage({
   params,
@@ -91,6 +92,21 @@ export default async function TournamentDetailPage({
             </CardHeader>
           </Card>
         </Link>
+      </div>
+
+      <div className="mt-6">
+        <BracketPositionsForm
+          tournamentId={id}
+          initialPositions={{
+            bracketTopLeftRegion: tournament.bracketTopLeftRegion,
+            bracketBottomLeftRegion: tournament.bracketBottomLeftRegion,
+            bracketTopRightRegion: tournament.bracketTopRightRegion,
+            bracketBottomRightRegion: tournament.bracketBottomRightRegion,
+          }}
+          disabled={games.some(
+            (g) => g.status === "in_progress" || g.status === "final",
+          )}
+        />
       </div>
 
       {teams.length === 68 && games.length === 0 && (

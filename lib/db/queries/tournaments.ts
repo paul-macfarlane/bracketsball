@@ -50,6 +50,10 @@ export async function updateTournament(
     name?: string;
     year?: number;
     isActive?: boolean;
+    bracketTopLeftRegion?: "south" | "east" | "west" | "midwest" | null;
+    bracketBottomLeftRegion?: "south" | "east" | "west" | "midwest" | null;
+    bracketTopRightRegion?: "south" | "east" | "west" | "midwest" | null;
+    bracketBottomRightRegion?: "south" | "east" | "west" | "midwest" | null;
   },
 ) {
   return db.transaction(async (tx) => {

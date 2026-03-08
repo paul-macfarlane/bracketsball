@@ -1,0 +1,461 @@
+"use client";
+
+import { useMemo } from "react";
+import { MatchupCard } from "./matchup-card";
+import type { BracketGame, BracketTeam } from "./types";
+import { ROUND_LABELS } from "./types";
+
+export interface BracketPositions {
+  topLeft: string;
+  bottomLeft: string;
+  topRight: string;
+  bottomRight: string;
+}
+
+const DEFAULT_BRACKET_POSITIONS: BracketPositions = {
+  topLeft: "south",
+  bottomLeft: "east",
+  topRight: "west",
+  bottomRight: "midwest",
+};
+
+interface BracketFullViewProps {
+  games: BracketGame[];
+  picks: Map<string, string>;
+  getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
+  onPick: (gameId: string, teamId: string) => void;
+  disabled?: boolean;
+  bracketPositions?: BracketPositions;
+}
+
+// Bracket converges from both sides toward the center:
+// [TopLeft    FF→R64→E8] ─┐
+//                          ├─ FF1 ─┐
+// [BottomLeft FF→R64→E8] ─┘       ├─ CHAMP
+// [TopRight   E8←R64←FF] ─┐       │
+//                          ├─ FF2 ─┘
+// [BottomRight E8←R64←FF]─┘
+const REGION_ROUNDS = [
+  "round_of_64",
+  "round_of_32",
+  "sweet_16",
+  "elite_8",
+] as const;
+
+export function BracketFullView({
+  games,
+  picks,
+  getTeamsForGame,
+  onPick,
+  disabled = false,
+  bracketPositions = DEFAULT_BRACKET_POSITIONS,
+}: BracketFullViewProps) {
+  const LEFT_REGIONS = useMemo(
+    () => [bracketPositions.topLeft, bracketPositions.bottomLeft],
+    [bracketPositions.topLeft, bracketPositions.bottomLeft],
+  );
+  const RIGHT_REGIONS = useMemo(
+    () => [bracketPositions.topRight, bracketPositions.bottomRight],
+    [bracketPositions.topRight, bracketPositions.bottomRight],
+  );
+  const gamesByRegionAndRound = useMemo(() => {
+    const map = new Map<string, BracketGame[]>();
+    for (const game of games) {
+      const key = `${game.region ?? "final"}-${game.round}`;
+      const list = map.get(key) ?? [];
+      list.push(game);
+      map.set(key, list);
+    }
+    for (const list of map.values()) {
+      list.sort((a, b) => a.gameNumber - b.gameNumber);
+    }
+    return map;
+  }, [games]);
+
+  const firstFourByR64Game = useMemo(() => {
+    const map = new Map<string, BracketGame>();
+    const firstFourGames = games.filter((g) => g.round === "first_four");
+    const r64Games = games.filter((g) => g.round === "round_of_64");
+
+    for (const ffGame of firstFourGames) {
+      const r64Game = r64Games.find(
+        (g) => g.sourceGame1Id === ffGame.id || g.sourceGame2Id === ffGame.id,
+      );
+      if (r64Game) {
+        map.set(r64Game.id, ffGame);
+      }
+    }
+    return map;
+  }, [games]);
+
+  const finalFourGames = useMemo(
+    () =>
+      games
+        .filter((g) => g.round === "final_four")
+        .sort((a, b) => a.gameNumber - b.gameNumber),
+    [games],
+  );
+
+  const championshipGame = useMemo(
+    () => games.find((g) => g.round === "championship") ?? null,
+    [games],
+  );
+
+  // Match FF games to the correct side by checking which Elite 8 regions feed into them.
+  // A FF game belongs to the left if BOTH its source E8 games are from left-side regions.
+  const { leftFinalFour, rightFinalFour } = useMemo(() => {
+    const leftRegionSet = new Set(LEFT_REGIONS);
+    const elite8Games = games.filter((g) => g.round === "elite_8");
+    const elite8ById = new Map(elite8Games.map((g) => [g.id, g]));
+
+    let left: BracketGame | null = null;
+    let right: BracketGame | null = null;
+
+    for (const ffGame of finalFourGames) {
+      const source1 = ffGame.sourceGame1Id
+        ? elite8ById.get(ffGame.sourceGame1Id)
+        : null;
+      const source2 = ffGame.sourceGame2Id
+        ? elite8ById.get(ffGame.sourceGame2Id)
+        : null;
+
+      const s1Left = source1?.region
+        ? leftRegionSet.has(source1.region)
+        : false;
+      const s2Left = source2?.region
+        ? leftRegionSet.has(source2.region)
+        : false;
+
+      if (s1Left && s2Left) {
+        left = ffGame;
+      } else if (!s1Left && !s2Left) {
+        right = ffGame;
+      } else {
+        // Mixed sources (data mismatch) — fall back to game number
+        if (!left) left = ffGame;
+        else right = ffGame;
+      }
+    }
+
+    return { leftFinalFour: left, rightFinalFour: right };
+  }, [finalFourGames, games, LEFT_REGIONS]);
+
+  // Check if any region on each side has First Four games, so we can reserve
+  // placeholder space on regions that don't (keeping round columns aligned).
+  const sideHasFirstFour = useMemo(() => {
+    const check = (regions: string[]) =>
+      regions.some((region) => {
+        const r64Games =
+          gamesByRegionAndRound.get(`${region}-round_of_64`) ?? [];
+        return r64Games.some((g) => firstFourByR64Game.has(g.id));
+      });
+    return { left: check(LEFT_REGIONS), right: check(RIGHT_REGIONS) };
+  }, [gamesByRegionAndRound, firstFourByR64Game, LEFT_REGIONS, RIGHT_REGIONS]);
+
+  return (
+    <div className="overflow-x-auto pb-4">
+      <div className="flex min-w-[1400px] items-stretch gap-0">
+        {/* Left regions */}
+        <div className="flex flex-col gap-8">
+          {LEFT_REGIONS.map((region) => (
+            <RegionBracket
+              key={region}
+              region={region}
+              rounds={REGION_ROUNDS}
+              gamesByRegionAndRound={gamesByRegionAndRound}
+              firstFourByR64Game={firstFourByR64Game}
+              picks={picks}
+              getTeamsForGame={getTeamsForGame}
+              onPick={onPick}
+              disabled={disabled}
+              direction="ltr"
+              sideHasFirstFour={sideHasFirstFour.left}
+            />
+          ))}
+        </div>
+
+        {/* Left Final Four: centered between South and East E8 */}
+        {leftFinalFour && (
+          <div className="flex flex-col items-center justify-center px-1">
+            <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
+              {ROUND_LABELS.final_four}
+            </div>
+            {(() => {
+              const [team1, team2] = getTeamsForGame(leftFinalFour.id);
+              return (
+                <MatchupCard
+                  gameId={leftFinalFour.id}
+                  team1={team1}
+                  team2={team2}
+                  pickedTeamId={picks.get(leftFinalFour.id) ?? null}
+                  onPick={onPick}
+                  disabled={disabled}
+                />
+              );
+            })()}
+          </div>
+        )}
+
+        {/* Championship: centered between the two Final Four games */}
+        {championshipGame && (
+          <div className="flex flex-col items-center justify-center px-1">
+            <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
+              {ROUND_LABELS.championship}
+            </div>
+            {(() => {
+              const [team1, team2] = getTeamsForGame(championshipGame.id);
+              return (
+                <MatchupCard
+                  gameId={championshipGame.id}
+                  team1={team1}
+                  team2={team2}
+                  pickedTeamId={picks.get(championshipGame.id) ?? null}
+                  onPick={onPick}
+                  disabled={disabled}
+                />
+              );
+            })()}
+          </div>
+        )}
+
+        {/* Right Final Four: centered between West and Midwest E8 */}
+        {rightFinalFour && (
+          <div className="flex flex-col items-center justify-center px-1">
+            <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
+              {ROUND_LABELS.final_four}
+            </div>
+            {(() => {
+              const [team1, team2] = getTeamsForGame(rightFinalFour.id);
+              return (
+                <MatchupCard
+                  gameId={rightFinalFour.id}
+                  team1={team1}
+                  team2={team2}
+                  pickedTeamId={picks.get(rightFinalFour.id) ?? null}
+                  onPick={onPick}
+                  disabled={disabled}
+                />
+              );
+            })()}
+          </div>
+        )}
+
+        {/* Right regions */}
+        <div className="flex flex-col gap-8">
+          {RIGHT_REGIONS.map((region) => (
+            <RegionBracket
+              key={region}
+              region={region}
+              rounds={REGION_ROUNDS}
+              gamesByRegionAndRound={gamesByRegionAndRound}
+              firstFourByR64Game={firstFourByR64Game}
+              picks={picks}
+              getTeamsForGame={getTeamsForGame}
+              onPick={onPick}
+              disabled={disabled}
+              direction="rtl"
+              sideHasFirstFour={sideHasFirstFour.right}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface RegionBracketProps {
+  region: string;
+  rounds: readonly string[];
+  gamesByRegionAndRound: Map<string, BracketGame[]>;
+  firstFourByR64Game: Map<string, BracketGame>;
+  picks: Map<string, string>;
+  getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
+  onPick: (gameId: string, teamId: string) => void;
+  disabled: boolean;
+  direction: "ltr" | "rtl";
+  sideHasFirstFour: boolean;
+}
+
+function RegionBracket({
+  region,
+  rounds,
+  gamesByRegionAndRound,
+  firstFourByR64Game,
+  picks,
+  getTeamsForGame,
+  onPick,
+  disabled,
+  direction,
+  sideHasFirstFour,
+}: RegionBracketProps) {
+  const orderedRounds = direction === "rtl" ? [...rounds].reverse() : rounds;
+
+  const r64Games = gamesByRegionAndRound.get(`${region}-round_of_64`) ?? [];
+  const hasFirstFour = r64Games.some((g) => firstFourByR64Game.has(g.id));
+
+  // If this region has no First Four but the other region on this side does,
+  // render an empty placeholder to keep round columns aligned.
+  const firstFourOrPlaceholder = hasFirstFour ? (
+    <FirstFourColumn
+      r64Games={r64Games}
+      firstFourByR64Game={firstFourByR64Game}
+      picks={picks}
+      getTeamsForGame={getTeamsForGame}
+      onPick={onPick}
+      disabled={disabled}
+    />
+  ) : sideHasFirstFour ? (
+    <FirstFourPlaceholder gameCount={r64Games.length} />
+  ) : null;
+
+  return (
+    <div>
+      <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {region}
+      </div>
+      <div className="flex items-center gap-0">
+        {orderedRounds.map((round) => {
+          const roundGames =
+            gamesByRegionAndRound.get(`${region}-${round}`) ?? [];
+
+          const isR64 = round === "round_of_64";
+
+          return (
+            <div key={round} className="flex items-center gap-0">
+              {direction === "ltr" && isR64 && firstFourOrPlaceholder}
+              <RoundColumn
+                round={round}
+                games={roundGames}
+                picks={picks}
+                getTeamsForGame={getTeamsForGame}
+                onPick={onPick}
+                disabled={disabled}
+              />
+              {direction === "rtl" && isR64 && firstFourOrPlaceholder}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FirstFourPlaceholder({ gameCount }: { gameCount: number }) {
+  return (
+    <div className="flex flex-col items-center justify-around px-1">
+      {/* Empty header to match FirstFourColumn's label height */}
+      <div className="mb-1 text-[10px]">&nbsp;</div>
+      <div className="flex flex-col justify-around" style={{ gap: "0.25rem" }}>
+        {Array.from({ length: gameCount }, (_, i) => (
+          <div key={i} className="h-[3.25rem] w-44" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface FirstFourColumnProps {
+  r64Games: BracketGame[];
+  firstFourByR64Game: Map<string, BracketGame>;
+  picks: Map<string, string>;
+  getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
+  onPick: (gameId: string, teamId: string) => void;
+  disabled: boolean;
+}
+
+function FirstFourColumn({
+  r64Games,
+  firstFourByR64Game,
+  picks,
+  getTeamsForGame,
+  onPick,
+  disabled,
+}: FirstFourColumnProps) {
+  return (
+    <div className="flex flex-col items-center justify-around px-1">
+      <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
+        {ROUND_LABELS.first_four}
+      </div>
+      <div className="flex flex-col justify-around" style={{ gap: "0.25rem" }}>
+        {r64Games.map((r64Game) => {
+          const ffGame = firstFourByR64Game.get(r64Game.id);
+          if (ffGame) {
+            const [team1, team2] = getTeamsForGame(ffGame.id);
+            return (
+              <MatchupCard
+                key={ffGame.id}
+                gameId={ffGame.id}
+                team1={team1}
+                team2={team2}
+                pickedTeamId={picks.get(ffGame.id) ?? null}
+                onPick={onPick}
+                disabled={disabled}
+              />
+            );
+          }
+          return <div key={r64Game.id} className="h-[3.25rem] w-44" />;
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface RoundColumnProps {
+  round: string;
+  games: BracketGame[];
+  picks: Map<string, string>;
+  getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
+  onPick: (gameId: string, teamId: string) => void;
+  disabled: boolean;
+}
+
+function RoundColumn({
+  round,
+  games,
+  picks,
+  getTeamsForGame,
+  onPick,
+  disabled,
+}: RoundColumnProps) {
+  return (
+    <div className="flex flex-col items-center justify-around px-1">
+      <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
+        {ROUND_LABELS[round] ?? round}
+      </div>
+      <div
+        className="flex flex-col justify-around gap-2"
+        style={getSpacingStyle(round)}
+      >
+        {games.map((game) => {
+          const [team1, team2] = getTeamsForGame(game.id);
+          return (
+            <MatchupCard
+              key={game.id}
+              gameId={game.id}
+              team1={team1}
+              team2={team2}
+              pickedTeamId={picks.get(game.id) ?? null}
+              onPick={onPick}
+              disabled={disabled}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function getSpacingStyle(round: string): React.CSSProperties {
+  switch (round) {
+    case "round_of_64":
+      return { gap: "0.25rem" };
+    case "round_of_32":
+      return { gap: "2.75rem" };
+    case "sweet_16":
+      return { gap: "8.25rem" };
+    case "elite_8":
+      return { gap: "19.25rem" };
+    default:
+      return { gap: "0.5rem" };
+  }
+}

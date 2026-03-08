@@ -32,9 +32,8 @@ const TOURNAMENT_NAME = "2025 NCAA Tournament";
 async function main() {
   // Dynamic imports so env vars are loaded before db connection is created
   const { db } = await import("../lib/db");
-  const { team, tournament, tournamentTeam, tournamentGame } = await import(
-    "../lib/db/tournament-schema"
-  );
+  const { team, tournament, tournamentTeam, tournamentGame } =
+    await import("../lib/db/tournament-schema");
 
   await db.transaction(async (tx) => {
     // Idempotent: delete existing tournament for this year (cascade deletes games and teams)
@@ -58,6 +57,10 @@ async function main() {
         name: TOURNAMENT_NAME,
         year: TOURNAMENT_YEAR,
         isActive: true,
+        bracketTopLeftRegion: "south",
+        bracketBottomLeftRegion: "east",
+        bracketTopRightRegion: "west",
+        bracketBottomRightRegion: "midwest",
       })
       .returning();
 
@@ -167,8 +170,7 @@ async function main() {
         let sourceGame2Id: string | null = null;
 
         if (firstFourSeeds.has(highSeed)) {
-          sourceGame1Id =
-            firstFourGameIds.get(`${region}-${highSeed}`) ?? null;
+          sourceGame1Id = firstFourGameIds.get(`${region}-${highSeed}`) ?? null;
         } else {
           const t = regionTeams.find((t) => t.seed === highSeed);
           if (t) {
@@ -178,8 +180,7 @@ async function main() {
         }
 
         if (firstFourSeeds.has(lowSeed)) {
-          sourceGame2Id =
-            firstFourGameIds.get(`${region}-${lowSeed}`) ?? null;
+          sourceGame2Id = firstFourGameIds.get(`${region}-${lowSeed}`) ?? null;
         } else {
           const t = regionTeams.find((t) => t.seed === lowSeed);
           if (t) {
@@ -280,7 +281,8 @@ async function main() {
     }
     console.log("  + 4 games");
 
-    // 8. Create Final Four (2 games: South vs East, West vs Midwest)
+    // 8. Create Final Four (2 games based on bracket positions)
+    // Left side regions play each other, right side regions play each other
     console.log("Creating Final Four games...");
     const [ff1] = await tx
       .insert(tournamentGame)
@@ -288,8 +290,10 @@ async function main() {
         tournamentId,
         round: "final_four",
         gameNumber: 1,
-        sourceGame1Id: gameIdMap.get("south-elite_8-1") ?? null,
-        sourceGame2Id: gameIdMap.get("east-elite_8-1") ?? null,
+        sourceGame1Id:
+          gameIdMap.get(`${t.bracketTopLeftRegion}-elite_8-1`) ?? null,
+        sourceGame2Id:
+          gameIdMap.get(`${t.bracketBottomLeftRegion}-elite_8-1`) ?? null,
         status: "scheduled",
       })
       .returning();
@@ -301,8 +305,10 @@ async function main() {
         tournamentId,
         round: "final_four",
         gameNumber: 2,
-        sourceGame1Id: gameIdMap.get("west-elite_8-1") ?? null,
-        sourceGame2Id: gameIdMap.get("midwest-elite_8-1") ?? null,
+        sourceGame1Id:
+          gameIdMap.get(`${t.bracketTopRightRegion}-elite_8-1`) ?? null,
+        sourceGame2Id:
+          gameIdMap.get(`${t.bracketBottomRightRegion}-elite_8-1`) ?? null,
         status: "scheduled",
       })
       .returning();

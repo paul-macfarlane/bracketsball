@@ -63,7 +63,10 @@ export function EditTeamButton({
           onChange={(e) => setSeed(e.target.valueAsNumber)}
           className="h-7 w-16"
         />
-        <Select value={region} onValueChange={(v) => setRegion(v as typeof region)}>
+        <Select
+          value={region}
+          onValueChange={(v) => setRegion(v as typeof region)}
+        >
           <SelectTrigger className="h-7 w-28">
             <SelectValue />
           </SelectTrigger>
@@ -75,7 +78,13 @@ export function EditTeamButton({
             ))}
           </SelectContent>
         </Select>
-        <Button size="sm" variant="default" onClick={handleSave} disabled={isPending} className="h-7">
+        <Button
+          size="sm"
+          variant="default"
+          onClick={handleSave}
+          disabled={isPending}
+          className="h-7"
+        >
           {isPending ? "..." : "Save"}
         </Button>
         <Button
