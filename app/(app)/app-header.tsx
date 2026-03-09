@@ -57,7 +57,7 @@ export function AppHeader({ session }: AppHeaderProps) {
   const links = isAdmin ? adminNavLinks : navLinks;
 
   return (
-    <header className="border-b">
+    <header className="sticky top-0 z-50 border-b bg-background">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         {/* Left: logo + nav links */}
         <div className="flex items-center gap-6">
