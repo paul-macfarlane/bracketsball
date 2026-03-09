@@ -504,43 +504,76 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ---
 
+## Epic: Bracket UX Enhancements
+
+### 33. Team & Game Info in Bracket Builder (Non-MVP) — Epic: Bracket UX Enhancements
+
+**As a** pool member filling out my bracket, **I want to** see supplemental information about each team and game **so that** I can make more informed picks — especially for teams I'm unfamiliar with.
+
+**Acceptance Criteria:**
+
+- **Investigation phase:** Research how to source supplemental team data (records, stats, strength ratings, short team descriptions). Evaluate options including:
+  - ESPN API (existing integration) — check if team records (overall and conference), stats, rankings, or team descriptions are available
+  - Other public/free sports data APIs (e.g., NCAA, kenpom-style ratings)
+  - Static/manually curated data as a fallback
+- Document findings and chosen approach before implementation begins
+- **Implementation — Game Details Button (pending investigation):**
+  - Each game matchup in the bracket builder has a small "details" button (e.g., info icon)
+  - Clicking/tapping opens a popover or modal with:
+    - Game venue/location
+    - Team records: overall (W-L) and conference (W-L) for each team
+    - Strengths, weaknesses, or other scouting-style notes per team (content depends on data source availability)
+    - Any other useful context (e.g., conference name, national ranking)
+  - Details button should be unobtrusive — doesn't clutter the pick UI
+  - Works on both desktop and mobile
+- **Implementation — Game Date/Time in Bracket View:**
+  - Enrich the bracket view (read-only bracket detail, not just the builder) to display the scheduled date and time for each game
+  - Date/time should be shown inline on each game card where space allows
+  - Games that have already been played can show the date played
+- **Data requirements:**
+  - Data is sourced automatically where possible (synced or fetched), with admin override capability
+  - New team fields (records, descriptions) stored in the DB and kept in sync
+
+---
+
 ## Summary
 
-| #   | Story                              | Epic                | MVP | Status      |
-| --- | ---------------------------------- | ------------------- | --- | ----------- |
-| 0   | Tech Stack Setup                   | Tech Stack Setup    | Yes | Done        |
-| 1   | Social Login                       | Auth                | Yes | Done        |
-| 2   | Profile Management                 | Profile             | Yes | Done        |
-| 3   | Account Deletion                   | Account             | Yes | Done        |
-| 4   | Create Bracket Pool                | Pools Setup         | Yes | Done        |
-| 5   | Manage Bracket Pool Settings       | Pool Settings       | Yes | Done        |
-| 6a  | Admin Tournament Management        | Sports Data         | Yes | Done        |
-| 6b  | ESPN Data Sync                     | Sports Data         | Yes | Done        |
-| 7   | Bracket Pool Invite Links          | Pool Members        | Yes | Done        |
-| 8   | Manage Pool Members                | Pool Members        | Yes | Done        |
-| 9   | Create Bracket Entry               | Bracket Creation    | Yes | Done        |
-| 10  | Edit Bracket Entry                 | Bracket Creation    | Yes | Done        |
-| 11  | View Own Brackets                  | Bracket Visibility  | Yes | Done        |
-| 12  | View Other Members' Brackets       | Bracket Visibility  | Yes | Done        |
-| 13  | View Pool Standings                | Bracket Visibility  | Yes | Done        |
-| 14  | View Individual Bracket Detail     | Bracket Visibility  | Yes | Done        |
-| 15  | Live Bracket Scoring & Standings   | Scoring & Standings | Yes | Done        |
-| 16  | Manage Bracket Scoring Settings    | Pool Settings       | No  | Not Started |
-| 17  | In-App User Invites                | Pool Members        | No  | Not Started |
-| 18  | Bracket Pool Public/Private Toggle | Public Pools        | No  | Not Started |
-| 19  | Theme Toggle                       | UX                  | No  | Not Started |
-| 20  | Public Pool Search                 | Public Pools        | No  | Not Started |
-| 21  | Transaction Audit                  | Tech Debt           | No  | Not Started |
-| 22  | Remove User Dashboard              | UX Cleanup          | No  | Done        |
-| 23  | Remove Admin Dashboard             | UX Cleanup          | No  | Done        |
-| 24  | Auto-Determine Game Winner         | UX Cleanup          | No  | Done        |
-| 25  | Auto-Fill Bracket Picks            | Auto-Fill Bracket   | No  | Not Started |
-| 26  | Fix Bracket Submit Double-Click    | Bug Fixes           | No  | Not Started |
-| 27  | Splash / Marketing Page            | Branding            | No  | Dnoe |
-| 28  | SEO Plan & Implementation          | Branding            | No  | Not Started |
-| 29  | App Theme & Design System          | Branding            | No  | Done        |
-| 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Done        |
-| 31  | Legal & Contact Pages              | Branding            | No  | Done        |
-| 32  | Update External Services Branding  | Branding            | No  | Not Started |
+| #   | Story                               | Epic                    | MVP | Status      |
+| --- | ----------------------------------- | ----------------------- | --- | ----------- |
+| 0   | Tech Stack Setup                    | Tech Stack Setup        | Yes | Done        |
+| 1   | Social Login                        | Auth                    | Yes | Done        |
+| 2   | Profile Management                  | Profile                 | Yes | Done        |
+| 3   | Account Deletion                    | Account                 | Yes | Done        |
+| 4   | Create Bracket Pool                 | Pools Setup             | Yes | Done        |
+| 5   | Manage Bracket Pool Settings        | Pool Settings           | Yes | Done        |
+| 6a  | Admin Tournament Management         | Sports Data             | Yes | Done        |
+| 6b  | ESPN Data Sync                      | Sports Data             | Yes | Done        |
+| 7   | Bracket Pool Invite Links           | Pool Members            | Yes | Done        |
+| 8   | Manage Pool Members                 | Pool Members            | Yes | Done        |
+| 9   | Create Bracket Entry                | Bracket Creation        | Yes | Done        |
+| 10  | Edit Bracket Entry                  | Bracket Creation        | Yes | Done        |
+| 11  | View Own Brackets                   | Bracket Visibility      | Yes | Done        |
+| 12  | View Other Members' Brackets        | Bracket Visibility      | Yes | Done        |
+| 13  | View Pool Standings                 | Bracket Visibility      | Yes | Done        |
+| 14  | View Individual Bracket Detail      | Bracket Visibility      | Yes | Done        |
+| 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
+| 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
+| 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
+| 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |
+| 19  | Theme Toggle                        | UX                      | No  | Not Started |
+| 20  | Public Pool Search                  | Public Pools            | No  | Not Started |
+| 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
+| 22  | Remove User Dashboard               | UX Cleanup              | No  | Done        |
+| 23  | Remove Admin Dashboard              | UX Cleanup              | No  | Done        |
+| 24  | Auto-Determine Game Winner          | UX Cleanup              | No  | Done        |
+| 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Not Started |
+| 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Not Started |
+| 27  | Splash / Marketing Page             | Branding                | No  | Dnoe        |
+| 28  | SEO Plan & Implementation           | Branding                | No  | Not Started |
+| 29  | App Theme & Design System           | Branding                | No  | Done        |
+| 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
+| 31  | Legal & Contact Pages               | Branding                | No  | Done        |
+| 32  | Update External Services Branding   | Branding                | No  | Not Started |
+| 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Not Started |
 
-**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 17 stories**
+**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 18 stories**
