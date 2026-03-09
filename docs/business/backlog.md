@@ -536,7 +536,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 24  | Auto-Determine Game Winner         | UX Cleanup          | No  | Done        |
 | 25  | Auto-Fill Bracket Picks            | Auto-Fill Bracket   | No  | Not Started |
 | 26  | Fix Bracket Submit Double-Click    | Bug Fixes           | No  | Not Started |
-| 27  | Splash / Marketing Page            | Branding            | No  | Not Started |
+| 27  | Splash / Marketing Page            | Branding            | No  | Dnoe |
 | 28  | SEO Plan & Implementation          | Branding            | No  | Not Started |
 | 29  | App Theme & Design System          | Branding            | No  | Done        |
 | 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Done        |
