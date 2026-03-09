@@ -525,7 +525,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 27  | Splash / Marketing Page            | Branding            | No  | Not Started |
 | 28  | SEO Plan & Implementation          | Branding            | No  | Not Started |
 | 29  | App Theme & Design System          | Branding            | No  | Done        |
-| 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Not Started |
+| 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Done        |
 | 31  | Legal & Contact Pages              | Branding            | No  | Not Started |
 
 **MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 16 stories**
