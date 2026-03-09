@@ -35,21 +35,12 @@ export default async function Home() {
           >
             Bracketsball
           </Link>
-          <div className="flex items-center gap-3">
-            <Button
-              asChild
-              variant="ghost"
-              className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              <Link href="/login">Log In</Link>
-            </Button>
-            <Button
-              asChild
-              className="bg-brand-orange text-brand-orange-foreground hover:bg-brand-orange/90"
-            >
-              <Link href="/login">Sign Up</Link>
-            </Button>
-          </div>
+          <Button
+            asChild
+            className="bg-brand-orange text-brand-orange-foreground hover:bg-brand-orange/90"
+          >
+            <Link href="/login">Sign In</Link>
+          </Button>
         </div>
       </header>
 
