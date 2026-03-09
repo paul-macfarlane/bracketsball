@@ -125,7 +125,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Seed scripts exist to populate 68 real 2025 NCAA tournament teams and a mock tournament bracket for testing
 - Data model supports: persistent teams, tournaments, tournament_team assignments, tournament games with bracket tree structure (source game references)
 
-### 6b. ESPN Data Sync (MVP — separate implementation)
+### 6b. ESPN Data Sync (MVP — separate implementation) ✅
 
 **As the** system, **I need to** sync live tournament data from ESPN **so that** brackets are scored automatically without manual data entry.
 
@@ -263,7 +263,8 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 **Acceptance Criteria:**
 
-- [x] When a game result is recorded (via admin UI or ESPN sync), all bracket entries with picks for that game have their scores recalculated — admin "Sync Standings" button triggers bulk recalculation
+- [x] When game results are synced from ESPN, all bracket entries have their scores recalculated automatically
+- [x] When an admin manually edits a game result, standings are NOT auto-recalculated — the admin uses the separate "Sync Standings" button to trigger recalculation on demand (intentional: allows batch manual edits without repeated recalculation)
 - [x] Each pick is scored based on the pool's round-based scoring settings
 - [x] Pool standings reflect current scores and are viewable by all pool members
 - [x] Potential remaining points are calculated for each bracket entry (max points still achievable)
@@ -419,6 +420,63 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ---
 
+## Epic: Branding
+
+### 27. Splash / Marketing Page (Non-MVP) — Epic: Branding
+
+**As a** visitor, **I want to** land on an engaging marketing page **so that** I understand what BRacketiering is and am motivated to sign up.
+
+**Acceptance Criteria:**
+
+- Public-facing splash page at `/` for unauthenticated users (authenticated users still redirect to Pools)
+- Hero section with app name, tagline, and primary CTA to sign up / log in
+- Feature highlights section summarizing the core value props (create pools, pick brackets, compete with friends, live scoring)
+- Visual March Madness / basketball theming that conveys the app's purpose
+- Responsive design — looks great on mobile, tablet, and desktop
+- Fast load time — no heavy assets blocking initial render
+
+### 28. SEO Plan & Implementation (Non-MVP) — Epic: Branding
+
+**As the** product owner, **I want** the app to be discoverable via search engines **so that** organic traffic can find BRacketiering.
+
+**Acceptance Criteria:**
+
+- Metadata: proper `<title>`, `<meta description>`, and Open Graph / Twitter Card tags on all public pages (splash page, login)
+- `robots.txt` allows crawling of public pages, disallows authenticated app routes
+- `sitemap.xml` generated for public pages
+- Structured data (JSON-LD) for the splash page (WebApplication or SoftwareApplication schema)
+- Canonical URLs set on all pages
+- Lighthouse SEO score ≥ 90 on the splash page
+- Document the SEO strategy and any ongoing tasks in `docs/technical/seo-plan.md`
+
+### 29. App Theme & Design System (Non-MVP) — Epic: Branding
+
+**As a** user, **I want** the app's visual design to feel like a March Madness bracket challenge **so that** the experience is fun and on-brand.
+
+**Acceptance Criteria:**
+
+- Define a cohesive color palette that evokes college basketball / March Madness energy (stored in CSS variables / Tailwind config)
+- Update ShadCN theme tokens (primary, secondary, accent, destructive, etc.) to use the new palette
+- Typography choices that feel sporty but remain readable
+- Consistent application of the new theme across all existing pages (no page-by-page visual inconsistencies)
+- Dark mode support with the new palette (can coordinate with Story 19 Theme Toggle)
+- Document the design tokens and rationale in `docs/technical/design-system.md`
+
+### 30. Icon Pack (Favicon, App Icons, OAuth) (Non-MVP) — Epic: Branding
+
+**As a** user, **I want** the app to have a recognizable icon **so that** I can identify it in my browser tabs, home screen, and OAuth consent screens.
+
+**Acceptance Criteria:**
+
+- Custom app icon designed that represents BRacketiering (bracket + basketball motif)
+- Favicon set: `favicon.ico` (16×16, 32×32), `apple-touch-icon.png` (180×180), `icon-192.png`, `icon-512.png`
+- PWA manifest (`site.webmanifest`) references the icon pack with correct sizes and MIME types
+- Open Graph image (`og-image.png`) for social sharing — 1200×630
+- OAuth provider icons: upload the app icon to Google Cloud Console and Discord Developer Portal for branded consent screens
+- Icons render correctly across major browsers (Chrome, Safari, Firefox, Edge) and mobile home screen bookmarks
+
+---
+
 ## Summary
 
 | #   | Story                              | Epic                | MVP | Status      |
@@ -430,7 +488,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 4   | Create Bracket Pool                | Pools Setup         | Yes | Done        |
 | 5   | Manage Bracket Pool Settings       | Pool Settings       | Yes | Done        |
 | 6a  | Admin Tournament Management        | Sports Data         | Yes | Done        |
-| 6b  | ESPN Data Sync                     | Sports Data         | Yes | Not Started |
+| 6b  | ESPN Data Sync                     | Sports Data         | Yes | Done        |
 | 7   | Bracket Pool Invite Links          | Pool Members        | Yes | Done        |
 | 8   | Manage Pool Members                | Pool Members        | Yes | Done        |
 | 9   | Create Bracket Entry               | Bracket Creation    | Yes | Done        |
@@ -451,5 +509,9 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 24  | Auto-Determine Game Winner         | UX Cleanup          | No  | Not Started |
 | 25  | Auto-Fill Bracket Picks            | Auto-Fill Bracket   | No  | Not Started |
 | 26  | Fix Bracket Submit Double-Click    | Bug Fixes           | No  | Not Started |
+| 27  | Splash / Marketing Page            | Branding            | No  | Not Started |
+| 28  | SEO Plan & Implementation          | Branding            | No  | Not Started |
+| 29  | App Theme & Design System          | Branding            | No  | Not Started |
+| 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Not Started |
 
-**MVP Total: 17 stories (16 done, 1 remaining)** | **Post-MVP: 11 stories**
+**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 15 stories**

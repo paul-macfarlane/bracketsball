@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { GenerateBracketButton } from "./generate-bracket-button";
 import { GameRow } from "./game-row";
 import { SyncStandingsButton } from "./sync-standings-button";
+import { SyncESPNButton } from "./sync-espn-button";
 
 export default async function TournamentGamesPage({
   params,
@@ -52,6 +53,7 @@ export default async function TournamentGamesPage({
           {tournament.name} — Games ({games.length})
         </h1>
         <div className="flex items-center gap-2">
+          {games.length > 0 && <SyncESPNButton tournamentId={id} />}
           {games.length > 0 && <SyncStandingsButton tournamentId={id} />}
           {games.length === 0 && tournamentTeams.length === 68 && (
             <GenerateBracketButton tournamentId={id} />
