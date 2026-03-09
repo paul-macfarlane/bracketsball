@@ -281,64 +281,34 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ---
 
-## Non-MVP Stories
+## Non-MVP Stories (Prioritized)
 
-### 16. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
-
-**As a** pool leader, **I want to** customize scoring per round **so that** I can tailor the pool's competitiveness.
-
-**Acceptance Criteria:**
-
-- Points per round can be customized individually
-- Only pool leaders can edit scoring
-- Changes are locked once tournament games begin
-
-### 17. In-App User Invites (Non-MVP) — Epic: Pool Members
-
-**As a** pool member, **I want to** invite existing users by searching for them **so that** I don't need to share a link externally.
-
-**Acceptance Criteria:**
-
-- User can search for other users by username
-- Selected users receive an in-app invite notification
-- Invited users can accept or decline
-
-### 18. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
-
-**As a** pool leader, **I want to** make my pool public or private **so that** I can control who can discover and join it.
-
-**Acceptance Criteria:**
-
-- Pool can be toggled between public and private
-- Private pools are invite-only
-- Public pools appear in search results
-- Toggle available at creation and in settings
-
-### 19. Theme Toggle (Non-MVP) — Epic: UX
-
-**As a** user, **I want to** switch between light, dark, and system theme modes **so that** I can use the app comfortably in any lighting condition.
-
-**Acceptance Criteria:**
-
-- User can toggle between light, dark, and system theme modes
-- Theme preference persists across sessions (via next-themes)
-- Toggle is accessible from the user dropdown menu (desktop) and mobile navigation menu
-- System mode automatically follows the user's OS preference
-
-### 20. Public Pool Search (Non-MVP) — Epic: Public Pools
-
-**As a** user, **I want to** search for public pools **so that** I can find and join open competitions.
-
-**Acceptance Criteria:**
-
-- User can search public pools by name
-- User can filter by brackets-per-entry range and pool size range
-- Only pools with available capacity are shown
-- User can join directly from search results
+Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
-## Epic: Tech Debt
+### 26. Fix Bracket Submit Double-Click (Non-MVP) — Epic: Bug Fixes
+
+**As a** pool member, **I want** bracket submission to show a success indicator on the first click **so that** I don't have to click submit twice.
+
+**Acceptance Criteria:**
+
+- Clicking submit once successfully submits the bracket and shows a success indicator
+- Investigate and fix the root cause of requiring two clicks
+- Submit button shows loading/disabled state while submission is in progress
+
+### 25. Auto-Fill Bracket Picks (Non-MVP) — Epic: Auto-Fill Bracket
+
+**As a** pool member, **I want to** auto-fill my bracket with generated picks **so that** I can quickly create an entry without manually picking every game.
+
+**Acceptance Criteria:**
+
+- User can choose from two auto-fill strategies:
+  - **Chalk (Higher Seed Always)**: the higher-seeded team always wins
+  - **Weighted Random**: winners are randomly selected, weighted toward the higher seed based on the seed differential
+- Auto-fill populates all remaining unpicked games in the bracket
+- User can modify any auto-filled picks before submitting
+- Auto-fill is available during bracket creation and editing (before tournament lock)
 
 ### 21. Transaction Audit (Non-MVP) — Epic: Tech Debt
 
@@ -353,9 +323,118 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Add `DbClient` optional parameter to query functions that need to participate in action-level transactions
 - Document any functions that were fixed
 
+### 16. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
+
+**As a** pool leader, **I want to** customize scoring per round **so that** I can tailor the pool's competitiveness.
+
+**Acceptance Criteria:**
+
+- Points per round can be customized individually
+- Only pool leaders can edit scoring
+- Changes are locked once tournament games begin
+
+### 33. Team & Game Info in Bracket Builder (Non-MVP) — Epic: Bracket UX Enhancements
+
+**As a** pool member filling out my bracket, **I want to** see supplemental information about each team and game **so that** I can make more informed picks — especially for teams I'm unfamiliar with.
+
+**Acceptance Criteria:**
+
+- **Investigation phase:** Research how to source supplemental team data (records, stats, strength ratings, short team descriptions). Evaluate options including:
+  - ESPN API (existing integration) — check if team records (overall and conference), stats, rankings, or team descriptions are available
+  - Other public/free sports data APIs (e.g., NCAA, kenpom-style ratings)
+  - Static/manually curated data as a fallback
+- Document findings and chosen approach before implementation begins
+- **Implementation — Game Details Button (pending investigation):**
+  - Each game matchup in the bracket builder has a small "details" button (e.g., info icon)
+  - Clicking/tapping opens a popover or modal with:
+    - Game venue/location
+    - Team records: overall (W-L) and conference (W-L) for each team
+    - Strengths, weaknesses, or other scouting-style notes per team (content depends on data source availability)
+    - Any other useful context (e.g., conference name, national ranking)
+  - Details button should be unobtrusive — doesn't clutter the pick UI
+  - Works on both desktop and mobile
+- **Implementation — Game Date/Time in Bracket View:**
+  - Enrich the bracket view (read-only bracket detail, not just the builder) to display the scheduled date and time for each game
+  - Date/time should be shown inline on each game card where space allows
+  - Games that have already been played can show the date played
+- **Data requirements:**
+  - Data is sourced automatically where possible (synced or fetched), with admin override capability
+  - New team fields (records, descriptions) stored in the DB and kept in sync
+
+### 28. SEO Plan & Implementation (Non-MVP) — Epic: Branding
+
+**As the** product owner, **I want** the app to be discoverable via search engines **so that** organic traffic can find Bracketsball.
+
+**Acceptance Criteria:**
+
+- Metadata: proper `<title>`, `<meta description>`, and Open Graph / Twitter Card tags on all public pages (splash page, login)
+- `robots.txt` allows crawling of public pages, disallows authenticated app routes
+- `sitemap.xml` generated for public pages
+- Structured data (JSON-LD) for the splash page (WebApplication or SoftwareApplication schema)
+- Canonical URLs set on all pages
+- Lighthouse SEO score ≥ 90 on the splash page
+- Document the SEO strategy and any ongoing tasks in `docs/technical/seo-plan.md`
+
+### 32. Update External Services Branding (Non-MVP) — Epic: Branding
+
+**As the** product owner, **I want to** update the app name, icons, and metadata across all external services **so that** the Bracketsball brand is consistent everywhere.
+
+**Acceptance Criteria:**
+
+- Google Cloud Console: Update OAuth consent screen app name to "Bracketsball", upload app icon (`icon-512.png`)
+- Discord Developer Portal: Update application name to "Bracketsball", upload app icon (`icon-512.png`)
+- Vercel: Update project name/display name to "Bracketsball"
+- GitHub: Update repository description to reflect new name
+- Neon: Update project name/description if applicable
+- cron-job.org: Update job names/descriptions to reflect new name
+- Verify OAuth consent screens show correct name and icon for both Google and Discord flows
+
+### 18. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
+
+**As a** pool leader, **I want to** make my pool public or private **so that** I can control who can discover and join it.
+
+**Acceptance Criteria:**
+
+- Pool can be toggled between public and private
+- Private pools are invite-only
+- Public pools appear in search results
+- Toggle available at creation and in settings
+
+### 20. Public Pool Search (Non-MVP) — Epic: Public Pools
+
+**As a** user, **I want to** search for public pools **so that** I can find and join open competitions.
+
+**Acceptance Criteria:**
+
+- User can search public pools by name
+- User can filter by brackets-per-entry range and pool size range
+- Only pools with available capacity are shown
+- User can join directly from search results
+
+### 17. In-App User Invites (Non-MVP) — Epic: Pool Members
+
+**As a** pool member, **I want to** invite existing users by searching for them **so that** I don't need to share a link externally.
+
+**Acceptance Criteria:**
+
+- User can search for other users by username
+- Selected users receive an in-app invite notification
+- Invited users can accept or decline
+
 ---
 
-## Epic: UX Cleanup
+## Completed Non-MVP Stories
+
+### 19. Theme Toggle (Non-MVP) ✅ — Epic: UX
+
+**As a** user, **I want to** switch between light, dark, and system theme modes **so that** I can use the app comfortably in any lighting condition.
+
+**Acceptance Criteria:**
+
+- User can toggle between light, dark, and system theme modes
+- Theme preference persists across sessions (via next-themes)
+- Toggle is accessible from the user dropdown menu (desktop) and mobile navigation menu
+- System mode automatically follows the user's OS preference
 
 ### 22. Remove User Dashboard (Non-MVP) ✅ — Epic: UX Cleanup
 
@@ -387,42 +466,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Admin no longer needs to manually select the winning team
 - Edge case: if scores are tied, no winner is auto-set (admin must resolve)
 
----
-
-## Epic: Auto-Fill Bracket
-
-### 25. Auto-Fill Bracket Picks (Non-MVP) — Epic: Auto-Fill Bracket
-
-**As a** pool member, **I want to** auto-fill my bracket with generated picks **so that** I can quickly create an entry without manually picking every game.
-
-**Acceptance Criteria:**
-
-- User can choose from two auto-fill strategies:
-  - **Chalk (Higher Seed Always)**: the higher-seeded team always wins
-  - **Weighted Random**: winners are randomly selected, weighted toward the higher seed based on the seed differential
-- Auto-fill populates all remaining unpicked games in the bracket
-- User can modify any auto-filled picks before submitting
-- Auto-fill is available during bracket creation and editing (before tournament lock)
-
----
-
-## Epic: Bug Fixes
-
-### 26. Fix Bracket Submit Double-Click (Non-MVP) — Epic: Bug Fixes
-
-**As a** pool member, **I want** bracket submission to show a success indicator on the first click **so that** I don't have to click submit twice.
-
-**Acceptance Criteria:**
-
-- Clicking submit once successfully submits the bracket and shows a success indicator
-- Investigate and fix the root cause of requiring two clicks
-- Submit button shows loading/disabled state while submission is in progress
-
----
-
-## Epic: Branding
-
-### 27. Splash / Marketing Page (Non-MVP) — Epic: Branding
+### 27. Splash / Marketing Page (Non-MVP) ✅ — Epic: Branding
 
 **As a** visitor, **I want to** land on an engaging marketing page **so that** I understand what Bracketsball is and am motivated to sign up.
 
@@ -434,20 +478,6 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Visual March Madness / basketball theming that conveys the app's purpose
 - Responsive design — looks great on mobile, tablet, and desktop
 - Fast load time — no heavy assets blocking initial render
-
-### 28. SEO Plan & Implementation (Non-MVP) — Epic: Branding
-
-**As the** product owner, **I want** the app to be discoverable via search engines **so that** organic traffic can find Bracketsball.
-
-**Acceptance Criteria:**
-
-- Metadata: proper `<title>`, `<meta description>`, and Open Graph / Twitter Card tags on all public pages (splash page, login)
-- `robots.txt` allows crawling of public pages, disallows authenticated app routes
-- `sitemap.xml` generated for public pages
-- Structured data (JSON-LD) for the splash page (WebApplication or SoftwareApplication schema)
-- Canonical URLs set on all pages
-- Lighthouse SEO score ≥ 90 on the splash page
-- Document the SEO strategy and any ongoing tasks in `docs/technical/seo-plan.md`
 
 ### 29. App Theme & Design System (Non-MVP) ✅ — Epic: Branding
 
@@ -462,7 +492,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Dark mode support with the new palette (can coordinate with Story 19 Theme Toggle)
 - Document the design tokens and rationale in `docs/technical/design-system.md`
 
-### 30. Icon Pack (Favicon, App Icons, OAuth) (Non-MVP) — Epic: Branding
+### 30. Icon Pack (Favicon, App Icons, OAuth) (Non-MVP) ✅ — Epic: Branding
 
 **As a** user, **I want** the app to have a recognizable icon **so that** I can identify it in my browser tabs, home screen, and OAuth consent screens.
 
@@ -475,7 +505,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - OAuth provider icons: upload the app icon to Google Cloud Console and Discord Developer Portal for branded consent screens
 - Icons render correctly across major browsers (Chrome, Safari, Firefox, Edge) and mobile home screen bookmarks
 
-### 31. Legal & Contact Pages (Non-MVP) — Epic: Branding
+### 31. Legal & Contact Pages (Non-MVP) ✅ — Epic: Branding
 
 **As a** visitor or user, **I want** access to a privacy policy, terms of service, and contact information **so that** I understand how my data is handled and how to reach the team.
 
@@ -487,52 +517,6 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - All three pages are publicly accessible (no auth required)
 - Footer with links to privacy, terms, and contact is present on the splash page and within the authenticated app
 - Pages are styled consistently with the app theme
-
-### 32. Update External Services Branding (Non-MVP) — Epic: Branding
-
-**As the** product owner, **I want to** update the app name, icons, and metadata across all external services **so that** the Bracketsball brand is consistent everywhere.
-
-**Acceptance Criteria:**
-
-- Google Cloud Console: Update OAuth consent screen app name to "Bracketsball", upload app icon (`icon-512.png`)
-- Discord Developer Portal: Update application name to "Bracketsball", upload app icon (`icon-512.png`)
-- Vercel: Update project name/display name to "Bracketsball"
-- GitHub: Update repository description to reflect new name
-- Neon: Update project name/description if applicable
-- cron-job.org: Update job names/descriptions to reflect new name
-- Verify OAuth consent screens show correct name and icon for both Google and Discord flows
-
----
-
-## Epic: Bracket UX Enhancements
-
-### 33. Team & Game Info in Bracket Builder (Non-MVP) — Epic: Bracket UX Enhancements
-
-**As a** pool member filling out my bracket, **I want to** see supplemental information about each team and game **so that** I can make more informed picks — especially for teams I'm unfamiliar with.
-
-**Acceptance Criteria:**
-
-- **Investigation phase:** Research how to source supplemental team data (records, stats, strength ratings, short team descriptions). Evaluate options including:
-  - ESPN API (existing integration) — check if team records (overall and conference), stats, rankings, or team descriptions are available
-  - Other public/free sports data APIs (e.g., NCAA, kenpom-style ratings)
-  - Static/manually curated data as a fallback
-- Document findings and chosen approach before implementation begins
-- **Implementation — Game Details Button (pending investigation):**
-  - Each game matchup in the bracket builder has a small "details" button (e.g., info icon)
-  - Clicking/tapping opens a popover or modal with:
-    - Game venue/location
-    - Team records: overall (W-L) and conference (W-L) for each team
-    - Strengths, weaknesses, or other scouting-style notes per team (content depends on data source availability)
-    - Any other useful context (e.g., conference name, national ranking)
-  - Details button should be unobtrusive — doesn't clutter the pick UI
-  - Works on both desktop and mobile
-- **Implementation — Game Date/Time in Bracket View:**
-  - Enrich the bracket view (read-only bracket detail, not just the builder) to display the scheduled date and time for each game
-  - Date/time should be shown inline on each game card where space allows
-  - Games that have already been played can show the date played
-- **Data requirements:**
-  - Data is sourced automatically where possible (synced or fetched), with admin override capability
-  - New team fields (records, descriptions) stored in the DB and kept in sync
 
 ---
 
@@ -557,23 +541,23 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 13  | View Pool Standings                 | Bracket Visibility      | Yes | Done        |
 | 14  | View Individual Bracket Detail      | Bracket Visibility      | Yes | Done        |
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
-| 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
-| 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
-| 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |
-| 19  | Theme Toggle                        | UX                      | No  | Not Started |
-| 20  | Public Pool Search                  | Public Pools            | No  | Not Started |
+| 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Not Started |
+| 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Not Started |
 | 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
+| 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
+| 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Not Started |
+| 28  | SEO Plan & Implementation           | Branding                | No  | Not Started |
+| 32  | Update External Services Branding   | Branding                | No  | Not Started |
+| 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |
+| 20  | Public Pool Search                  | Public Pools            | No  | Not Started |
+| 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
+| 19  | Theme Toggle                        | UX                      | No  | Done        |
 | 22  | Remove User Dashboard               | UX Cleanup              | No  | Done        |
 | 23  | Remove Admin Dashboard              | UX Cleanup              | No  | Done        |
 | 24  | Auto-Determine Game Winner          | UX Cleanup              | No  | Done        |
-| 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Not Started |
-| 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Not Started |
-| 27  | Splash / Marketing Page             | Branding                | No  | Dnoe        |
-| 28  | SEO Plan & Implementation           | Branding                | No  | Not Started |
+| 27  | Splash / Marketing Page             | Branding                | No  | Done        |
 | 29  | App Theme & Design System           | Branding                | No  | Done        |
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
-| 32  | Update External Services Branding   | Branding                | No  | Not Started |
-| 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Not Started |
 
-**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 18 stories**
+**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 18 stories (8 done, 10 remaining)**
