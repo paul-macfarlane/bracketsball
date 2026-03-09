@@ -488,6 +488,20 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Footer with links to privacy, terms, and contact is present on the splash page and within the authenticated app
 - Pages are styled consistently with the app theme
 
+### 32. Update External Services Branding (Non-MVP) — Epic: Branding
+
+**As the** product owner, **I want to** update the app name, icons, and metadata across all external services **so that** the Bracketsball brand is consistent everywhere.
+
+**Acceptance Criteria:**
+
+- Google Cloud Console: Update OAuth consent screen app name to "Bracketsball", upload app icon (`icon-512.png`)
+- Discord Developer Portal: Update application name to "Bracketsball", upload app icon (`icon-512.png`)
+- Vercel: Update project name/display name to "Bracketsball"
+- GitHub: Update repository description to reflect new name
+- Neon: Update project name/description if applicable
+- cron-job.org: Update job names/descriptions to reflect new name
+- Verify OAuth consent screens show correct name and icon for both Google and Discord flows
+
 ---
 
 ## Summary
@@ -526,6 +540,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 28  | SEO Plan & Implementation          | Branding            | No  | Not Started |
 | 29  | App Theme & Design System          | Branding            | No  | Done        |
 | 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Done        |
-| 31  | Legal & Contact Pages              | Branding            | No  | Not Started |
+| 31  | Legal & Contact Pages              | Branding            | No  | Done        |
+| 32  | Update External Services Branding  | Branding            | No  | Not Started |
 
-**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 16 stories**
+**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 17 stories**
