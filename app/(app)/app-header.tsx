@@ -61,8 +61,11 @@ export function AppHeader({ session }: AppHeaderProps) {
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         {/* Left: logo + nav links */}
         <div className="flex items-center gap-6">
-          <Link href="/pools" className="text-lg font-bold">
-            BRacketiering
+          <Link
+            href="/pools"
+            className="font-heading text-lg font-bold uppercase tracking-wide"
+          >
+            Bracketsball
           </Link>
           <nav className="hidden items-center gap-4 md:flex">
             {links.map((link) => {

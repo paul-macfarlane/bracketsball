@@ -1,4 +1,4 @@
-# BRacketiering Backlog
+# Bracketsball Backlog
 
 Derived from [Original Vision](./originalVision.md). Items are organized by epic and priority. All MVP epics come first, followed by non-MVP epics at the end.
 
@@ -424,7 +424,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ### 27. Splash / Marketing Page (Non-MVP) — Epic: Branding
 
-**As a** visitor, **I want to** land on an engaging marketing page **so that** I understand what BRacketiering is and am motivated to sign up.
+**As a** visitor, **I want to** land on an engaging marketing page **so that** I understand what Bracketsball is and am motivated to sign up.
 
 **Acceptance Criteria:**
 
@@ -437,7 +437,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ### 28. SEO Plan & Implementation (Non-MVP) — Epic: Branding
 
-**As the** product owner, **I want** the app to be discoverable via search engines **so that** organic traffic can find BRacketiering.
+**As the** product owner, **I want** the app to be discoverable via search engines **so that** organic traffic can find Bracketsball.
 
 **Acceptance Criteria:**
 
@@ -468,12 +468,25 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 **Acceptance Criteria:**
 
-- Custom app icon designed that represents BRacketiering (bracket + basketball motif)
+- Custom app icon designed that represents Bracketsball (bracket + basketball motif)
 - Favicon set: `favicon.ico` (16×16, 32×32), `apple-touch-icon.png` (180×180), `icon-192.png`, `icon-512.png`
 - PWA manifest (`site.webmanifest`) references the icon pack with correct sizes and MIME types
 - Open Graph image (`og-image.png`) for social sharing — 1200×630
 - OAuth provider icons: upload the app icon to Google Cloud Console and Discord Developer Portal for branded consent screens
 - Icons render correctly across major browsers (Chrome, Safari, Firefox, Edge) and mobile home screen bookmarks
+
+### 31. Legal & Contact Pages (Non-MVP) — Epic: Branding
+
+**As a** visitor or user, **I want** access to a privacy policy, terms of service, and contact information **so that** I understand how my data is handled and how to reach the team.
+
+**Acceptance Criteria:**
+
+- Privacy Policy page at `/privacy` — covers data collection, OAuth data usage, cookies, data retention, and deletion rights
+- Terms of Service page at `/terms` — covers acceptable use, account termination, liability limitations
+- Contact information accessible from the footer (email or contact form)
+- All three pages are publicly accessible (no auth required)
+- Footer with links to privacy, terms, and contact is present on the splash page and within the authenticated app
+- Pages are styled consistently with the app theme
 
 ---
 
@@ -511,7 +524,8 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 26  | Fix Bracket Submit Double-Click    | Bug Fixes           | No  | Not Started |
 | 27  | Splash / Marketing Page            | Branding            | No  | Not Started |
 | 28  | SEO Plan & Implementation          | Branding            | No  | Not Started |
-| 29  | App Theme & Design System          | Branding            | No  | Not Started |
+| 29  | App Theme & Design System          | Branding            | No  | Done        |
 | 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Not Started |
+| 31  | Legal & Contact Pages              | Branding            | No  | Not Started |
 
-**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 15 stories**
+**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 16 stories**

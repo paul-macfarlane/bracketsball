@@ -1,4 +1,4 @@
-# BRacketeering Original Vision
+# Bracketsball Original Vision
 
 This is an app for users to compete in March Madness Bracket Challenges. There isn’t anything groundbreaking about the app. It is just suppose to be a fun app for friends to compete with each other to see who is the best at predicting NCAA basketball games in the NCAA Tournament.
 

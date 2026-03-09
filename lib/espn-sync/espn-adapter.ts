@@ -118,7 +118,7 @@ export async function fetchESPNScoreboard(
   const url = `${ESPN_SCOREBOARD_URL}?groups=100&dates=${dateFormatted}&limit=200`;
 
   const response = await fetch(url, {
-    headers: { "User-Agent": "Bracketiering/1.0" },
+    headers: { "User-Agent": "Bracketsball/1.0" },
   });
 
   if (!response.ok) {

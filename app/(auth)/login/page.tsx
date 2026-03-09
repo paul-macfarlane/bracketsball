@@ -23,7 +23,9 @@ export default async function LoginPage({
     <div className="flex min-h-screen items-center justify-center">
       <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-8 px-4">
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight">BRacketiering</h1>
+          <h1 className="text-3xl font-bold uppercase tracking-wide">
+            Bracketsball
+          </h1>
           <p className="mt-2 text-muted-foreground">
             Sign in to start competing
           </p>
