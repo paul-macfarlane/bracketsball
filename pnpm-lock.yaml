@@ -11,6 +11,9 @@ dependencies:
   "@neondatabase/serverless":
     specifier: ^1.0.2
     version: 1.0.2
+  "@tailwindcss/typography":
+    specifier: ^0.5.19
+    version: 0.5.19(tailwindcss@4.2.1)
   better-auth:
     specifier: ^1.5.4
     version: 1.5.4(@prisma/client@7.4.2)(drizzle-kit@0.31.9)(drizzle-orm@0.45.1)(mongodb@7.1.0)(next@16.1.6)(pg@8.20.0)(prisma@7.4.2)(react-dom@19.2.3)(react@19.2.3)
@@ -4426,6 +4429,18 @@ packages:
       tailwindcss: 4.2.1
     dev: true
 
+  /@tailwindcss/typography@0.5.19(tailwindcss@4.2.1):
+    resolution:
+      {
+        integrity: sha512-w31dd8HOx3k9vPtcQh5QHP9GwKcgbMp87j58qi6xgiBnFFtKEAgCWnDw4qUT8aHwkCp8bKvb/KGKWWHedP0AAg==,
+      }
+    peerDependencies:
+      tailwindcss: ">=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1"
+    dependencies:
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 4.2.1
+    dev: false
+
   /@ts-morph/common@0.27.0:
     resolution:
       {
@@ -5818,7 +5833,6 @@ packages:
       }
     engines: { node: ">=4" }
     hasBin: true
-    dev: true
 
   /csstype@3.2.3:
     resolution:
@@ -9617,6 +9631,17 @@ packages:
     engines: { node: ">= 0.4" }
     dev: true
 
+  /postcss-selector-parser@6.0.10:
+    resolution:
+      {
+        integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==,
+      }
+    engines: { node: ">=4" }
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
+    dev: false
+
   /postcss-selector-parser@7.1.1:
     resolution:
       {
@@ -10917,7 +10942,6 @@ packages:
       {
         integrity: sha512-/tBrSQ36vCleJkAOsy9kbNTgaxvGbyOamC30PRePTQe/o1MFwEKHQk4Cn7BNGaPtjp+PuUrByJehM1hgxfq4sw==,
       }
-    dev: true
 
   /tapable@2.3.0:
     resolution:
@@ -11360,7 +11384,6 @@ packages:
       {
         integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==,
       }
-    dev: true
 
   /valibot@1.2.0(typescript@5.9.3):
     resolution:

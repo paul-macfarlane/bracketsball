@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth, type Session } from "@/lib/auth";
 import { AppHeader } from "./app-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export default async function AppLayout({
   children,
@@ -18,9 +19,10 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <AppHeader session={session as Session} />
-      <main className="container mx-auto px-4 py-6">{children}</main>
+      <main className="container mx-auto flex-1 px-4 py-6">{children}</main>
+      <SiteFooter />
     </div>
   );
 }
