@@ -357,7 +357,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: UX Cleanup
 
-### 22. Remove User Dashboard (Non-MVP) — Epic: UX Cleanup
+### 22. Remove User Dashboard (Non-MVP) ✅ — Epic: UX Cleanup
 
 **As a** user, **I want** the app to default to the Pools page **so that** I land on the most useful page without an unnecessary dashboard.
 
@@ -367,7 +367,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Default authenticated route (`/`) redirects to the Pools page
 - Navigation no longer shows a "Dashboard" link
 
-### 23. Remove Admin Dashboard (Non-MVP) — Epic: UX Cleanup
+### 23. Remove Admin Dashboard (Non-MVP) ✅ — Epic: UX Cleanup
 
 **As an** admin, **I want** the admin area to default to the Teams tab **so that** I skip the unnecessary dashboard and land on actionable content.
 
@@ -377,7 +377,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Admin area defaults to the Teams tab
 - Admin navigation no longer shows a "Dashboard" link
 
-### 24. Auto-Determine Game Winner from Scores (Non-MVP) — Epic: UX Cleanup
+### 24. Auto-Determine Game Winner from Scores (Non-MVP) ✅ — Epic: UX Cleanup
 
 **As an** admin, **I want** the winning team to be automatically determined when I enter game scores **so that** I don't have to redundantly select the winner.
 
@@ -449,7 +449,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Lighthouse SEO score ≥ 90 on the splash page
 - Document the SEO strategy and any ongoing tasks in `docs/technical/seo-plan.md`
 
-### 29. App Theme & Design System (Non-MVP) — Epic: Branding
+### 29. App Theme & Design System (Non-MVP) ✅ — Epic: Branding
 
 **As a** user, **I want** the app's visual design to feel like a March Madness bracket challenge **so that** the experience is fun and on-brand.
 
@@ -517,15 +517,15 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 | 19  | Theme Toggle                       | UX                  | No  | Not Started |
 | 20  | Public Pool Search                 | Public Pools        | No  | Not Started |
 | 21  | Transaction Audit                  | Tech Debt           | No  | Not Started |
-| 22  | Remove User Dashboard              | UX Cleanup          | No  | Not Started |
-| 23  | Remove Admin Dashboard             | UX Cleanup          | No  | Not Started |
-| 24  | Auto-Determine Game Winner         | UX Cleanup          | No  | Not Started |
+| 22  | Remove User Dashboard              | UX Cleanup          | No  | Done        |
+| 23  | Remove Admin Dashboard             | UX Cleanup          | No  | Done        |
+| 24  | Auto-Determine Game Winner         | UX Cleanup          | No  | Done        |
 | 25  | Auto-Fill Bracket Picks            | Auto-Fill Bracket   | No  | Not Started |
 | 26  | Fix Bracket Submit Double-Click    | Bug Fixes           | No  | Not Started |
 | 27  | Splash / Marketing Page            | Branding            | No  | Not Started |
 | 28  | SEO Plan & Implementation          | Branding            | No  | Not Started |
 | 29  | App Theme & Design System          | Branding            | No  | Done        |
-| 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Not Started |
+| 30  | Icon Pack (Favicon, App, OAuth)    | Branding            | No  | Done        |
 | 31  | Legal & Contact Pages              | Branding            | No  | Not Started |
 
 **MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 16 stories**
