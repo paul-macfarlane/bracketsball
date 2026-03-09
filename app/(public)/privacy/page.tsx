@@ -84,7 +84,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong>Contact us</strong> at{" "}
-          <a href="mailto:contact@bracketsball.com">contact@bracketsball.com</a>{" "}
+          <a href="mailto:bracketsball@gmail.com">bracketsball@gmail.com</a>{" "}
           with any privacy questions
         </li>
       </ul>
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
       <h2>9. Contact</h2>
       <p>
         For privacy questions or data requests, email{" "}
-        <a href="mailto:contact@bracketsball.com">contact@bracketsball.com</a>.
+        <a href="mailto:bracketsball@gmail.com">bracketsball@gmail.com</a>.
       </p>
     </article>
   );

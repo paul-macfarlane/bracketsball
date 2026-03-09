@@ -117,7 +117,7 @@ export default function TermsPage() {
       <h2>10. Contact</h2>
       <p>
         For questions about these terms, email{" "}
-        <a href="mailto:contact@bracketsball.com">contact@bracketsball.com</a>.
+        <a href="mailto:bracketsball@gmail.com">bracketsball@gmail.com</a>.
       </p>
     </article>
   );
