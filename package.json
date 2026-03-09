@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed:teams": "npx tsx scripts/seed-teams.ts",
-    "db:seed:tournament": "npx tsx scripts/seed-tournament.ts"
+    "db:seed:tournament": "npx tsx scripts/seed-tournament.ts",
+    "sync:test": "npx tsx scripts/test-espn-sync.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

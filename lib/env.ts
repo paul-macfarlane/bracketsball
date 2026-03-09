@@ -14,4 +14,5 @@ export const env = {
   GOOGLE_CLIENT_SECRET: requireEnv("GOOGLE_CLIENT_SECRET"),
   DISCORD_CLIENT_ID: requireEnv("DISCORD_CLIENT_ID"),
   DISCORD_CLIENT_SECRET: requireEnv("DISCORD_CLIENT_SECRET"),
+  CRON_SECRET: process.env.CRON_SECRET ?? "",
 } as const;

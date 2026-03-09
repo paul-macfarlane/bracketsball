@@ -135,6 +135,9 @@ export const tournamentGame = pgTable(
   (table) => [
     index("tournament_game_tournament_id_idx").on(table.tournamentId),
     index("tournament_game_round_idx").on(table.tournamentId, table.round),
+    uniqueIndex("tournament_game_espn_event_id_unique_idx").on(
+      table.espnEventId,
+    ),
   ],
 );
 

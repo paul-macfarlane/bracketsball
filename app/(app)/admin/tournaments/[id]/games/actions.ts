@@ -12,6 +12,8 @@ import {
   getTournamentGames,
 } from "@/lib/db/queries/tournaments";
 import { syncStandingsForTournament } from "@/lib/db/queries/standings";
+import { syncTournament } from "@/lib/espn-sync/sync";
+import { espnAdapter } from "@/lib/espn-sync/espn-adapter";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({
@@ -197,6 +199,27 @@ export async function generateBracketAction(tournamentId: string) {
   });
 
   revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+}
+
+export async function syncFromESPNAction(tournamentId: string) {
+  await requireAdmin();
+
+  const tournament = await getTournamentById(tournamentId);
+  if (!tournament) {
+    return { error: "Tournament not found." };
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  const result = await syncTournament(tournamentId, espnAdapter, today);
+
+  revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+  return {
+    success: true,
+    gamesUpdated: result.gamesUpdated,
+    gamesSkipped: result.gamesSkipped,
+    teamsUpserted: result.teamsUpserted,
+    errors: result.errors,
+  };
 }
 
 export async function syncStandingsAction(tournamentId: string) {
