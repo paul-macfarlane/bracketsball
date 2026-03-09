@@ -281,6 +281,34 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ---
 
+## Epic: Pre-Tournament Setup
+
+### 34. Configure ESPN Sync Cron Jobs (MVP) — Epic: Pre-Tournament Setup
+
+**As the** product owner, **I want to** set up the cron jobs on cron-job.org for ESPN data sync **so that** tournament data syncs automatically once games begin.
+
+**Acceptance Criteria:**
+
+- Cron jobs configured on cron-job.org to hit the ESPN sync endpoint(s) on an appropriate schedule
+- Sync frequency is suitable for live tournament updates (e.g., every few minutes during game days)
+- Verify sync works end-to-end in production before the tournament starts
+
+### 32. Update External Services Branding (MVP) — Epic: Branding
+
+**As the** product owner, **I want to** update the app name, icons, and metadata across all external services **so that** the Bracketsball brand is consistent everywhere.
+
+**Acceptance Criteria:**
+
+- Google Cloud Console: Update OAuth consent screen app name to "Bracketsball", upload app icon (`icon-512.png`)
+- Discord Developer Portal: Update application name to "Bracketsball", upload app icon (`icon-512.png`)
+- Vercel: Update project name/display name to "Bracketsball"
+- GitHub: Update repository description to reflect new name
+- Neon: Update project name/description if applicable
+- cron-job.org: Update job names/descriptions to reflect new name
+- Verify OAuth consent screens show correct name and icon for both Google and Discord flows
+
+---
+
 ## Non-MVP Stories (Prioritized)
 
 Stories below are ordered by priority. Completed stories are grouped at the end.
@@ -374,20 +402,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Canonical URLs set on all pages
 - Lighthouse SEO score ≥ 90 on the splash page
 - Document the SEO strategy and any ongoing tasks in `docs/technical/seo-plan.md`
-
-### 32. Update External Services Branding (Non-MVP) — Epic: Branding
-
-**As the** product owner, **I want to** update the app name, icons, and metadata across all external services **so that** the Bracketsball brand is consistent everywhere.
-
-**Acceptance Criteria:**
-
-- Google Cloud Console: Update OAuth consent screen app name to "Bracketsball", upload app icon (`icon-512.png`)
-- Discord Developer Portal: Update application name to "Bracketsball", upload app icon (`icon-512.png`)
-- Vercel: Update project name/display name to "Bracketsball"
-- GitHub: Update repository description to reflect new name
-- Neon: Update project name/description if applicable
-- cron-job.org: Update job names/descriptions to reflect new name
-- Verify OAuth consent screens show correct name and icon for both Google and Discord flows
 
 ### 18. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
 
@@ -541,13 +555,14 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 13  | View Pool Standings                 | Bracket Visibility      | Yes | Done        |
 | 14  | View Individual Bracket Detail      | Bracket Visibility      | Yes | Done        |
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
+| 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | Not Started |
+| 32  | Update External Services Branding   | Branding                | Yes | Not Started |
 | 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Not Started |
 | 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Not Started |
 | 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
 | 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
 | 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Not Started |
 | 28  | SEO Plan & Implementation           | Branding                | No  | Not Started |
-| 32  | Update External Services Branding   | Branding                | No  | Not Started |
 | 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |
 | 20  | Public Pool Search                  | Public Pools            | No  | Not Started |
 | 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
@@ -560,4 +575,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 17 stories (17 done, 0 remaining)** | **Post-MVP: 18 stories (8 done, 10 remaining)**
+**MVP Total: 19 stories (17 done, 2 remaining)** | **Post-MVP: 16 stories (8 done, 8 remaining)**
