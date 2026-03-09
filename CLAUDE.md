@@ -1,4 +1,4 @@
-# BRacketiering
+# Bracketsball
 
 March Madness bracket challenge app where users compete in pools by predicting NCAA tournament game outcomes.
 
