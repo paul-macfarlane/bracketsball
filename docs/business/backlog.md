@@ -557,7 +557,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
 | 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | Not Started |
 | 32  | Update External Services Branding   | Branding                | Yes | Not Started |
-| 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Not Started |
+| 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Done |
 | 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Not Started |
 | 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
 | 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
