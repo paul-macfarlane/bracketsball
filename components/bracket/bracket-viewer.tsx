@@ -3,6 +3,8 @@
 import { useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { StickySubHeader } from "@/components/sticky-sub-header";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { BracketFullView } from "./bracket-full-view";
 import type { BracketPositions } from "./bracket-full-view";
 import type { BracketGame, BracketTeam, BracketPick } from "./types";
@@ -18,6 +20,8 @@ interface BracketViewerProps {
   picks: BracketPick[];
   bracketPositions?: BracketPositions;
   poolScoring: PoolScoring;
+  poolId?: string;
+  poolName?: string;
 }
 
 export function BracketViewer({
@@ -30,6 +34,8 @@ export function BracketViewer({
   picks: picksList,
   bracketPositions,
   poolScoring,
+  poolId,
+  poolName,
 }: BracketViewerProps) {
   const picks = useMemo(
     () => new Map(picksList.map((p) => [p.tournamentGameId, p.pickedTeamId])),
@@ -92,23 +98,35 @@ export function BracketViewer({
   return (
     <div>
       {/* Header */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold">{bracketName}</h1>
-          <Badge
-            variant={bracketStatus === "submitted" ? "default" : "secondary"}
-          >
-            {bracketStatus === "submitted" ? "Submitted" : "Draft"}
-          </Badge>
+      <StickySubHeader>
+        {poolName && poolId && (
+          <PageBreadcrumbs
+            crumbs={[
+              { label: "Pools", href: "/pools" },
+              { label: poolName, href: `/pools/${poolId}` },
+              { label: bracketName },
+            ]}
+            className="mb-2"
+          />
+        )}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold">{bracketName}</h1>
+            <Badge
+              variant={bracketStatus === "submitted" ? "default" : "secondary"}
+            >
+              {bracketStatus === "submitted" ? "Submitted" : "Draft"}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-semibold">Points: {totalPoints}</span>
+            <span className="text-muted-foreground">|</span>
+            <span className="text-muted-foreground">
+              Potential: {potentialPoints}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="font-semibold">Points: {totalPoints}</span>
-          <span className="text-muted-foreground">|</span>
-          <span className="text-muted-foreground">
-            Potential: {potentialPoints}
-          </span>
-        </div>
-      </div>
+      </StickySubHeader>
 
       {/* Bracket view — disabled (read-only) */}
       <BracketFullView

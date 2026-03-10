@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import Link from "next/link";
 
 import { auth } from "@/lib/auth";
 import { getPoolById } from "@/lib/db/queries/pools";
@@ -99,15 +98,6 @@ export default async function BracketPage({
 
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="mb-4">
-        <Link
-          href={`/pools/${poolId}`}
-          className="text-sm text-muted-foreground hover:underline"
-        >
-          &larr; Back to {poolData.pool.name}
-        </Link>
-      </div>
-
       {isOwner ? (
         <BracketEditor
           bracketEntryId={bracketId}
@@ -121,6 +111,7 @@ export default async function BracketPage({
           bracketPositions={bracketPositions}
           tournamentStarted={tournamentStarted}
           poolScoring={poolScoring}
+          poolName={poolData.pool.name}
         />
       ) : (
         <BracketViewer
@@ -133,6 +124,8 @@ export default async function BracketPage({
           picks={bracketPicks}
           bracketPositions={bracketPositions}
           poolScoring={poolScoring}
+          poolId={poolId}
+          poolName={poolData.pool.name}
         />
       )}
     </div>

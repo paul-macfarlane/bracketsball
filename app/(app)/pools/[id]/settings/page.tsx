@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import Link from "next/link";
 
 import { auth } from "@/lib/auth";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
+import { StickySubHeader } from "@/components/sticky-sub-header";
 import {
   getPoolById,
   getMaxBracketCountInPool,
@@ -49,16 +50,17 @@ export default async function PoolSettingsPage({
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-4">
-        <Link
-          href={`/pools/${id}`}
-          className="text-sm text-muted-foreground hover:underline"
-        >
-          &larr; Back to pool
-        </Link>
-      </div>
-
-      <h1 className="mb-4 text-2xl font-bold">{poolData.pool.name} Settings</h1>
+      <StickySubHeader>
+        <PageBreadcrumbs
+          crumbs={[
+            { label: "Pools", href: "/pools" },
+            { label: poolData.pool.name, href: `/pools/${id}` },
+            { label: "Settings" },
+          ]}
+          className="mb-2"
+        />
+        <h1 className="text-2xl font-bold">{poolData.pool.name} Settings</h1>
+      </StickySubHeader>
 
       <Card>
         <CardHeader>
