@@ -315,16 +315,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
-### 26. Fix Bracket Submit Double-Click (Non-MVP) — Epic: Bug Fixes
-
-**As a** pool member, **I want** bracket submission to show a success indicator on the first click **so that** I don't have to click submit twice.
-
-**Acceptance Criteria:**
-
-- Clicking submit once successfully submits the bracket and shows a success indicator
-- Investigate and fix the root cause of requiring two clicks
-- Submit button shows loading/disabled state while submission is in progress
-
 ### 25. Auto-Fill Bracket Picks (Non-MVP) — Epic: Auto-Fill Bracket
 
 **As a** pool member, **I want to** auto-fill my bracket with generated picks **so that** I can quickly create an entry without manually picking every game.
@@ -438,6 +428,16 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 ---
 
 ## Completed Non-MVP Stories
+
+### 26. Fix Bracket Submit Double-Click (Non-MVP) ✅ — Epic: Bug Fixes
+
+**As a** pool member, **I want** bracket submission to show a success indicator on the first click **so that** I don't have to click submit twice.
+
+**Acceptance Criteria:**
+
+- Clicking submit once successfully submits the bracket and shows a success indicator
+- Investigate and fix the root cause of requiring two clicks
+- Submit button shows loading/disabled state while submission is in progress
 
 ### 19. Theme Toggle (Non-MVP) ✅ — Epic: UX
 
@@ -557,7 +557,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
 | 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | Not Started |
 | 32  | Update External Services Branding   | Branding                | Yes | Not Started |
-| 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Done |
+| 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Done        |
 | 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Not Started |
 | 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
 | 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
@@ -575,4 +575,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 19 stories (17 done, 2 remaining)** | **Post-MVP: 16 stories (8 done, 8 remaining)**
+**MVP Total: 19 stories (17 done, 2 remaining)** | **Post-MVP: 16 stories (9 done, 7 remaining)**
