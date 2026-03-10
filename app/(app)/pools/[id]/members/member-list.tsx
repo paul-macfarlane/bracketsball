@@ -88,8 +88,8 @@ export function MemberList({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
             <CardTitle>Members</CardTitle>
             <CardDescription>
               {members.length} member{members.length !== 1 ? "s" : ""} in this
@@ -106,22 +106,69 @@ export function MemberList({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {members.map((member) => {
             const isCurrentUser = member.userId === currentUserId;
 
             return (
               <div
                 key={member.id}
-                className="flex items-center justify-between rounded-md border p-3"
+                className="flex items-center gap-2 rounded-md border p-2 sm:gap-3 sm:p-3"
               >
-                <div className="flex items-center gap-3">
-                  <UserDisplay
-                    name={member.userName + (isCurrentUser ? " (you)" : "")}
-                    image={member.userImage}
-                    username={member.userUsername}
-                  />
-                  {!isLeader && (
+                <UserDisplay
+                  name={member.userName + (isCurrentUser ? " (you)" : "")}
+                  image={member.userImage}
+                  username={member.userUsername}
+                  size="sm"
+                />
+                <div className="ml-auto flex shrink-0 items-center gap-1.5">
+                  {isLeader && !isCurrentUser ? (
+                    <>
+                      <Select
+                        value={member.role}
+                        onValueChange={(value: "leader" | "member") =>
+                          handleRoleChange(member.id, value)
+                        }
+                      >
+                        <SelectTrigger className="h-8 w-[100px] text-xs sm:w-[110px] sm:text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="leader">Leader</SelectItem>
+                          <SelectItem value="member">Member</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
+                            <UserMinus className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove member</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to remove {member.userName}{" "}
+                              from this pool? All of their bracket entries will
+                              be permanently deleted.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleRemove(member.id)}
+                            >
+                              Remove
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </>
+                  ) : (
                     <Badge
                       variant={
                         member.role === "leader" ? "default" : "secondary"
@@ -131,56 +178,6 @@ export function MemberList({
                     </Badge>
                   )}
                 </div>
-                {isLeader && !isCurrentUser && (
-                  <div className="flex items-center gap-2">
-                    <Select
-                      value={member.role}
-                      onValueChange={(value: "leader" | "member") =>
-                        handleRoleChange(member.id, value)
-                      }
-                    >
-                      <SelectTrigger className="w-[110px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="leader">Leader</SelectItem>
-                        <SelectItem value="member">Member</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <UserMinus className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Remove member</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to remove {member.userName}{" "}
-                            from this pool? All of their bracket entries will be
-                            permanently deleted.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleRemove(member.id)}
-                          >
-                            Remove
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                )}
-                {isLeader && isCurrentUser && (
-                  <Badge
-                    variant={member.role === "leader" ? "default" : "secondary"}
-                  >
-                    {member.role}
-                  </Badge>
-                )}
               </div>
             );
           })}

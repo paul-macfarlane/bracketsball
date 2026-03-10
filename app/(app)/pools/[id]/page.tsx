@@ -89,12 +89,7 @@ export default async function PoolDetailPage({
   };
 
   const standings = activeTournament
-    ? await getPoolStandings(
-        id,
-        activeTournament.id,
-        session.user.id,
-        poolScoring,
-      )
+    ? await getPoolStandings(id, activeTournament.id, poolScoring)
     : [];
 
   return (

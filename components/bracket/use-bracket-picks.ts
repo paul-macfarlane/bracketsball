@@ -158,6 +158,23 @@ export function useBracketPicks({
     ],
   );
 
+  const applyBulkPicks = useCallback(
+    (newPicks: { tournamentGameId: string; pickedTeamId: string }[]) => {
+      setPicks((prev) => {
+        const next = new Map(prev);
+        for (const pick of newPicks) {
+          next.set(pick.tournamentGameId, pick.pickedTeamId);
+        }
+        return next;
+      });
+    },
+    [],
+  );
+
+  const clearAllPicks = useCallback(() => {
+    setPicks(new Map());
+  }, []);
+
   const totalGames = games.length;
   const pickedGames = picks.size;
 
@@ -165,6 +182,8 @@ export function useBracketPicks({
     picks,
     handlePick,
     getTeamsForGame,
+    applyBulkPicks,
+    clearAllPicks,
     totalGames,
     pickedGames,
   };

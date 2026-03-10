@@ -12,13 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { UserDisplay } from "@/components/user-display";
 
 export interface StandingsEntry {
   id: string;
   name: string;
-  status: string;
   totalPoints: number;
   potentialPoints: number;
   userId: string;
@@ -108,11 +106,6 @@ export function StandingsTable({ standings, poolId }: StandingsTableProps) {
                   >
                     {entry.name}
                   </Link>
-                  {entry.status === "draft" && (
-                    <Badge variant="secondary" className="ml-2">
-                      Draft
-                    </Badge>
-                  )}
                 </TableCell>
                 <TableCell>
                   <UserDisplay
@@ -137,47 +130,31 @@ export function StandingsTable({ standings, poolId }: StandingsTableProps) {
         </Table>
       </div>
 
-      {/* Mobile card list */}
-      <div className="space-y-2 md:hidden">
+      {/* Mobile list */}
+      <div className="space-y-1 md:hidden">
         {sorted.map((entry) => (
           <Link
             key={entry.id}
             href={`/pools/${poolId}/brackets/${entry.id}`}
-            className="flex items-center gap-3 rounded-lg border p-3 transition-colors active:bg-muted"
+            className="flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors active:bg-muted"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-bold">
+            <span className="w-6 shrink-0 text-center text-sm font-bold text-muted-foreground">
               {entry.rank}
-            </div>
+            </span>
+            <ChampionDisplay championPick={entry.championPick} />
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="truncate font-medium">{entry.name}</span>
-                {entry.status === "draft" && (
-                  <Badge variant="secondary" className="shrink-0">
-                    Draft
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <UserDisplay
-                  name={entry.userName}
-                  image={entry.userImage}
-                  username={entry.userUsername}
-                  size="sm"
-                />
+              <div className="truncate text-sm font-medium">{entry.name}</div>
+              <div className="truncate text-xs text-muted-foreground">
+                {entry.userName}
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-3">
-              <ChampionDisplay championPick={entry.championPick} />
-              <div className="text-right">
-                <div className="text-sm font-semibold">
-                  {entry.totalPoints} pts
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {entry.potentialPoints} pot
-                </div>
+            <div className="shrink-0 text-right">
+              <div className="text-sm font-semibold">{entry.totalPoints}</div>
+              <div className="text-xs text-muted-foreground">
+                {entry.potentialPoints}
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </div>
+            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Link>
         ))}
       </div>
