@@ -339,6 +339,8 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - All query functions that perform multiple writes use `db.transaction()`
 - All server actions that call multiple write functions accept/pass a `DbClient` parameter and wrap writes in a single transaction
 - Add `DbClient` optional parameter to query functions that need to participate in action-level transactions
+- Standardize the `client: DbClient = db` pattern across all query functions — establish a consistent convention for when and how query functions accept a transaction client, including handling the dual-use case (standalone with own transaction vs. participating in a caller's transaction) without ad-hoc `client === db` checks
+- Document the chosen pattern in `docs/technical/standards.md` so future query functions follow the same approach
 - Document any functions that were fixed
 
 ### 16. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
