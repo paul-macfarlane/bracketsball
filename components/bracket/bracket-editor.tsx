@@ -68,6 +68,7 @@ export function BracketEditor({
     initialTiebreaker?.toString() ?? "",
   );
   const [isPending, startTransition] = useTransition();
+  const [isSubmitting, startSubmitTransition] = useTransition();
   const [status, setStatus] = useState(bracketStatus);
 
   const { picks, handlePick, getTeamsForGame, totalGames, pickedGames } =
@@ -157,7 +158,20 @@ export function BracketEditor({
   }
 
   function handleSubmit() {
-    startTransition(async () => {
+    startSubmitTransition(async () => {
+      // Save tiebreaker first to avoid race with blur handler
+      const value = parseInt(tiebreaker, 10);
+      if (!isNaN(value) && value >= 0 && value <= 500) {
+        const tiebreakerResult = await updateTiebreakerAction(
+          bracketEntryId,
+          value,
+        );
+        if (tiebreakerResult.error) {
+          toast.error(tiebreakerResult.error);
+          return;
+        }
+      }
+
       const result = await submitBracketAction(bracketEntryId);
       if (result.error) {
         toast.error(result.error);
@@ -295,9 +309,9 @@ export function BracketEditor({
           {!isLocked && (
             <Button
               onClick={handleSubmit}
-              disabled={!isComplete || isPending || isSubmitted}
+              disabled={!isComplete || isSubmitting || isSubmitted}
             >
-              {isPending ? "Submitting..." : "Submit Bracket"}
+              {isSubmitting ? "Submitting..." : "Submit Bracket"}
             </Button>
           )}
         </div>
