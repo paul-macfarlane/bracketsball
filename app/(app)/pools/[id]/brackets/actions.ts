@@ -14,20 +14,32 @@ import {
   getBracketEntryCountForUser,
   getPicksForEntry,
   savePick as savePickQuery,
+  savePicksBatch,
   deletePicksForGames,
+  clearAllPicks,
   updateBracketEntryName,
   updateTiebreaker as updateTiebreakerQuery,
   submitBracketEntry,
   unsubmitBracketEntry,
   deleteBracketEntry,
 } from "@/lib/db/queries/bracket-entries";
-import { getTournamentGames } from "@/lib/db/queries/tournaments";
+import {
+  getTournamentGames,
+  getTournamentTeams,
+} from "@/lib/db/queries/tournaments";
+import {
+  autoFillBracket,
+  type AutoFillStrategy,
+} from "@/lib/bracket-auto-fill";
+import type { BracketTeam } from "@/components/bracket/types";
 import {
   createBracketEntrySchema,
   updateBracketNameSchema,
   savePickSchema,
   updateTiebreakerSchema,
   submitBracketSchema,
+  autoFillBracketSchema,
+  clearBracketSchema,
 } from "@/lib/validators/bracket-entry";
 import { hasTournamentStarted } from "@/lib/db/queries/pools";
 
@@ -329,6 +341,127 @@ export async function deleteBracketEntryAction(bracketEntryId: string) {
 
   revalidatePath(`/pools/${entry.poolId}`);
   return { success: true, poolId: entry.poolId };
+}
+
+export async function autoFillBracketAction(
+  bracketEntryId: string,
+  strategy: AutoFillStrategy,
+) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Not authenticated" };
+  }
+
+  const parsed = autoFillBracketSchema.safeParse({
+    bracketEntryId,
+    strategy,
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const entry = await getBracketEntryById(parsed.data.bracketEntryId);
+  if (!entry || entry.userId !== session.user.id) {
+    return { error: "Bracket entry not found" };
+  }
+
+  const started = await hasTournamentStarted();
+  if (started) {
+    return { error: "Tournament has already started" };
+  }
+
+  const [games, tournamentTeamsRaw, existingPicks] = await Promise.all([
+    getTournamentGames(entry.tournamentId),
+    getTournamentTeams(entry.tournamentId),
+    getPicksForEntry(parsed.data.bracketEntryId),
+  ]);
+
+  const tournamentTeams: BracketTeam[] = tournamentTeamsRaw.map((tt) => ({
+    id: tt.teamId,
+    name: tt.teamName,
+    shortName: tt.teamShortName,
+    abbreviation: tt.teamAbbreviation,
+    logoUrl: tt.teamLogoUrl,
+    seed: tt.seed,
+    region: tt.region,
+  }));
+
+  const bracketPicks = existingPicks.map((p) => ({
+    tournamentGameId: p.tournamentGameId,
+    pickedTeamId: p.pickedTeamId,
+  }));
+
+  const result = autoFillBracket(
+    games,
+    tournamentTeams,
+    bracketPicks,
+    parsed.data.strategy,
+  );
+
+  if (result.picks.length === 0) {
+    return { error: "All games are already picked" };
+  }
+
+  await db.transaction(async (tx) => {
+    await savePicksBatch(parsed.data.bracketEntryId, result.picks, tx);
+    await updateTiebreakerQuery(
+      parsed.data.bracketEntryId,
+      result.tiebreakerScore,
+      tx,
+    );
+
+    // If entry was submitted, revert to draft since picks changed
+    if (entry.status === "submitted") {
+      await unsubmitBracketEntry(parsed.data.bracketEntryId, tx);
+    }
+  });
+
+  revalidatePath(`/pools/${entry.poolId}/brackets/${entry.id}`);
+  return {
+    success: true,
+    picks: result.picks,
+    tiebreakerScore: result.tiebreakerScore,
+  };
+}
+
+export async function clearBracketAction(bracketEntryId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Not authenticated" };
+  }
+
+  const parsed = clearBracketSchema.safeParse({ bracketEntryId });
+  if (!parsed.success) {
+    return { error: "Invalid input" };
+  }
+
+  const entry = await getBracketEntryById(parsed.data.bracketEntryId);
+  if (!entry || entry.userId !== session.user.id) {
+    return { error: "Bracket entry not found" };
+  }
+
+  const started = await hasTournamentStarted();
+  if (started) {
+    return { error: "Tournament has already started" };
+  }
+
+  await db.transaction(async (tx) => {
+    await clearAllPicks(parsed.data.bracketEntryId, tx);
+    await updateTiebreakerQuery(parsed.data.bracketEntryId, 0, tx);
+
+    if (entry.status === "submitted") {
+      await unsubmitBracketEntry(parsed.data.bracketEntryId, tx);
+    }
+  });
+
+  revalidatePath(`/pools/${entry.poolId}/brackets/${entry.id}`);
+  return { success: true };
 }
 
 // Helper: find all games downstream of a given game (games that receive the winner)

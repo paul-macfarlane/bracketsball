@@ -18,6 +18,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { BracketFullView } from "./bracket-full-view";
 import type { BracketPositions } from "./bracket-full-view";
 import { useBracketPicks } from "./use-bracket-picks";
@@ -28,7 +34,10 @@ import {
   submitBracketAction,
   unsubmitBracketAction,
   deleteBracketEntryAction,
+  autoFillBracketAction,
+  clearBracketAction,
 } from "@/app/(app)/pools/[id]/brackets/actions";
+import type { AutoFillStrategy } from "@/lib/bracket-auto-fill";
 import {
   getPointsForRound,
   calculateBracketScores,
@@ -71,13 +80,20 @@ export function BracketEditor({
   const [isSubmitting, startSubmitTransition] = useTransition();
   const [status, setStatus] = useState(bracketStatus);
 
-  const { picks, handlePick, getTeamsForGame, totalGames, pickedGames } =
-    useBracketPicks({
-      bracketEntryId,
-      games,
-      tournamentTeams,
-      initialPicks,
-    });
+  const {
+    picks,
+    handlePick,
+    getTeamsForGame,
+    applyBulkPicks,
+    clearAllPicks,
+    totalGames,
+    pickedGames,
+  } = useBracketPicks({
+    bracketEntryId,
+    games,
+    tournamentTeams,
+    initialPicks,
+  });
 
   const tiebreakerValue = tiebreaker === "" ? null : parseInt(tiebreaker, 10);
   const isComplete =
@@ -182,6 +198,45 @@ export function BracketEditor({
     });
   }
 
+  function handleAutoFill(strategy: AutoFillStrategy) {
+    startTransition(async () => {
+      const result = await autoFillBracketAction(bracketEntryId, strategy);
+      if (result.error) {
+        toast.error(result.error);
+      } else if (result.picks) {
+        applyBulkPicks(result.picks);
+        if (result.tiebreakerScore !== undefined) {
+          setTiebreaker(result.tiebreakerScore.toString());
+        }
+        const strategyLabel =
+          strategy === "chalk"
+            ? "Chalk"
+            : strategy === "weighted_random"
+              ? "Weighted Random"
+              : "Random";
+        toast.success(
+          `Auto-filled ${result.picks.length} picks with ${strategyLabel} strategy.`,
+        );
+      }
+    });
+  }
+
+  function handleClear() {
+    startTransition(async () => {
+      const result = await clearBracketAction(bracketEntryId);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        clearAllPicks();
+        setTiebreaker("");
+        if (status === "submitted") {
+          setStatus("draft");
+        }
+        toast.success("Bracket cleared.");
+      }
+    });
+  }
+
   function handleDelete() {
     startTransition(async () => {
       const result = await deleteBracketEntryAction(bracketEntryId);
@@ -203,68 +258,121 @@ export function BracketEditor({
         </div>
       )}
 
-      {/* Header */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      {/* Header — stacks vertically on mobile */}
+      <div className="mb-4 space-y-3">
+        {/* Row 1: Name + status */}
         <div className="flex items-center gap-3">
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
             onBlur={handleNameBlur}
             maxLength={100}
+            className="min-w-0 flex-1"
           />
           <Badge variant={isSubmitted ? "default" : "secondary"}>
             {isSubmitted ? "Submitted" : "Draft"}
           </Badge>
         </div>
-        <div className="flex items-center gap-3">
-          {scores && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold">
-                Points: {scores.totalPoints}
-              </span>
-              <span className="text-muted-foreground">|</span>
-              <span className="text-muted-foreground">
-                Potential: {scores.potentialPoints}
-              </span>
-            </div>
-          )}
-          <span className="text-sm text-muted-foreground">
-            {pickedGames}/{totalGames} picks
-          </span>
-          {isSubmitted && !isLocked && (
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={isPending}
-              onClick={handleUnsubmit}
-            >
-              Edit Picks
-            </Button>
-          )}
-          {!isLocked && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm" disabled={isPending}>
-                  Delete
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete bracket?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete &quot;{name}&quot; and all its
-                    picks. This cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete}>
+
+        {/* Row 2: Stats + actions */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 text-sm">
+            {scores && (
+              <>
+                <span className="font-semibold">{scores.totalPoints} pts</span>
+                <span className="text-muted-foreground">|</span>
+                <span className="text-muted-foreground">
+                  {scores.potentialPoints} pot
+                </span>
+                <span className="text-muted-foreground">|</span>
+              </>
+            )}
+            <span className="text-muted-foreground">
+              {pickedGames}/{totalGames} picks
+            </span>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            {!isDisabled && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" disabled={isPending}>
+                    Auto-Fill
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleAutoFill("chalk")}>
+                    Chalk (Higher Seed)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleAutoFill("weighted_random")}
+                  >
+                    Weighted Random
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleAutoFill("random")}>
+                    Random (50/50)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {!isDisabled && pickedGames > 0 && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" disabled={isPending}>
+                    Clear
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Clear all picks?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will remove all picks and your tiebreaker score. You
+                      can re-fill your bracket afterwards.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClear}>
+                      Clear All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            {isSubmitted && !isLocked && (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isPending}
+                onClick={handleUnsubmit}
+              >
+                Edit Picks
+              </Button>
+            )}
+            {!isLocked && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" disabled={isPending}>
                     Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete bracket?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete &quot;{name}&quot; and all
+                      its picks. This cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { eq, and, count, inArray, or } from "drizzle-orm";
+import { eq, and, count, inArray } from "drizzle-orm";
 
 import { db, type DbClient } from "@/lib/db";
 import {
@@ -139,8 +139,9 @@ export async function deletePicksForGames(
 export async function updateTiebreaker(
   bracketEntryId: string,
   tiebreakerScore: number,
+  client: DbClient = db,
 ) {
-  const [updated] = await db
+  const [updated] = await client
     .update(bracketEntry)
     .set({ tiebreakerScore })
     .where(eq(bracketEntry.id, bracketEntryId))
@@ -185,10 +186,62 @@ export async function deleteBracketEntry(bracketEntryId: string) {
   await db.delete(bracketEntry).where(eq(bracketEntry.id, bracketEntryId));
 }
 
+export async function savePicksBatch(
+  bracketEntryId: string,
+  picks: { tournamentGameId: string; pickedTeamId: string }[],
+  client: DbClient = db,
+) {
+  if (picks.length === 0) return;
+
+  const doWork = async (tx: DbClient) => {
+    for (const pick of picks) {
+      const [existing] = await tx
+        .select()
+        .from(bracketPick)
+        .where(
+          and(
+            eq(bracketPick.bracketEntryId, bracketEntryId),
+            eq(bracketPick.tournamentGameId, pick.tournamentGameId),
+          ),
+        )
+        .limit(1);
+
+      if (existing) {
+        await tx
+          .update(bracketPick)
+          .set({ pickedTeamId: pick.pickedTeamId })
+          .where(eq(bracketPick.id, existing.id));
+      } else {
+        await tx.insert(bracketPick).values({
+          bracketEntryId,
+          tournamentGameId: pick.tournamentGameId,
+          pickedTeamId: pick.pickedTeamId,
+        });
+      }
+    }
+  };
+
+  // If caller already provided a transaction client, use it directly.
+  // Otherwise wrap in our own transaction for atomicity.
+  if (client === db) {
+    await db.transaction(async (tx) => doWork(tx));
+  } else {
+    await doWork(client);
+  }
+}
+
+export async function clearAllPicks(
+  bracketEntryId: string,
+  client: DbClient = db,
+) {
+  await client
+    .delete(bracketPick)
+    .where(eq(bracketPick.bracketEntryId, bracketEntryId));
+}
+
 export async function getPoolStandings(
   poolId: string,
   tournamentId: string,
-  currentUserId: string,
   poolScoring: PoolScoring,
 ) {
   // Get bracket entries: all submitted + current user's drafts
@@ -209,10 +262,7 @@ export async function getPoolStandings(
       and(
         eq(bracketEntry.poolId, poolId),
         eq(bracketEntry.tournamentId, tournamentId),
-        or(
-          eq(bracketEntry.status, "submitted"),
-          eq(bracketEntry.userId, currentUserId),
-        ),
+        eq(bracketEntry.status, "submitted"),
       ),
     );
 

@@ -63,8 +63,8 @@ export function LeavePoolButton({
         disabled
         title="Promote another member to leader before leaving"
       >
-        <LogOut className="mr-2 h-4 w-4" />
-        Leave Pool
+        <LogOut className="h-4 w-4 sm:mr-2" />
+        <span className="hidden sm:inline">Leave Pool</span>
       </Button>
     );
   }
@@ -73,8 +73,8 @@ export function LeavePoolButton({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <LogOut className="mr-2 h-4 w-4" />
-          Leave Pool
+          <LogOut className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">Leave Pool</span>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

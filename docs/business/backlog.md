@@ -339,6 +339,8 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - All query functions that perform multiple writes use `db.transaction()`
 - All server actions that call multiple write functions accept/pass a `DbClient` parameter and wrap writes in a single transaction
 - Add `DbClient` optional parameter to query functions that need to participate in action-level transactions
+- Standardize the `client: DbClient = db` pattern across all query functions — establish a consistent convention for when and how query functions accept a transaction client, including handling the dual-use case (standalone with own transaction vs. participating in a caller's transaction) without ad-hoc `client === db` checks
+- Document the chosen pattern in `docs/technical/standards.md` so future query functions follow the same approach
 - Document any functions that were fixed
 
 ### 16. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
@@ -414,6 +416,36 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - User can filter by brackets-per-entry range and pool size range
 - Only pools with available capacity are shown
 - User can join directly from search results
+
+### 35. Sticky Page Headers (Non-MVP) — Epic: Navigation UX
+
+**As a** user, **I want** page headings and key controls to stay visible as I scroll **so that** I can always see context and access actions without scrolling back up.
+
+**Acceptance Criteria:**
+
+- Pool detail page: pool name, settings link, and section tabs stick to the top when scrolling
+- Bracket editor: bracket name, status, stats, and action buttons (Auto-Fill, Clear, etc.) stick to the top when scrolling through the bracket
+- Bracket viewer: bracket name and score summary stick to the top
+- Admin pages: page header and tab navigation stick to the top
+- Sticky headers have a subtle border or shadow to visually separate from scrolling content
+- Works correctly on both desktop and mobile
+- Does not obscure too much vertical space on small screens
+
+### 36. Breadcrumb Navigation (Non-MVP) — Epic: Navigation UX
+
+**As a** user, **I want to** see breadcrumb navigation on nested pages **so that** I can understand where I am and easily navigate back to parent pages.
+
+**Acceptance Criteria:**
+
+- Replace "Back to X" links with ShadCN Breadcrumb component on all nested pages
+- Breadcrumb paths:
+  - Pool detail: Pools > Pool Name
+  - Bracket editor/viewer: Pools > Pool Name > Bracket Name
+  - Pool settings: Pools > Pool Name > Settings
+  - Admin pages: Admin > Section (Teams, Tournaments, etc.)
+- Breadcrumbs are responsive — collapse or truncate gracefully on mobile
+- Current page is shown as non-linked text; parent pages are clickable links
+- Consistent placement across all pages
 
 ### 17. In-App User Invites (Non-MVP) — Epic: Pool Members
 
@@ -558,13 +590,15 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | Not Started |
 | 32  | Update External Services Branding   | Branding                | Yes | Not Started |
 | 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Done        |
-| 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Not Started |
+| 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | In Progress |
 | 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
 | 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
 | 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Not Started |
 | 28  | SEO Plan & Implementation           | Branding                | No  | Not Started |
 | 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |
 | 20  | Public Pool Search                  | Public Pools            | No  | Not Started |
+| 35  | Sticky Page Headers                 | Navigation UX           | No  | Not Started |
+| 36  | Breadcrumb Navigation               | Navigation UX           | No  | Not Started |
 | 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
 | 19  | Theme Toggle                        | UX                      | No  | Done        |
 | 22  | Remove User Dashboard               | UX Cleanup              | No  | Done        |
@@ -575,4 +609,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 19 stories (17 done, 2 remaining)** | **Post-MVP: 16 stories (9 done, 7 remaining)**
+**MVP Total: 19 stories (17 done, 2 remaining)** | **Post-MVP: 18 stories (9 done, 9 remaining)**

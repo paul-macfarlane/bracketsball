@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { cn } from "@/lib/utils";
 import { MatchupCard } from "./matchup-card";
 import type { BracketGame, BracketTeam } from "./types";
 import { ROUND_LABELS } from "./types";
@@ -280,22 +281,7 @@ function RegionBracket({
 
   const r64Games = gamesByRegionAndRound.get(`${region}-round_of_64`) ?? [];
   const hasFirstFour = r64Games.some((g) => firstFourByR64Game.has(g.id));
-
-  // If this region has no First Four but the other region on this side does,
-  // render an empty placeholder to keep round columns aligned.
-  const firstFourOrPlaceholder = hasFirstFour ? (
-    <FirstFourColumn
-      r64Games={r64Games}
-      firstFourByR64Game={firstFourByR64Game}
-      picks={picks}
-      getTeamsForGame={getTeamsForGame}
-      onPick={onPick}
-      disabled={disabled}
-      roundPointsMap={roundPointsMap}
-    />
-  ) : sideHasFirstFour ? (
-    <FirstFourPlaceholder gameCount={r64Games.length} />
-  ) : null;
+  const showFirstFourColumn = hasFirstFour || sideHasFirstFour;
 
   return (
     <div>
@@ -307,22 +293,34 @@ function RegionBracket({
           const roundGames =
             gamesByRegionAndRound.get(`${region}-${round}`) ?? [];
 
-          const isR64 = round === "round_of_64";
-
-          return (
-            <div key={round} className="flex items-center gap-0">
-              {direction === "ltr" && isR64 && firstFourOrPlaceholder}
-              <RoundColumn
-                round={round}
-                games={roundGames}
+          if (round === "round_of_64") {
+            return (
+              <R64WithFirstFour
+                key={round}
+                r64Games={roundGames}
+                firstFourByR64Game={firstFourByR64Game}
                 picks={picks}
                 getTeamsForGame={getTeamsForGame}
                 onPick={onPick}
                 disabled={disabled}
+                direction={direction}
+                showFirstFourColumn={showFirstFourColumn}
                 roundPointsMap={roundPointsMap}
               />
-              {direction === "rtl" && isR64 && firstFourOrPlaceholder}
-            </div>
+            );
+          }
+
+          return (
+            <RoundColumn
+              key={round}
+              round={round}
+              games={roundGames}
+              picks={picks}
+              getTeamsForGame={getTeamsForGame}
+              onPick={onPick}
+              disabled={disabled}
+              roundPointsMap={roundPointsMap}
+            />
           );
         })}
       </div>
@@ -330,65 +328,110 @@ function RegionBracket({
   );
 }
 
-function FirstFourPlaceholder({ gameCount }: { gameCount: number }) {
-  return (
-    <div className="flex flex-col items-center justify-around px-1">
-      {/* Empty header to match FirstFourColumn's label height */}
-      <div className="mb-1 text-[10px]">&nbsp;</div>
-      <div className="flex flex-col justify-around" style={{ gap: "0.25rem" }}>
-        {Array.from({ length: gameCount }, (_, i) => (
-          <div key={i} className="h-[3.25rem] w-44" />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-interface FirstFourColumnProps {
+interface R64WithFirstFourProps {
   r64Games: BracketGame[];
   firstFourByR64Game: Map<string, BracketGame>;
   picks: Map<string, string>;
   getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
   onPick: (gameId: string, teamId: string) => void;
   disabled: boolean;
+  direction: "ltr" | "rtl";
+  showFirstFourColumn: boolean;
   roundPointsMap?: Map<string, number>;
 }
 
-function FirstFourColumn({
+/**
+ * Renders R64 games paired with their First Four play-in games in rows,
+ * ensuring each FF game is vertically aligned with its R64 game.
+ */
+function R64WithFirstFour({
   r64Games,
   firstFourByR64Game,
   picks,
   getTeamsForGame,
   onPick,
   disabled,
+  direction,
+  showFirstFourColumn,
   roundPointsMap,
-}: FirstFourColumnProps) {
+}: R64WithFirstFourProps) {
+  const hasAnyFirstFour = r64Games.some((g) => firstFourByR64Game.has(g.id));
+
   return (
-    <div className="flex flex-col items-center justify-around px-1">
-      <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
-        {ROUND_LABELS.first_four}
+    <div className="flex flex-col items-center px-1">
+      {/* Column headers */}
+      <div className="mb-1 flex gap-0">
+        {showFirstFourColumn && (
+          <div
+            className={cn(
+              "w-44 px-1 text-center text-[10px] font-medium text-muted-foreground",
+              direction === "rtl" ? "order-2" : "order-1",
+            )}
+          >
+            {hasAnyFirstFour ? ROUND_LABELS.first_four : "\u00A0"}
+          </div>
+        )}
+        <div
+          className={cn(
+            "w-44 px-1 text-center text-[10px] font-medium text-muted-foreground",
+            direction === "rtl" ? "order-1" : "order-2",
+          )}
+        >
+          {ROUND_LABELS.round_of_64}
+        </div>
       </div>
-      <div className="flex flex-col justify-around" style={{ gap: "0.25rem" }}>
+      {/* Game rows */}
+      <div className="flex flex-col" style={{ gap: "0.25rem" }}>
         {r64Games.map((r64Game) => {
           const ffGame = firstFourByR64Game.get(r64Game.id);
-          if (ffGame) {
-            const [team1, team2] = getTeamsForGame(ffGame.id);
-            return (
-              <MatchupCard
-                key={ffGame.id}
-                gameId={ffGame.id}
-                team1={team1}
-                team2={team2}
-                pickedTeamId={picks.get(ffGame.id) ?? null}
-                onPick={onPick}
-                disabled={disabled}
-                winnerTeamId={ffGame.winnerTeamId}
-                gameStatus={ffGame.status}
-                roundPoints={roundPointsMap?.get("first_four") ?? 0}
-              />
-            );
-          }
-          return <div key={r64Game.id} className="h-[3.25rem] w-44" />;
+          const [r64Team1, r64Team2] = getTeamsForGame(r64Game.id);
+
+          return (
+            <div key={r64Game.id} className="flex items-center gap-0">
+              {showFirstFourColumn && (
+                <div
+                  className={cn(
+                    "px-1",
+                    direction === "rtl" ? "order-2" : "order-1",
+                  )}
+                >
+                  {ffGame ? (
+                    <MatchupCard
+                      gameId={ffGame.id}
+                      team1={getTeamsForGame(ffGame.id)[0]}
+                      team2={getTeamsForGame(ffGame.id)[1]}
+                      pickedTeamId={picks.get(ffGame.id) ?? null}
+                      onPick={onPick}
+                      disabled={disabled}
+                      winnerTeamId={ffGame.winnerTeamId}
+                      gameStatus={ffGame.status}
+                      roundPoints={roundPointsMap?.get("first_four") ?? 0}
+                    />
+                  ) : (
+                    <div className="w-44" />
+                  )}
+                </div>
+              )}
+              <div
+                className={cn(
+                  "px-1",
+                  direction === "rtl" ? "order-1" : "order-2",
+                )}
+              >
+                <MatchupCard
+                  gameId={r64Game.id}
+                  team1={r64Team1}
+                  team2={r64Team2}
+                  pickedTeamId={picks.get(r64Game.id) ?? null}
+                  onPick={onPick}
+                  disabled={disabled}
+                  winnerTeamId={r64Game.winnerTeamId}
+                  gameStatus={r64Game.status}
+                  roundPoints={roundPointsMap?.get("round_of_64") ?? 0}
+                />
+              </div>
+            </div>
+          );
         })}
       </div>
     </div>

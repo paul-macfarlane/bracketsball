@@ -37,3 +37,12 @@ export const updateTiebreakerSchema = z.object({
 export const submitBracketSchema = z.object({
   bracketEntryId: z.string().min(1),
 });
+
+export const autoFillBracketSchema = z.object({
+  bracketEntryId: z.string().min(1),
+  strategy: z.enum(["chalk", "weighted_random", "random"]),
+});
+
+export const clearBracketSchema = z.object({
+  bracketEntryId: z.string().min(1),
+});
