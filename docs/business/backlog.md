@@ -293,6 +293,24 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Sync frequency is suitable for live tournament updates (e.g., every few minutes during game days)
 - Verify sync works end-to-end in production before the tournament starts
 
+### 39. Validate Cron Sync Performance (MVP) — Epic: Pre-Tournament Setup
+
+**As the** product owner, **I want to** validate that the ESPN sync cron job completes well within a 30-second timeout **so that** syncs don't fail or get killed mid-transaction in production.
+
+**Acceptance Criteria:**
+
+- **Audit the sync endpoint (`/api/sync-espn`)** for total execution time under realistic conditions:
+  - Scoreboard fetch from ESPN API (single date vs. multi-date scenarios)
+  - DB transaction: team upserts, game matching/updates, winner advancement
+  - Post-sync standings recalculation across all pools
+- **Measure or estimate wall-clock time** for each phase of the sync under peak load (e.g., R64 day with 16 games in progress, multiple pools with many bracket entries)
+- **Address the multi-date fetch bottleneck**: the current 500ms delay between date fetches in `espn-adapter.ts` means a 2-day R64 window adds 500ms+ overhead — verify this is acceptable or optimize
+- **Verify standings recalc scales**: `syncStandingsForTournament()` runs after every sync — confirm it completes quickly with realistic pool/bracket counts
+- **Confirm team stats sync is NOT called by the cron endpoint** (it runs separately via admin UI and takes ~20-30s on its own for 68 teams — must never be bundled into the cron)
+- **Add logging or timing instrumentation** to the sync endpoint so execution time can be monitored in production (e.g., log total duration and phase durations)
+- **Document any optimizations made** and the expected sync duration under various tournament phases
+- **Set Vercel function `maxDuration`** on the sync route if needed to ensure adequate timeout (Vercel Pro allows up to 300s, but target < 30s)
+
 ### 32. Update External Services Branding (MVP) ✅ — Epic: Branding
 
 **As the** product owner, **I want to** update the app name, icons, and metadata across all external services **so that** the Bracketsball brand is consistent everywhere.
@@ -426,6 +444,39 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - User can search for other users by username
 - Selected users receive an in-app invite notification
 - Invited users can accept or decline
+
+### 37. Team Mascot / Nickname Display (Non-MVP) — Epic: Bracket UX Enhancements
+
+**As a** user, **I want to** see team mascots alongside school names **so that** teams feel more identifiable and the app feels more like a real sports experience.
+
+**Acceptance Criteria:**
+
+- Add a `mascot` (or `nickname`) field to the `team` table (e.g., "Boilermakers", "Jayhawks")
+- ESPN provides this via the `name` field on team objects (separate from `location` which is the school name) — sync it automatically
+- Display mascot alongside school name where space allows (bracket builder, team comparison dialog, standings)
+- On compact views (matchup cards), continue showing short name only
+- Admin can edit mascot via team management UI
+
+### 38. Admin Manual Team & Game Data Entry (Non-MVP) — Epic: Bracket UX Enhancements
+
+**As an** admin, **I want to** manually enter and edit team stats and game details **so that** I can fill in data ESPN doesn't provide (e.g., conference record, strength of schedule, NET ranking) and correct any inaccuracies.
+
+**Acceptance Criteria:**
+
+- Admin can edit all team stats fields on the tournament team admin page (overall record, conference record, conference name, PPG, opp PPG, FG%, 3PT%, FT%, RPG, APG, SPG, BPG, TOPG, AP ranking, SOS)
+- Admin can edit game details: start time, venue name, venue city, venue state
+- Manual edits are not overwritten by ESPN sync (sync only writes non-null fields from ESPN)
+- Changes take effect immediately in the bracket builder comparison view
+
+### 40. GitHub Repo Link in Footer (Non-MVP) — Epic: Branding
+
+**As a** visitor or user, **I want to** see a link to the GitHub repository in the app footer **so that** I can view the source code and contribute.
+
+**Acceptance Criteria:**
+
+- Add a GitHub icon/link to the existing footer alongside privacy, terms, and contact links
+- Link points to the Bracketsball GitHub repository
+- Opens in a new tab
 
 ---
 
@@ -588,17 +639,21 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 14  | View Individual Bracket Detail      | Bracket Visibility      | Yes | Done        |
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
 | 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | Not Started |
+| 39  | Validate Cron Sync Performance      | Pre-Tournament Setup    | Yes | Not Started |
 | 32  | Update External Services Branding   | Branding                | Yes | Done        |
 | 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Done        |
 | 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Done        |
 | 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
 | 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
-| 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Not Started |
+| 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Done        |
 | 28  | SEO Plan & Implementation           | Branding                | No  | Not Started |
 | 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |
 | 20  | Public Pool Search                  | Public Pools            | No  | Not Started |
 | 35  | Sticky Page Headers                 | Navigation UX           | No  | Done        |
 | 36  | Breadcrumb Navigation               | Navigation UX           | No  | Done        |
+| 37  | Team Mascot / Nickname Display      | Bracket UX Enhancements | No  | Not Started |
+| 38  | Admin Manual Team & Game Data Entry | Bracket UX Enhancements | No  | Not Started |
+| 40  | GitHub Repo Link in Footer          | Branding                | No  | Not Started |
 | 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
 | 19  | Theme Toggle                        | UX                      | No  | Done        |
 | 22  | Remove User Dashboard               | UX Cleanup              | No  | Done        |
@@ -609,4 +664,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 19 stories (18 done, 1 remaining)** | **Post-MVP: 18 stories (11 done, 7 remaining)**
+**MVP Total: 20 stories (18 done, 2 remaining)** | **Post-MVP: 21 stories (12 done, 9 remaining)**

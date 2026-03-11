@@ -66,6 +66,25 @@ export default async function BracketPage({
     logoUrl: tt.teamLogoUrl,
     seed: tt.seed,
     region: tt.region,
+    stats: {
+      overallWins: tt.overallWins,
+      overallLosses: tt.overallLosses,
+      conferenceWins: tt.conferenceWins,
+      conferenceLosses: tt.conferenceLosses,
+      conferenceName: tt.conferenceName,
+      ppg: tt.ppg,
+      oppPpg: tt.oppPpg,
+      fgPct: tt.fgPct,
+      threePtPct: tt.threePtPct,
+      ftPct: tt.ftPct,
+      reboundsPerGame: tt.reboundsPerGame,
+      assistsPerGame: tt.assistsPerGame,
+      stealsPerGame: tt.stealsPerGame,
+      blocksPerGame: tt.blocksPerGame,
+      turnoversPerGame: tt.turnoversPerGame,
+      apRanking: tt.apRanking,
+      strengthOfSchedule: tt.strengthOfSchedule,
+    },
   }));
 
   const bracketPicks = picks.map((p) => ({

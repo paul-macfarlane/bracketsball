@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { StickySubHeader } from "@/components/sticky-sub-header";
@@ -69,31 +69,39 @@ export function BracketViewer({
     return map;
   }, [poolScoring]);
 
-  function getTeamsForGame(
-    gameId: string,
-  ): [BracketTeam | null, BracketTeam | null] {
-    const game = gamesById.get(gameId);
-    if (!game) return [null, null];
+  const getTeamById = useCallback(
+    (teamId: string): BracketTeam | null => teamsById.get(teamId) ?? null,
+    [teamsById],
+  );
 
-    let team1: BracketTeam | null = null;
-    let team2: BracketTeam | null = null;
+  const getTeamsForGame = useCallback(
+    (gameId: string): [BracketTeam | null, BracketTeam | null] => {
+      const game = gamesById.get(gameId);
+      if (!game) return [null, null];
 
-    if (game.team1Id) {
-      team1 = teamsById.get(game.team1Id) ?? null;
-    } else if (game.sourceGame1Id) {
-      const pickedTeamId = picks.get(game.sourceGame1Id);
-      if (pickedTeamId) team1 = teamsById.get(pickedTeamId) ?? null;
-    }
+      let team1: BracketTeam | null = null;
+      let team2: BracketTeam | null = null;
 
-    if (game.team2Id) {
-      team2 = teamsById.get(game.team2Id) ?? null;
-    } else if (game.sourceGame2Id) {
-      const pickedTeamId = picks.get(game.sourceGame2Id);
-      if (pickedTeamId) team2 = teamsById.get(pickedTeamId) ?? null;
-    }
+      // Prioritize actual team data (accurate for completed/in-progress games).
+      // Fall back to user's pick from source game (for future games without teams set yet).
+      if (game.team1Id) {
+        team1 = teamsById.get(game.team1Id) ?? null;
+      } else if (game.sourceGame1Id) {
+        const pickedTeamId = picks.get(game.sourceGame1Id);
+        if (pickedTeamId) team1 = teamsById.get(pickedTeamId) ?? null;
+      }
 
-    return [team1, team2];
-  }
+      if (game.team2Id) {
+        team2 = teamsById.get(game.team2Id) ?? null;
+      } else if (game.sourceGame2Id) {
+        const pickedTeamId = picks.get(game.sourceGame2Id);
+        if (pickedTeamId) team2 = teamsById.get(pickedTeamId) ?? null;
+      }
+
+      return [team1, team2];
+    },
+    [gamesById, teamsById, picks],
+  );
 
   return (
     <div>
@@ -133,6 +141,7 @@ export function BracketViewer({
         games={games}
         picks={picks}
         getTeamsForGame={getTeamsForGame}
+        getTeamById={getTeamById}
         onPick={() => {}}
         disabled={true}
         bracketPositions={bracketPositions}

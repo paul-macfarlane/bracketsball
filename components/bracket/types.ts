@@ -9,8 +9,33 @@ export interface BracketGame {
   sourceGame2Id: string | null;
   winnerTeamId: string | null;
   status: string;
+  statusDetail: string | null;
   team1Score: number | null;
   team2Score: number | null;
+  startTime: Date | null;
+  venueName: string | null;
+  venueCity: string | null;
+  venueState: string | null;
+}
+
+export interface TeamStats {
+  overallWins: number | null;
+  overallLosses: number | null;
+  conferenceWins: number | null;
+  conferenceLosses: number | null;
+  conferenceName: string | null;
+  ppg: number | null;
+  oppPpg: number | null;
+  fgPct: number | null;
+  threePtPct: number | null;
+  ftPct: number | null;
+  reboundsPerGame: number | null;
+  assistsPerGame: number | null;
+  stealsPerGame: number | null;
+  blocksPerGame: number | null;
+  turnoversPerGame: number | null;
+  apRanking: number | null;
+  strengthOfSchedule: number | null;
 }
 
 export interface BracketTeam {
@@ -21,6 +46,7 @@ export interface BracketTeam {
   logoUrl: string | null;
   seed: number;
   region: string;
+  stats?: TeamStats;
 }
 
 export interface BracketPick {

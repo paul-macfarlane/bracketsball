@@ -37,15 +37,18 @@ export async function syncTournament(
 
 /**
  * Sync ESPN data for a date range into the given tournament.
+ * When scheduleOnly is true, only syncs metadata (espnEventId, startTime, venue)
+ * without updating scores, status, or winner — useful for pre-populating schedule.
  */
 export async function syncTournamentDateRange(
   tournamentId: string,
   adapter: TournamentDataSource,
   startDate: string,
   endDate: string,
+  options?: { scheduleOnly?: boolean },
 ): Promise<SyncResult> {
   const espnGames = await adapter.fetchGamesForDateRange(startDate, endDate);
-  return syncGamesToDB(tournamentId, espnGames);
+  return syncGamesToDB(tournamentId, espnGames, options);
 }
 
 /**
@@ -54,7 +57,9 @@ export async function syncTournamentDateRange(
 async function syncGamesToDB(
   tournamentId: string,
   espnGames: SyncGame[],
+  options?: { scheduleOnly?: boolean },
 ): Promise<SyncResult> {
+  const scheduleOnly = options?.scheduleOnly ?? false;
   const result: SyncResult = {
     gamesUpdated: 0,
     gamesSkipped: 0,
@@ -185,19 +190,27 @@ async function syncGamesToDB(
         // 5. Update game
         const updateData: Record<string, unknown> = {
           espnEventId: espnGame.espnEventId,
-          status: espnGame.status,
-          team1Score: espnGame.team1Score,
-          team2Score: espnGame.team2Score,
-          winnerTeamId,
           startTime: espnGame.startTime,
           venueName: espnGame.venue.name,
           venueCity: espnGame.venue.city,
           venueState: espnGame.venue.state,
         };
 
-        // Set teams if we have them
-        if (team1DbId) updateData.team1Id = team1DbId;
-        if (team2DbId) updateData.team2Id = team2DbId;
+        if (!scheduleOnly) {
+          updateData.status = espnGame.status;
+          updateData.statusDetail = espnGame.statusDetail;
+          updateData.team1Score = espnGame.team1Score;
+          updateData.team2Score = espnGame.team2Score;
+          updateData.winnerTeamId = winnerTeamId;
+        }
+
+        // Set teams if we have them (skip in scheduleOnly mode — teams
+        // are already seeded on R64/FF games and later rounds get teams
+        // via winner advancement, not from ESPN data directly)
+        if (!scheduleOnly) {
+          if (team1DbId) updateData.team1Id = team1DbId;
+          if (team2DbId) updateData.team2Id = team2DbId;
+        }
 
         await tx
           .update(tournamentGame)
@@ -214,7 +227,7 @@ async function syncGamesToDB(
         }
 
         // 6. Advance winner to next round
-        if (espnGame.status === "final" && winnerTeamId) {
+        if (!scheduleOnly && espnGame.status === "final" && winnerTeamId) {
           const nextGame = dbGames.find(
             (g) =>
               g.sourceGame1Id === dbGame!.id || g.sourceGame2Id === dbGame!.id,
@@ -334,31 +347,87 @@ async function upsertTournamentTeam(
 }
 
 /**
+ * Map a team seed to its R64 game number (1-indexed).
+ * E.g. seed 1 or 16 → game 1, seed 8 or 9 → game 2, etc.
+ */
+function seedToR64GameNumber(seed: number): number | undefined {
+  const idx = R64_SEED_MATCHUPS.findIndex(([h, l]) => h === seed || l === seed);
+  return idx >= 0 ? idx + 1 : undefined;
+}
+
+/**
+ * Get all R64 game numbers that feed into a given DB game by tracing
+ * source games recursively.
+ */
+function getR64AncestorGameNumbers(
+  game: typeof tournamentGame.$inferSelect,
+  gamesById: Map<string, typeof tournamentGame.$inferSelect>,
+): Set<number> {
+  if (game.round === "round_of_64") {
+    return new Set([game.gameNumber]);
+  }
+
+  const positions = new Set<number>();
+  if (game.sourceGame1Id) {
+    const source = gamesById.get(game.sourceGame1Id);
+    if (source) {
+      for (const pos of getR64AncestorGameNumbers(source, gamesById)) {
+        positions.add(pos);
+      }
+    }
+  }
+  if (game.sourceGame2Id) {
+    const source = gamesById.get(game.sourceGame2Id);
+    if (source) {
+      for (const pos of getR64AncestorGameNumbers(source, gamesById)) {
+        positions.add(pos);
+      }
+    }
+  }
+  return positions;
+}
+
+/**
  * Match an ESPN game to a DB game by round + region + seed position.
+ *
+ * For R64, we use the seed matchup to find the exact game number.
+ * For R32+, we trace source games back to R64 and check which R64
+ * seed positions feed into each candidate, matching by the ESPN
+ * game's team seeds.
  */
 function findPositionalMatch(
   dbGames: (typeof tournamentGame.$inferSelect)[],
   espnGame: SyncGame,
 ): typeof tournamentGame.$inferSelect | undefined {
-  // For Final Four and Championship, match by round + gameNumber
+  const gamesById = new Map(dbGames.map((g) => [g.id, g]));
+
+  // For Final Four and Championship, match by tracing source regions
   if (espnGame.round === "final_four" || espnGame.round === "championship") {
-    // These don't have regions, so match by round
     const candidates = dbGames.filter(
       (g) => g.round === espnGame.round && !g.espnEventId,
     );
-    if (candidates.length === 1) return candidates[0];
+    if (candidates.length <= 1) return candidates[0];
 
-    // For Final Four with 2 games, try to match by teams if available
-    if (espnGame.round === "final_four" && candidates.length === 2) {
-      // Return first unmatched one (order might not be stable, but espnEventId will be set for next sync)
-      return candidates[0];
+    // For Final Four: match by checking which regions' E8 games feed each candidate
+    if (espnGame.round === "final_four" && espnGame.team1 && espnGame.team2) {
+      const team1R64 = seedToR64GameNumber(espnGame.team1.seed);
+      const team2R64 = seedToR64GameNumber(espnGame.team2.seed);
+
+      if (team1R64 != null && team2R64 != null) {
+        for (const candidate of candidates) {
+          const ancestors = getR64AncestorGameNumbers(candidate, gamesById);
+          if (ancestors.has(team1R64) && ancestors.has(team2R64)) {
+            return candidate;
+          }
+        }
+      }
     }
     return candidates[0];
   }
 
   if (!espnGame.region) return undefined;
 
-  // For regional rounds, match by round + region + gameNumber derived from seeds
+  // For R64, match by seed matchup → exact gameNumber
   if (espnGame.round === "round_of_64" && espnGame.team1 && espnGame.team2) {
     const highSeed = Math.min(espnGame.team1.seed, espnGame.team2.seed);
     const lowSeed = Math.max(espnGame.team1.seed, espnGame.team2.seed);
@@ -378,7 +447,7 @@ function findPositionalMatch(
     }
   }
 
-  // For later regional rounds, match by round + region + gameNumber
+  // For R32, Sweet 16, Elite 8: use team seeds to match via R64 ancestry
   const candidates = dbGames.filter(
     (g) =>
       g.round === espnGame.round &&
@@ -386,10 +455,25 @@ function findPositionalMatch(
       !g.espnEventId,
   );
 
-  if (candidates.length === 1) return candidates[0];
+  if (candidates.length <= 1) return candidates[0];
 
-  // If multiple candidates and we have seed info, try to narrow down
-  // by checking source games' teams
+  // Use team seeds to find which R64 game numbers correspond to each team,
+  // then match to the candidate whose source game chain includes both.
+  if (espnGame.team1 && espnGame.team2) {
+    const team1R64 = seedToR64GameNumber(espnGame.team1.seed);
+    const team2R64 = seedToR64GameNumber(espnGame.team2.seed);
+
+    if (team1R64 != null && team2R64 != null) {
+      for (const candidate of candidates) {
+        const ancestors = getR64AncestorGameNumbers(candidate, gamesById);
+        if (ancestors.has(team1R64) && ancestors.has(team2R64)) {
+          return candidate;
+        }
+      }
+    }
+  }
+
+  // Fallback: return first unmatched candidate
   return candidates[0];
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE "tournament_game" ADD COLUMN "status_detail" text;

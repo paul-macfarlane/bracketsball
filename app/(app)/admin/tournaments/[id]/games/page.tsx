@@ -17,6 +17,7 @@ import { GenerateBracketButton } from "./generate-bracket-button";
 import { GameRow } from "./game-row";
 import { SyncStandingsButton } from "./sync-standings-button";
 import { SyncESPNButton } from "./sync-espn-button";
+import { SyncTeamStatsButton } from "./sync-team-stats-button";
 
 export default async function TournamentGamesPage({
   params,
@@ -49,12 +50,13 @@ export default async function TournamentGamesPage({
         ]}
         className="mb-4"
       />
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 space-y-3">
         <h1 className="text-2xl font-bold">
           {tournament.name} — Games ({games.length})
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {games.length > 0 && <SyncESPNButton tournamentId={id} />}
+          {games.length > 0 && <SyncTeamStatsButton tournamentId={id} />}
           {games.length > 0 && <SyncStandingsButton tournamentId={id} />}
           {games.length === 0 && tournamentTeams.length === 68 && (
             <GenerateBracketButton tournamentId={id} />

@@ -88,6 +88,7 @@ export function BracketEditor({
     picks,
     handlePick,
     getTeamsForGame,
+    getTeamById,
     applyBulkPicks,
     clearAllPicks,
     totalGames,
@@ -403,6 +404,7 @@ export function BracketEditor({
         games={games}
         picks={picks}
         getTeamsForGame={getTeamsForGame}
+        getTeamById={getTeamById}
         onPick={handlePick}
         disabled={isDisabled}
         bracketPositions={bracketPositions}
