@@ -33,6 +33,12 @@ export function useBracketPicks({
   const pendingSaves = useRef(new Set<string>());
 
   // Resolve the two teams available for a given game based on picks
+  // Look up any team by ID (used for resolving picked teams in indicators)
+  const getTeamById = useCallback(
+    (teamId: string): BracketTeam | null => teamMap.get(teamId) ?? null,
+    [teamMap],
+  );
+
   const getTeamsForGame = useCallback(
     (gameId: string): [BracketTeam | null, BracketTeam | null] => {
       const game = gameMap.get(gameId);
@@ -41,18 +47,20 @@ export function useBracketPicks({
       let team1: BracketTeam | null = null;
       let team2: BracketTeam | null = null;
 
-      if (game.sourceGame1Id) {
+      // Prioritize actual team data (accurate for completed/in-progress games).
+      // Fall back to user's pick from source game (for future games without teams set yet).
+      if (game.team1Id) {
+        team1 = teamMap.get(game.team1Id) ?? null;
+      } else if (game.sourceGame1Id) {
         const pickedId = picks.get(game.sourceGame1Id);
         team1 = pickedId ? (teamMap.get(pickedId) ?? null) : null;
-      } else if (game.team1Id) {
-        team1 = teamMap.get(game.team1Id) ?? null;
       }
 
-      if (game.sourceGame2Id) {
+      if (game.team2Id) {
+        team2 = teamMap.get(game.team2Id) ?? null;
+      } else if (game.sourceGame2Id) {
         const pickedId = picks.get(game.sourceGame2Id);
         team2 = pickedId ? (teamMap.get(pickedId) ?? null) : null;
-      } else if (game.team2Id) {
-        team2 = teamMap.get(game.team2Id) ?? null;
       }
 
       return [team1, team2];
@@ -182,6 +190,7 @@ export function useBracketPicks({
     picks,
     handlePick,
     getTeamsForGame,
+    getTeamById,
     applyBulkPicks,
     clearAllPicks,
     totalGames,

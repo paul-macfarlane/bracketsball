@@ -66,10 +66,25 @@ const YEAR_CONFIGS: Record<number, YearConfig> = {
       bottomRight: "west",
     },
   },
-  // TODO: Fill in dates after Selection Sunday and bracket reveal.
-  // Dates follow the standard pattern: First Four Tue-Wed, R64 Thu-Fri,
-  // R32 Sat-Sun, Sweet 16 Thu-Fri (week 2), Elite 8 Sat-Sun (week 2),
-  // Final Four Sat (week 3), Championship Mon (week 3).
+  2025: {
+    phases: [
+      { name: "First Four", start: "2025-03-18", end: "2025-03-19" },
+      { name: "Round of 64", start: "2025-03-20", end: "2025-03-21" },
+      { name: "Round of 32", start: "2025-03-22", end: "2025-03-23" },
+      { name: "Sweet 16", start: "2025-03-27", end: "2025-03-28" },
+      { name: "Elite 8", start: "2025-03-29", end: "2025-03-30" },
+      { name: "Final Four", start: "2025-04-05", end: "2025-04-05" },
+      { name: "Championship", start: "2025-04-07", end: "2025-04-07" },
+    ],
+    positions: {
+      topLeft: "south",
+      bottomLeft: "east",
+      topRight: "west",
+      bottomRight: "midwest",
+    },
+  },
+  // Official 2026 schedule: https://www.ncaa.com/news/basketball-men/article/2025-06-12/2026-march-madness-mens-ncaa-tournament-schedule-dates
+  // Selection Sunday: March 15. Final Four & Championship at Lucas Oil Stadium, Indianapolis.
   // Bracket positions (TL/BL/TR/BR) determine which regions' Elite 8
   // winners meet in each Final Four game — announced on Selection Sunday.
   2026: {
@@ -83,10 +98,10 @@ const YEAR_CONFIGS: Record<number, YearConfig> = {
       { name: "Championship", start: "2026-04-06", end: "2026-04-06" },
     ],
     positions: {
-      topLeft: "south", // TODO: Update after Selection Sunday
-      bottomLeft: "east", // TODO: Update after Selection Sunday
-      topRight: "west", // TODO: Update after Selection Sunday
-      bottomRight: "midwest", // TODO: Update after Selection Sunday
+      topLeft: "south", // TODO: Update after Selection Sunday (March 15)
+      bottomLeft: "east", // TODO: Update after Selection Sunday (March 15)
+      topRight: "west", // TODO: Update after Selection Sunday (March 15)
+      bottomRight: "midwest", // TODO: Update after Selection Sunday (March 15)
     },
   },
 };
@@ -111,15 +126,24 @@ const ROUND_NAMES: Record<string, string> = {
   championship: "Championship",
 };
 
-function waitForEnter(prompt: string): Promise<void> {
+/**
+ * Waits for user input. Returns "exit" if the user types "exit" or "q",
+ * otherwise returns "continue".
+ */
+function waitForInput(prompt: string): Promise<"continue" | "exit"> {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
   return new Promise((resolve) => {
-    rl.question(prompt, () => {
+    rl.question(prompt, (answer) => {
       rl.close();
-      resolve();
+      const trimmed = answer.trim().toLowerCase();
+      if (trimmed === "exit" || trimmed === "q" || trimmed === "quit") {
+        resolve("exit");
+      } else {
+        resolve("continue");
+      }
     });
   });
 }
@@ -197,7 +221,7 @@ async function main() {
   }
 
   // --- Step 1: Fetch all ESPN data to discover teams ---
-  console.log("[1/4] Fetching ESPN data to discover teams...");
+  console.log("[1/6] Fetching ESPN data to discover teams...");
   const allEspnGames = await espnAdapter.fetchGamesForDateRange(
     fullStart,
     fullEnd,
@@ -231,7 +255,7 @@ async function main() {
   }
 
   // --- Step 2: Create tournament + seed teams ---
-  console.log("\n[2/4] Setting up tournament...");
+  console.log("\n[2/6] Setting up tournament...");
   const [existing] = await db
     .select()
     .from(tournament)
@@ -330,7 +354,7 @@ async function main() {
   console.log(`  Assigned ${assignedTeams.size} tournament teams`);
 
   // --- Step 3: Generate bracket ---
-  console.log("\n[3/4] Generating bracket structure...");
+  console.log("\n[3/6] Generating bracket structure...");
 
   const REGIONS = ["south", "east", "west", "midwest"] as const;
   const R64_SEED_MATCHUPS: [number, number][] = [
@@ -557,13 +581,116 @@ async function main() {
     console.log("  Created 1 Championship game");
   });
 
-  // --- Step 4: Sync ---
+  // --- Step 4: Initial game schedule sync (populate times, venues, ESPN IDs for all games) ---
+  console.log(
+    "\n[4/6] Syncing game schedule from ESPN (times, venues, ESPN IDs)...",
+  );
+  const initialSyncResult = await syncTournamentDateRange(
+    tournamentId,
+    espnAdapter,
+    fullStart,
+    fullEnd,
+    { scheduleOnly: true },
+  );
+  console.log(
+    `  Games updated: ${initialSyncResult.gamesUpdated} | Skipped: ${initialSyncResult.gamesSkipped} | Teams upserted: ${initialSyncResult.teamsUpserted}`,
+  );
+  if (initialSyncResult.errors.length > 0) {
+    console.log(`  Errors (${initialSyncResult.errors.length}):`);
+    for (const err of initialSyncResult.errors.slice(0, 5)) {
+      console.log(`    - ${err}`);
+    }
+  }
+
+  // Validate schedule data populated
+  const scheduleGames = await db
+    .select()
+    .from(tournamentGame)
+    .where(eq(tournamentGame.tournamentId, tournamentId));
+  const withStartTime = scheduleGames.filter((g) => g.startTime !== null);
+  const withVenue = scheduleGames.filter((g) => g.venueName !== null);
+  const withEspnEventId = scheduleGames.filter((g) => g.espnEventId !== null);
+  console.log(`\n  Schedule Validation:`);
+  console.log(
+    `    Games with start time: ${withStartTime.length}/${scheduleGames.length}`,
+  );
+  console.log(
+    `    Games with venue: ${withVenue.length}/${scheduleGames.length}`,
+  );
+  console.log(
+    `    Games with ESPN event ID: ${withEspnEventId.length}/${scheduleGames.length}`,
+  );
+
+  // --- Step 5: Sync team stats ---
+  console.log("\n[5/6] Syncing team stats from ESPN...");
+  const { syncTeamStats } = await import("../lib/espn-sync/sync-team-stats");
+
+  const statsResult = await syncTeamStats(tournamentId, (completed, total) => {
+    if (completed % 10 === 0 || completed === total) {
+      console.log(`  Stats progress: ${completed}/${total} teams`);
+    }
+  });
+
+  console.log(
+    `  Teams updated: ${statsResult.teamsUpdated} | Skipped: ${statsResult.teamsSkipped}`,
+  );
+  if (statsResult.errors.length > 0) {
+    console.log(`  Errors (${statsResult.errors.length}):`);
+    for (const err of statsResult.errors.slice(0, 5)) {
+      console.log(`    - ${err}`);
+    }
+  }
+
+  // Validate team stats
+  const tTeamsWithStats = await db
+    .select()
+    .from(tournamentTeam)
+    .where(eq(tournamentTeam.tournamentId, tournamentId));
+
+  const withStats = tTeamsWithStats.filter((tt) => tt.ppg !== null);
+  const withRecord = tTeamsWithStats.filter((tt) => tt.overallWins !== null);
+  const withApRank = tTeamsWithStats.filter((tt) => tt.apRanking !== null);
+
+  console.log(`\n  Team Stats Validation:`);
+  console.log(
+    `    Teams with stats: ${withStats.length}/${tTeamsWithStats.length}`,
+  );
+  console.log(
+    `    Teams with record: ${withRecord.length}/${tTeamsWithStats.length}`,
+  );
+  console.log(
+    `    Teams with AP ranking: ${withApRank.length}/${tTeamsWithStats.length}`,
+  );
+
+  // Print a few sample stats
+  const sampleTeams = tTeamsWithStats
+    .filter((tt) => tt.ppg !== null)
+    .slice(0, 3);
+  if (sampleTeams.length > 0) {
+    console.log(`\n  Sample team stats:`);
+    for (const tt of sampleTeams) {
+      const dbTeam = dbTeams.find((t) => t.id === tt.teamId);
+      console.log(
+        `    ${dbTeam?.name ?? "Unknown"}: ${tt.overallWins}-${tt.overallLosses} (${tt.conferenceName ?? "?"}) | PPG: ${tt.ppg?.toFixed(1)} | Opp PPG: ${tt.oppPpg?.toFixed(1)} | FG%: ${tt.fgPct?.toFixed(1)} | 3PT%: ${tt.threePtPct?.toFixed(1)}${tt.apRanking ? ` | AP #${tt.apRanking}` : ""}`,
+      );
+    }
+  }
+
+  // --- Step 6: Sync game results ---
   if (progressive) {
-    console.log("\n[4/4] Running progressive sync (phase by phase)...");
-    console.log("       Press Enter after each phase to continue.\n");
+    console.log("\n[6/6] Running progressive sync (phase by phase)...");
+    console.log(
+      '       Press Enter after each phase to continue, or type "exit" to stop.\n',
+    );
 
     await printValidation(tournamentId);
-    await waitForEnter("\n  Press Enter to start syncing First Four...");
+    const startAction = await waitForInput(
+      "\n  Press Enter to start syncing First Four (or 'exit' to stop)... ",
+    );
+    if (startAction === "exit") {
+      console.log("\n  Exiting early. Tournament data persisted.");
+      process.exit(0);
+    }
 
     for (let i = 0; i < phases.length; i++) {
       const phase = phases[i];
@@ -593,11 +720,17 @@ async function main() {
       await printValidation(tournamentId);
 
       if (i < phases.length - 1) {
-        await waitForEnter(`\n  Press Enter to sync ${phases[i + 1].name}...`);
+        const action = await waitForInput(
+          `\n  Press Enter to sync ${phases[i + 1].name} (or 'exit' to stop)... `,
+        );
+        if (action === "exit") {
+          console.log("\n  Exiting early. Tournament data persisted.");
+          process.exit(0);
+        }
       }
     }
   } else {
-    console.log("\n[4/4] Running full sync...");
+    console.log("\n[6/6] Running full sync (updating scores/results)...");
     const syncResult = await syncTournamentDateRange(
       tournamentId,
       espnAdapter,

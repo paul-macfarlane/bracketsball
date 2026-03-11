@@ -75,6 +75,10 @@ function parseEvent(event: ESPNEvent): SyncGame | null {
   }
 
   const status = mapStatus(event.status?.type?.name ?? "");
+  const statusDetail =
+    competition.status?.type?.shortDetail ??
+    event.status?.type?.shortDetail ??
+    null;
   const team1 = toSyncTeam(sorted[0]);
   const team2 = toSyncTeam(sorted[1]);
 
@@ -97,6 +101,7 @@ function parseEvent(event: ESPNEvent): SyncGame | null {
     round,
     region,
     status,
+    statusDetail,
     startTime: event.date ? new Date(event.date) : null,
     venue: {
       name: competition.venue?.fullName ?? null,

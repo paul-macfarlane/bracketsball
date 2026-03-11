@@ -31,6 +31,8 @@ import { InviteList } from "./invites/invite-list";
 import { MemberList } from "./members/member-list";
 import { CreateBracketDialog } from "./brackets/create-bracket-dialog";
 import { StandingsTable } from "@/components/pool/standings-table";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
+import { StickySubHeader } from "@/components/sticky-sub-header";
 import type { PoolScoring } from "@/lib/scoring";
 
 export default async function PoolDetailPage({
@@ -94,25 +96,25 @@ export default async function PoolDetailPage({
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-4">
-        <Link
-          href="/pools"
-          className="text-sm text-muted-foreground hover:underline"
-        >
-          &larr; Back to pools
-        </Link>
-      </div>
-
-      <div className="mb-4 flex items-start justify-between">
-        <h1 className="text-2xl font-bold">{poolData.pool.name}</h1>
-        <div className="flex gap-2">
-          {canAccessPoolPage(poolData.membership.role, "settings") && (
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/pools/${id}/settings`}>Settings</Link>
-            </Button>
-          )}
+      <StickySubHeader>
+        <PageBreadcrumbs
+          crumbs={[
+            { label: "Pools", href: "/pools" },
+            { label: poolData.pool.name },
+          ]}
+          className="mb-2"
+        />
+        <div className="flex items-start justify-between">
+          <h1 className="text-2xl font-bold">{poolData.pool.name}</h1>
+          <div className="flex gap-2">
+            {canAccessPoolPage(poolData.membership.role, "settings") && (
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/pools/${id}/settings`}>Settings</Link>
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      </StickySubHeader>
 
       {/* Standings — front and center */}
       {activeTournament && (

@@ -24,6 +24,7 @@ interface BracketFullViewProps {
   games: BracketGame[];
   picks: Map<string, string>;
   getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
+  getTeamById?: (teamId: string) => BracketTeam | null;
   onPick: (gameId: string, teamId: string) => void;
   disabled?: boolean;
   bracketPositions?: BracketPositions;
@@ -48,11 +49,34 @@ export function BracketFullView({
   games,
   picks,
   getTeamsForGame,
+  getTeamById,
   onPick,
   disabled = false,
   bracketPositions = DEFAULT_BRACKET_POSITIONS,
   roundPointsMap,
 }: BracketFullViewProps) {
+  // Compute eliminated team IDs: any team that lost a completed game
+  const eliminatedTeamIds = useMemo(() => {
+    const eliminated = new Set<string>();
+    for (const game of games) {
+      if (game.status === "final" && game.winnerTeamId) {
+        if (game.team1Id && game.team1Id !== game.winnerTeamId) {
+          eliminated.add(game.team1Id);
+        }
+        if (game.team2Id && game.team2Id !== game.winnerTeamId) {
+          eliminated.add(game.team2Id);
+        }
+      }
+    }
+    return eliminated;
+  }, [games]);
+
+  // Tournament has started if any game is no longer scheduled
+  const tournamentStarted = useMemo(
+    () => games.some((g) => g.status !== "scheduled"),
+    [games],
+  );
+
   const LEFT_REGIONS = useMemo(
     () => [bracketPositions.topLeft, bracketPositions.bottomLeft],
     [bracketPositions.topLeft, bracketPositions.bottomLeft],
@@ -64,12 +88,17 @@ export function BracketFullView({
 
   const gamesByRegionAndRound = useMemo(() => {
     const map = new Map<string, BracketGame[]>();
+
     for (const game of games) {
       const key = `${game.region ?? "final"}-${game.round}`;
       const list = map.get(key) ?? [];
       list.push(game);
       map.set(key, list);
     }
+
+    // Sort games within each round by gameNumber — this is set correctly
+    // at tournament seeding time based on standard bracket order
+    // (1v16, 8v9, 5v12, 4v13, 6v11, 3v14, 7v10, 2v15).
     for (const list of map.values()) {
       list.sort((a, b) => a.gameNumber - b.gameNumber);
     }
@@ -158,17 +187,39 @@ export function BracketFullView({
 
   function renderMatchup(game: BracketGame) {
     const [team1, team2] = getTeamsForGame(game.id);
+    const pickedTeamId = picks.get(game.id) ?? null;
+    // Resolve picked team data even if it's not one of the displayed teams
+    // (e.g., user predicted an eliminated team that didn't make it to this game)
+    const pickedTeamData = pickedTeamId
+      ? team1?.id === pickedTeamId
+        ? team1
+        : team2?.id === pickedTeamId
+          ? team2
+          : (getTeamById?.(pickedTeamId) ?? null)
+      : null;
     return (
       <MatchupCard
         gameId={game.id}
         team1={team1}
         team2={team2}
-        pickedTeamId={picks.get(game.id) ?? null}
+        pickedTeamId={pickedTeamId}
+        pickedTeamData={pickedTeamData}
         onPick={onPick}
         disabled={disabled}
         winnerTeamId={game.winnerTeamId}
         gameStatus={game.status}
+        statusDetail={game.statusDetail}
         roundPoints={roundPointsMap?.get(game.round) ?? 0}
+        team1Score={game.team1Score}
+        team2Score={game.team2Score}
+        startTime={game.startTime}
+        venueName={game.venueName}
+        venueCity={game.venueCity}
+        venueState={game.venueState}
+        eliminatedTeamIds={eliminatedTeamIds}
+        tournamentStarted={tournamentStarted}
+        actualTeam1Id={game.team1Id}
+        actualTeam2Id={game.team2Id}
       />
     );
   }
@@ -187,11 +238,14 @@ export function BracketFullView({
               firstFourByR64Game={firstFourByR64Game}
               picks={picks}
               getTeamsForGame={getTeamsForGame}
+              getTeamById={getTeamById}
               onPick={onPick}
               disabled={disabled}
               direction="ltr"
               sideHasFirstFour={sideHasFirstFour.left}
               roundPointsMap={roundPointsMap}
+              eliminatedTeamIds={eliminatedTeamIds}
+              tournamentStarted={tournamentStarted}
             />
           ))}
         </div>
@@ -237,11 +291,14 @@ export function BracketFullView({
               firstFourByR64Game={firstFourByR64Game}
               picks={picks}
               getTeamsForGame={getTeamsForGame}
+              getTeamById={getTeamById}
               onPick={onPick}
               disabled={disabled}
               direction="rtl"
               sideHasFirstFour={sideHasFirstFour.right}
               roundPointsMap={roundPointsMap}
+              eliminatedTeamIds={eliminatedTeamIds}
+              tournamentStarted={tournamentStarted}
             />
           ))}
         </div>
@@ -257,11 +314,14 @@ interface RegionBracketProps {
   firstFourByR64Game: Map<string, BracketGame>;
   picks: Map<string, string>;
   getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
+  getTeamById?: (teamId: string) => BracketTeam | null;
   onPick: (gameId: string, teamId: string) => void;
   disabled: boolean;
   direction: "ltr" | "rtl";
   sideHasFirstFour: boolean;
   roundPointsMap?: Map<string, number>;
+  eliminatedTeamIds: Set<string>;
+  tournamentStarted: boolean;
 }
 
 function RegionBracket({
@@ -271,11 +331,14 @@ function RegionBracket({
   firstFourByR64Game,
   picks,
   getTeamsForGame,
+  getTeamById,
   onPick,
   disabled,
   direction,
   sideHasFirstFour,
   roundPointsMap,
+  eliminatedTeamIds,
+  tournamentStarted,
 }: RegionBracketProps) {
   const orderedRounds = direction === "rtl" ? [...rounds].reverse() : rounds;
 
@@ -288,7 +351,7 @@ function RegionBracket({
       <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {region}
       </div>
-      <div className="flex items-center gap-0">
+      <div className="flex items-stretch gap-0">
         {orderedRounds.map((round) => {
           const roundGames =
             gamesByRegionAndRound.get(`${region}-${round}`) ?? [];
@@ -301,11 +364,14 @@ function RegionBracket({
                 firstFourByR64Game={firstFourByR64Game}
                 picks={picks}
                 getTeamsForGame={getTeamsForGame}
+                getTeamById={getTeamById}
                 onPick={onPick}
                 disabled={disabled}
                 direction={direction}
                 showFirstFourColumn={showFirstFourColumn}
                 roundPointsMap={roundPointsMap}
+                eliminatedTeamIds={eliminatedTeamIds}
+                tournamentStarted={tournamentStarted}
               />
             );
           }
@@ -317,9 +383,12 @@ function RegionBracket({
               games={roundGames}
               picks={picks}
               getTeamsForGame={getTeamsForGame}
+              getTeamById={getTeamById}
               onPick={onPick}
               disabled={disabled}
               roundPointsMap={roundPointsMap}
+              eliminatedTeamIds={eliminatedTeamIds}
+              tournamentStarted={tournamentStarted}
             />
           );
         })}
@@ -333,11 +402,27 @@ interface R64WithFirstFourProps {
   firstFourByR64Game: Map<string, BracketGame>;
   picks: Map<string, string>;
   getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
+  getTeamById?: (teamId: string) => BracketTeam | null;
   onPick: (gameId: string, teamId: string) => void;
   disabled: boolean;
   direction: "ltr" | "rtl";
   showFirstFourColumn: boolean;
   roundPointsMap?: Map<string, number>;
+  eliminatedTeamIds: Set<string>;
+  tournamentStarted: boolean;
+}
+
+/** Resolve picked team data, looking up by ID if not one of the displayed teams */
+function resolvePickedTeam(
+  pickedTeamId: string | null,
+  team1: BracketTeam | null,
+  team2: BracketTeam | null,
+  getTeamById?: (teamId: string) => BracketTeam | null,
+): BracketTeam | null {
+  if (!pickedTeamId) return null;
+  if (team1?.id === pickedTeamId) return team1;
+  if (team2?.id === pickedTeamId) return team2;
+  return getTeamById?.(pickedTeamId) ?? null;
 }
 
 /**
@@ -349,11 +434,14 @@ function R64WithFirstFour({
   firstFourByR64Game,
   picks,
   getTeamsForGame,
+  getTeamById,
   onPick,
   disabled,
   direction,
   showFirstFourColumn,
   roundPointsMap,
+  eliminatedTeamIds,
+  tournamentStarted,
 }: R64WithFirstFourProps) {
   const hasAnyFirstFour = r64Games.some((g) => firstFourByR64Game.has(g.id));
 
@@ -386,6 +474,10 @@ function R64WithFirstFour({
           const ffGame = firstFourByR64Game.get(r64Game.id);
           const [r64Team1, r64Team2] = getTeamsForGame(r64Game.id);
 
+          // Resolve FF game teams if present
+          const ffTeams = ffGame ? getTeamsForGame(ffGame.id) : null;
+          const ffPickedId = ffGame ? (picks.get(ffGame.id) ?? null) : null;
+
           return (
             <div key={r64Game.id} className="flex items-center gap-0">
               {showFirstFourColumn && (
@@ -395,17 +487,34 @@ function R64WithFirstFour({
                     direction === "rtl" ? "order-2" : "order-1",
                   )}
                 >
-                  {ffGame ? (
+                  {ffGame && ffTeams ? (
                     <MatchupCard
                       gameId={ffGame.id}
-                      team1={getTeamsForGame(ffGame.id)[0]}
-                      team2={getTeamsForGame(ffGame.id)[1]}
-                      pickedTeamId={picks.get(ffGame.id) ?? null}
+                      team1={ffTeams[0]}
+                      team2={ffTeams[1]}
+                      pickedTeamId={ffPickedId}
+                      pickedTeamData={resolvePickedTeam(
+                        ffPickedId,
+                        ffTeams[0],
+                        ffTeams[1],
+                        getTeamById,
+                      )}
                       onPick={onPick}
                       disabled={disabled}
                       winnerTeamId={ffGame.winnerTeamId}
                       gameStatus={ffGame.status}
+                      statusDetail={ffGame.statusDetail}
                       roundPoints={roundPointsMap?.get("first_four") ?? 0}
+                      team1Score={ffGame.team1Score}
+                      team2Score={ffGame.team2Score}
+                      startTime={ffGame.startTime}
+                      venueName={ffGame.venueName}
+                      venueCity={ffGame.venueCity}
+                      venueState={ffGame.venueState}
+                      eliminatedTeamIds={eliminatedTeamIds}
+                      tournamentStarted={tournamentStarted}
+                      actualTeam1Id={ffGame.team1Id}
+                      actualTeam2Id={ffGame.team2Id}
                     />
                   ) : (
                     <div className="w-44" />
@@ -423,11 +532,28 @@ function R64WithFirstFour({
                   team1={r64Team1}
                   team2={r64Team2}
                   pickedTeamId={picks.get(r64Game.id) ?? null}
+                  pickedTeamData={resolvePickedTeam(
+                    picks.get(r64Game.id) ?? null,
+                    r64Team1,
+                    r64Team2,
+                    getTeamById,
+                  )}
                   onPick={onPick}
                   disabled={disabled}
                   winnerTeamId={r64Game.winnerTeamId}
                   gameStatus={r64Game.status}
+                  statusDetail={r64Game.statusDetail}
                   roundPoints={roundPointsMap?.get("round_of_64") ?? 0}
+                  team1Score={r64Game.team1Score}
+                  team2Score={r64Game.team2Score}
+                  startTime={r64Game.startTime}
+                  venueName={r64Game.venueName}
+                  venueCity={r64Game.venueCity}
+                  venueState={r64Game.venueState}
+                  eliminatedTeamIds={eliminatedTeamIds}
+                  tournamentStarted={tournamentStarted}
+                  actualTeam1Id={r64Game.team1Id}
+                  actualTeam2Id={r64Game.team2Id}
                 />
               </div>
             </div>
@@ -443,9 +569,12 @@ interface RoundColumnProps {
   games: BracketGame[];
   picks: Map<string, string>;
   getTeamsForGame: (gameId: string) => [BracketTeam | null, BracketTeam | null];
+  getTeamById?: (teamId: string) => BracketTeam | null;
   onPick: (gameId: string, teamId: string) => void;
   disabled: boolean;
   roundPointsMap?: Map<string, number>;
+  eliminatedTeamIds: Set<string>;
+  tournamentStarted: boolean;
 }
 
 function RoundColumn({
@@ -453,52 +582,55 @@ function RoundColumn({
   games,
   picks,
   getTeamsForGame,
+  getTeamById,
   onPick,
   disabled,
   roundPointsMap,
+  eliminatedTeamIds,
+  tournamentStarted,
 }: RoundColumnProps) {
   return (
-    <div className="flex flex-col items-center justify-around px-1">
+    <div className="flex flex-1 flex-col px-1">
       <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
         {ROUND_LABELS[round] ?? round}
       </div>
-      <div
-        className="flex flex-col justify-around gap-2"
-        style={getSpacingStyle(round)}
-      >
+      <div className="flex flex-1 flex-col justify-around">
         {games.map((game) => {
           const [team1, team2] = getTeamsForGame(game.id);
+          const pickedId = picks.get(game.id) ?? null;
           return (
             <MatchupCard
               key={game.id}
               gameId={game.id}
               team1={team1}
               team2={team2}
-              pickedTeamId={picks.get(game.id) ?? null}
+              pickedTeamId={pickedId}
+              pickedTeamData={resolvePickedTeam(
+                pickedId,
+                team1,
+                team2,
+                getTeamById,
+              )}
               onPick={onPick}
               disabled={disabled}
               winnerTeamId={game.winnerTeamId}
               gameStatus={game.status}
+              statusDetail={game.statusDetail}
               roundPoints={roundPointsMap?.get(round) ?? 0}
+              team1Score={game.team1Score}
+              team2Score={game.team2Score}
+              startTime={game.startTime}
+              venueName={game.venueName}
+              venueCity={game.venueCity}
+              venueState={game.venueState}
+              eliminatedTeamIds={eliminatedTeamIds}
+              tournamentStarted={tournamentStarted}
+              actualTeam1Id={game.team1Id}
+              actualTeam2Id={game.team2Id}
             />
           );
         })}
       </div>
     </div>
   );
-}
-
-function getSpacingStyle(round: string): React.CSSProperties {
-  switch (round) {
-    case "round_of_64":
-      return { gap: "0.25rem" };
-    case "round_of_32":
-      return { gap: "2.75rem" };
-    case "sweet_16":
-      return { gap: "8.25rem" };
-    case "elite_8":
-      return { gap: "19.25rem" };
-    default:
-      return { gap: "0.5rem" };
-  }
 }

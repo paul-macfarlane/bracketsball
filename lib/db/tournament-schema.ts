@@ -8,6 +8,7 @@ import {
   index,
   uniqueIndex,
   pgEnum,
+  real,
 } from "drizzle-orm/pg-core";
 
 export const tournamentRoundEnum = pgEnum("tournament_round", [
@@ -91,6 +92,25 @@ export const tournamentTeam = pgTable(
       .references(() => team.id, { onDelete: "cascade" }),
     seed: integer("seed").notNull(),
     region: tournamentRegionEnum("region").notNull(),
+    // Team stats (synced from ESPN or manually entered)
+    overallWins: integer("overall_wins"),
+    overallLosses: integer("overall_losses"),
+    conferenceWins: integer("conference_wins"),
+    conferenceLosses: integer("conference_losses"),
+    conferenceName: text("conference_name"),
+    ppg: real("ppg"),
+    oppPpg: real("opp_ppg"),
+    fgPct: real("fg_pct"),
+    threePtPct: real("three_pt_pct"),
+    ftPct: real("ft_pct"),
+    reboundsPerGame: real("rebounds_per_game"),
+    assistsPerGame: real("assists_per_game"),
+    stealsPerGame: real("steals_per_game"),
+    blocksPerGame: real("blocks_per_game"),
+    turnoversPerGame: real("turnovers_per_game"),
+    apRanking: integer("ap_ranking"),
+    strengthOfSchedule: real("strength_of_schedule"),
+    statsSyncedAt: timestamp("stats_synced_at"),
   },
   (table) => [
     uniqueIndex("tournament_team_unique_idx").on(
@@ -119,6 +139,7 @@ export const tournamentGame = pgTable(
     team2Score: integer("team2_score"),
     winnerTeamId: text("winner_team_id").references(() => team.id),
     status: gameStatusEnum("status").notNull().default("scheduled"),
+    statusDetail: text("status_detail"),
     startTime: timestamp("start_time"),
     venueName: text("venue_name"),
     venueCity: text("venue_city"),

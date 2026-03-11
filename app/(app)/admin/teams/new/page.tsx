@@ -1,7 +1,5 @@
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { TeamForm } from "../team-form";
 import { createTeamAction } from "../actions";
 
@@ -13,13 +11,13 @@ export default function NewTeamPage() {
 
   return (
     <div>
-      <Link
-        href="/admin/teams"
-        className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ChevronLeft className="mr-1 h-4 w-4" />
-        Back to Teams
-      </Link>
+      <PageBreadcrumbs
+        crumbs={[
+          { label: "Teams", href: "/admin/teams" },
+          { label: "New Team" },
+        ]}
+        className="mb-4"
+      />
       <Card>
         <CardHeader>
           <CardTitle>Add Team</CardTitle>

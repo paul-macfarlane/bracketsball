@@ -25,6 +25,7 @@ export interface SyncGame {
   round: TournamentRound;
   region: TournamentRegion | null;
   status: GameStatus;
+  statusDetail: string | null;
   startTime: Date | null;
   venue: { name: string | null; city: string | null; state: string | null };
   team1: SyncTeam | null; // higher seed

@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { StickySubHeader } from "@/components/sticky-sub-header";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { BracketFullView } from "./bracket-full-view";
 import type { BracketPositions } from "./bracket-full-view";
 import type { BracketGame, BracketTeam, BracketPick } from "./types";
@@ -18,6 +20,8 @@ interface BracketViewerProps {
   picks: BracketPick[];
   bracketPositions?: BracketPositions;
   poolScoring: PoolScoring;
+  poolId?: string;
+  poolName?: string;
 }
 
 export function BracketViewer({
@@ -30,6 +34,8 @@ export function BracketViewer({
   picks: picksList,
   bracketPositions,
   poolScoring,
+  poolId,
+  poolName,
 }: BracketViewerProps) {
   const picks = useMemo(
     () => new Map(picksList.map((p) => [p.tournamentGameId, p.pickedTeamId])),
@@ -63,58 +69,79 @@ export function BracketViewer({
     return map;
   }, [poolScoring]);
 
-  function getTeamsForGame(
-    gameId: string,
-  ): [BracketTeam | null, BracketTeam | null] {
-    const game = gamesById.get(gameId);
-    if (!game) return [null, null];
+  const getTeamById = useCallback(
+    (teamId: string): BracketTeam | null => teamsById.get(teamId) ?? null,
+    [teamsById],
+  );
 
-    let team1: BracketTeam | null = null;
-    let team2: BracketTeam | null = null;
+  const getTeamsForGame = useCallback(
+    (gameId: string): [BracketTeam | null, BracketTeam | null] => {
+      const game = gamesById.get(gameId);
+      if (!game) return [null, null];
 
-    if (game.team1Id) {
-      team1 = teamsById.get(game.team1Id) ?? null;
-    } else if (game.sourceGame1Id) {
-      const pickedTeamId = picks.get(game.sourceGame1Id);
-      if (pickedTeamId) team1 = teamsById.get(pickedTeamId) ?? null;
-    }
+      let team1: BracketTeam | null = null;
+      let team2: BracketTeam | null = null;
 
-    if (game.team2Id) {
-      team2 = teamsById.get(game.team2Id) ?? null;
-    } else if (game.sourceGame2Id) {
-      const pickedTeamId = picks.get(game.sourceGame2Id);
-      if (pickedTeamId) team2 = teamsById.get(pickedTeamId) ?? null;
-    }
+      // Prioritize actual team data (accurate for completed/in-progress games).
+      // Fall back to user's pick from source game (for future games without teams set yet).
+      if (game.team1Id) {
+        team1 = teamsById.get(game.team1Id) ?? null;
+      } else if (game.sourceGame1Id) {
+        const pickedTeamId = picks.get(game.sourceGame1Id);
+        if (pickedTeamId) team1 = teamsById.get(pickedTeamId) ?? null;
+      }
 
-    return [team1, team2];
-  }
+      if (game.team2Id) {
+        team2 = teamsById.get(game.team2Id) ?? null;
+      } else if (game.sourceGame2Id) {
+        const pickedTeamId = picks.get(game.sourceGame2Id);
+        if (pickedTeamId) team2 = teamsById.get(pickedTeamId) ?? null;
+      }
+
+      return [team1, team2];
+    },
+    [gamesById, teamsById, picks],
+  );
 
   return (
     <div>
       {/* Header */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold">{bracketName}</h1>
-          <Badge
-            variant={bracketStatus === "submitted" ? "default" : "secondary"}
-          >
-            {bracketStatus === "submitted" ? "Submitted" : "Draft"}
-          </Badge>
+      <StickySubHeader>
+        {poolName && poolId && (
+          <PageBreadcrumbs
+            crumbs={[
+              { label: "Pools", href: "/pools" },
+              { label: poolName, href: `/pools/${poolId}` },
+              { label: bracketName },
+            ]}
+            className="mb-2"
+          />
+        )}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold">{bracketName}</h1>
+            <Badge
+              variant={bracketStatus === "submitted" ? "default" : "secondary"}
+            >
+              {bracketStatus === "submitted" ? "Submitted" : "Draft"}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-semibold">Points: {totalPoints}</span>
+            <span className="text-muted-foreground">|</span>
+            <span className="text-muted-foreground">
+              Potential: {potentialPoints}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="font-semibold">Points: {totalPoints}</span>
-          <span className="text-muted-foreground">|</span>
-          <span className="text-muted-foreground">
-            Potential: {potentialPoints}
-          </span>
-        </div>
-      </div>
+      </StickySubHeader>
 
       {/* Bracket view — disabled (read-only) */}
       <BracketFullView
         games={games}
         picks={picks}
         getTeamsForGame={getTeamsForGame}
+        getTeamById={getTeamById}
         onPick={() => {}}
         disabled={true}
         bracketPositions={bracketPositions}

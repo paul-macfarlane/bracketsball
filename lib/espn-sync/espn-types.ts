@@ -76,5 +76,6 @@ export interface ESPNStatus {
     name: string;
     state: string;
     completed: boolean;
+    shortDetail?: string;
   };
 }

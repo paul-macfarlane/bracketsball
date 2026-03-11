@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 
 import {
   getTournamentById,
@@ -49,13 +49,14 @@ export default async function TournamentTeamsPage({
 
   return (
     <div>
-      <Link
-        href={`/admin/tournaments/${id}`}
-        className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ChevronLeft className="mr-1 h-4 w-4" />
-        Back to {tournament.name}
-      </Link>
+      <PageBreadcrumbs
+        crumbs={[
+          { label: "Tournaments", href: "/admin/tournaments" },
+          { label: tournament.name, href: `/admin/tournaments/${id}` },
+          { label: "Teams" },
+        ]}
+        className="mb-4"
+      />
       <div className="mb-6">
         <h1 className="text-2xl font-bold">
           {tournament.name} — Teams ({tournamentTeams.length}/68)
