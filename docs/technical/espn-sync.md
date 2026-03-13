@@ -40,7 +40,7 @@ You don't need to manually create the tournament, seed teams, or generate the br
 **Option B: Manual setup via Admin UI**
 
 1. Create the tournament — set year, name, mark as active.
-2. Seed teams — Run `pnpm db:seed:teams` or add manually.
+2. Seed teams — add manually via Admin UI.
 3. Assign all 68 teams with correct seeds and regions.
 4. Configure bracket positions (which region in each quadrant).
 5. Click "Generate Bracket".
@@ -48,20 +48,20 @@ You don't need to manually create the tournament, seed teams, or generate the br
 
 ### During the Tournament
 
-**Cron schedule recommendations:**
+**Cron schedule recommendations (2026 tournament):**
 
-| Phase        | Dates (approx)     | Suggested cron schedule   |
-| ------------ | ------------------ | ------------------------- |
-| First Four   | Tue-Wed before R64 | Every 15 min, 6pm-1am ET  |
-| Round of 64  | Thu-Fri            | Every 10 min, 12pm-1am ET |
-| Round of 32  | Sat-Sun            | Every 10 min, 12pm-1am ET |
-| Sweet 16     | Thu-Fri (week 2)   | Every 10 min, 7pm-1am ET  |
-| Elite 8      | Sat-Sun (week 2)   | Every 10 min, 2pm-1am ET  |
-| Final Four   | Saturday (week 3)  | Every 5 min, 6pm-1am ET   |
-| Championship | Monday (week 3)    | Every 5 min, 9pm-1am ET   |
-| Off days     | Any non-game day   | Once daily (or skip)      |
+| Phase        | Dates             | Suggested cron (UTC)                         | crontab expression         |
+| ------------ | ----------------- | -------------------------------------------- | -------------------------- |
+| First Four   | Tue-Wed Mar 17-18 | Every 15 min, 6pm-1am ET (11pm-6am UTC)      | `*/15 23,0-5 17-18 3 *`    |
+| Round of 64  | Thu-Fri Mar 19-20 | Every 10 min, 12pm-1am ET (5pm-6am UTC next) | `*/10 17-23,0-5 19-20 3 *` |
+| Round of 32  | Sat-Sun Mar 21-22 | Every 10 min, 12pm-1am ET (5pm-6am UTC next) | `*/10 17-23,0-5 21-22 3 *` |
+| Sweet 16     | Thu-Fri Mar 26-27 | Every 10 min, 7pm-1am ET (12am-6am UTC next) | `*/10 0-5 27-28 3 *`       |
+| Elite 8      | Sat-Sun Mar 28-29 | Every 10 min, 2pm-1am ET (7pm-6am UTC next)  | `*/10 19-23,0-5 28-29 3 *` |
+| Final Four   | Sat Apr 4         | Every 5 min, 6pm-1am ET (11pm-6am UTC next)  | `*/5 23,0-5 4-5 4 *`       |
+| Championship | Mon Apr 6         | Every 5 min, 8pm-1am ET (1am-6am UTC next)   | `*/5 1-6 7 4 *`            |
+| Off days     | Any non-game day  | Once daily or skip                           | `0 12 * * *`               |
 
-A simpler approach: **every 15 minutes from noon to 1am ET during the tournament window** covers all scenarios without over-complicating the schedule.
+A simpler approach: **every 15 minutes from noon to 1am ET during the tournament window (Mar 17 – Apr 6)** covers all scenarios without over-complicating the schedule. In crontab: `*/15 17-23,0-5 * 3-4 *` (filter active dates via cron-job.org's date settings).
 
 Set this up at [cron-job.org](https://cron-job.org):
 
@@ -122,7 +122,7 @@ This pauses between each phase (First Four, Round of 64, Round of 32, etc.) and 
 
 The tournament persists in the database after the script runs. Re-running for the same year replaces it.
 
-Supported years: 2023, 2024, 2026 (placeholder). To add a new year, add its phase dates and bracket positions to `YEAR_CONFIGS` in the script.
+Supported years: 2023, 2024, 2025, 2026. To add a new year, add its phase dates and bracket positions to `YEAR_CONFIGS` in the script.
 
 ### Adding a New Year
 
