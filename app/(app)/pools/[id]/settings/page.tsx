@@ -84,6 +84,13 @@ export default async function PoolSettingsPage({
                 imageUrl: poolData.pool.imageUrl ?? "",
                 maxBracketsPerUser: poolData.pool.maxBracketsPerUser,
                 maxParticipants: poolData.pool.maxParticipants,
+                scoringFirstFour: poolData.pool.scoringFirstFour,
+                scoringRound64: poolData.pool.scoringRound64,
+                scoringRound32: poolData.pool.scoringRound32,
+                scoringSweet16: poolData.pool.scoringSweet16,
+                scoringElite8: poolData.pool.scoringElite8,
+                scoringFinalFour: poolData.pool.scoringFinalFour,
+                scoringChampionship: poolData.pool.scoringChampionship,
               }}
               memberCount={poolData.memberCount}
               maxBracketCountInPool={maxBracketCountInPool}

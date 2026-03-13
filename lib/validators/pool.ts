@@ -3,7 +3,14 @@ import { z } from "zod";
 export const POOL_LIMITS = {
   bracketsPerUser: { min: 1, max: 10, default: 5 },
   participants: { min: 2, max: 100, default: 50 },
+  scoring: { min: 0, max: 1000 },
 } as const;
+
+const scoringField = z
+  .number()
+  .int("Must be a whole number")
+  .min(POOL_LIMITS.scoring.min, `Must be at least ${POOL_LIMITS.scoring.min}`)
+  .max(POOL_LIMITS.scoring.max, `Must be at most ${POOL_LIMITS.scoring.max}`);
 
 export const createPoolSchema = z.object({
   name: z
@@ -86,6 +93,13 @@ export function buildUpdatePoolSchema(
         POOL_LIMITS.participants.max,
         `Maximum ${POOL_LIMITS.participants.max} participants`,
       ),
+    scoringFirstFour: scoringField,
+    scoringRound64: scoringField,
+    scoringRound32: scoringField,
+    scoringSweet16: scoringField,
+    scoringElite8: scoringField,
+    scoringFinalFour: scoringField,
+    scoringChampionship: scoringField,
   });
 }
 

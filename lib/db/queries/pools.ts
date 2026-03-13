@@ -89,6 +89,13 @@ interface UpdatePoolData {
   imageUrl?: string | null;
   maxBracketsPerUser: number;
   maxParticipants: number;
+  scoringFirstFour: number;
+  scoringRound64: number;
+  scoringRound32: number;
+  scoringSweet16: number;
+  scoringElite8: number;
+  scoringFinalFour: number;
+  scoringChampionship: number;
 }
 
 export async function updatePool(poolId: string, data: UpdatePoolData) {
@@ -99,6 +106,13 @@ export async function updatePool(poolId: string, data: UpdatePoolData) {
       imageUrl: data.imageUrl || null,
       maxBracketsPerUser: data.maxBracketsPerUser,
       maxParticipants: data.maxParticipants,
+      scoringFirstFour: data.scoringFirstFour,
+      scoringRound64: data.scoringRound64,
+      scoringRound32: data.scoringRound32,
+      scoringSweet16: data.scoringSweet16,
+      scoringElite8: data.scoringElite8,
+      scoringFinalFour: data.scoringFinalFour,
+      scoringChampionship: data.scoringChampionship,
     })
     .where(eq(pool.id, poolId))
     .returning();
