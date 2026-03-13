@@ -29,10 +29,6 @@ docker compose up -d
 # Run database migrations
 pnpm db:migrate
 
-# Seed data
-pnpm db:seed:teams
-pnpm db:seed:tournament
-
 # Start dev server
 pnpm dev
 ```

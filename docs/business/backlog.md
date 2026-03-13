@@ -638,7 +638,8 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 13  | View Pool Standings                 | Bracket Visibility      | Yes | Done        |
 | 14  | View Individual Bracket Detail      | Bracket Visibility      | Yes | Done        |
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
-| 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | Not Started |
+<<<<<<< HEAD
+| 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | In Progress |
 | 39  | Validate Cron Sync Performance      | Pre-Tournament Setup    | Yes | Not Started |
 | 32  | Update External Services Branding   | Branding                | Yes | Done        |
 | 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Done        |
