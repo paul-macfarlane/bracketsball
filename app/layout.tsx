@@ -17,10 +17,19 @@ const barlowCondensed = Barlow_Condensed({
   weight: ["400", "500", "600", "700"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Bracketsball",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Bracketsball — March Madness Bracket Challenge",
+    template: "%s — Bracketsball",
+  },
   description:
-    "March Madness bracket challenge — create pools, fill your bracket, and compete with friends.",
+    "March Madness bracket challenge — create pools, fill your bracket, and compete with friends. Free, fast, and built for the tournament.",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: [
       { url: "/icon-16.png", sizes: "16x16", type: "image/png" },
@@ -32,18 +41,25 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "Bracketsball",
+    title: "Bracketsball — March Madness Bracket Challenge",
     description:
-      "March Madness bracket challenge — create pools, fill your bracket, and compete with friends.",
+      "March Madness bracket challenge — create pools, fill your bracket, and compete with friends. Free, fast, and built for the tournament.",
+    url: "/",
+    siteName: "Bracketsball",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
     type: "website",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bracketsball",
+    title: "Bracketsball — March Madness Bracket Challenge",
     description:
-      "March Madness bracket challenge — create pools, fill your bracket, and compete with friends.",
+      "March Madness bracket challenge — create pools, fill your bracket, and compete with friends. Free, fast, and built for the tournament.",
     images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

@@ -15,6 +15,40 @@ import { auth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+function JsonLd() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Bracketsball",
+    url: siteUrl,
+    description:
+      "March Madness bracket challenge — create pools, fill your bracket, and compete with friends. Free, fast, and built for the tournament.",
+    applicationCategory: "SportsApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    featureList: [
+      "Create bracket pools",
+      "Fill NCAA tournament brackets",
+      "Live scoring and standings",
+      "Compete with friends",
+      "Custom scoring rules",
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+}
+
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -26,6 +60,7 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <JsonLd />
       {/* Splash Header */}
       <header className="absolute top-0 right-0 left-0 z-10">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">

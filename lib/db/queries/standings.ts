@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import {
@@ -34,8 +34,16 @@ export async function syncStandingsForTournament(tournamentId: string) {
 
   if (entries.length === 0) return { updatedCount: 0 };
 
-  // Get all picks for these entries in one query
-  const allPicks = await db.select().from(bracketPick);
+  // Get picks only for this tournament's entries (not all picks globally)
+  const entryIds = entries.map((e) => e.id);
+  const allPicks = await db
+    .select({
+      bracketEntryId: bracketPick.bracketEntryId,
+      tournamentGameId: bracketPick.tournamentGameId,
+      pickedTeamId: bracketPick.pickedTeamId,
+    })
+    .from(bracketPick)
+    .where(inArray(bracketPick.bracketEntryId, entryIds));
 
   // Group picks by entry
   const picksByEntry = new Map<
