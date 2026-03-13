@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 import { createPoolSchema } from "@/lib/validators/pool";
-import { createPoolWithLeader } from "@/lib/db/queries/pools";
+import {
+  createPoolWithLeader,
+  hasTournamentStarted,
+} from "@/lib/db/queries/pools";
 
 export async function createPool(formData: unknown) {
   const session = await auth.api.getSession({
@@ -14,6 +17,13 @@ export async function createPool(formData: unknown) {
 
   if (!session) {
     return { error: "Not authenticated" };
+  }
+
+  const tournamentStarted = await hasTournamentStarted();
+  if (tournamentStarted) {
+    return {
+      error: "Pools cannot be created after the tournament has started",
+    };
   }
 
   const parsed = createPoolSchema.safeParse(formData);

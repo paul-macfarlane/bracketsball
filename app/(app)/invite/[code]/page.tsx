@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 import { getPoolInviteByCode } from "@/lib/db/queries/pool-invites";
+import { hasTournamentStarted } from "@/lib/db/queries/pools";
 import { InviteAcceptCard } from "./invite-accept-card";
 
 export default async function InvitePage({
@@ -50,6 +51,18 @@ export default async function InvitePage({
         <ErrorCard
           title="Invite Exhausted"
           message="This invite link has reached its maximum number of uses."
+        />
+      </div>
+    );
+  }
+
+  const tournamentStarted = await hasTournamentStarted();
+  if (tournamentStarted) {
+    return (
+      <div className="mx-auto max-w-md py-12">
+        <ErrorCard
+          title="Tournament Started"
+          message="Pools cannot be joined after the tournament has started."
         />
       </div>
     );

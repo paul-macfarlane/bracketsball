@@ -77,6 +77,7 @@ docs/                   # Documentation
 
 - Use **Drizzle ORM** with **Neon** serverless Postgres.
 - Define schema in code (`lib/db/schema.ts`). Migrations are version-controlled.
+- **Schema changes require migration files.** Always run `pnpm db:generate` to create a migration file before running `pnpm db:push` to apply it. This ensures a full history of schema changes is tracked in version control.
 - All queries go through dedicated functions in `lib/db/queries/` — no inline SQL in components or route handlers.
 - **Use transactions for multi-step writes.** Any function that performs more than one database write (insert, update, or delete) must wrap them in `db.transaction(async (tx) => { ... })`. Use `tx` instead of `db` for all queries inside the transaction. This ensures atomicity — either all writes succeed or none do.
 - Always parameterize queries. Never interpolate user input into SQL strings.

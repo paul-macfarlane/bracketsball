@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import Link from "next/link";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Plus, Search } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { getPoolsByUserId } from "@/lib/db/queries/pools";
@@ -25,12 +25,20 @@ export default async function PoolsPage() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">My Pools</h1>
-        <Button asChild>
-          <Link href="/pools/create">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Pool
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href="/pools/discover">
+              <Search className="mr-2 h-4 w-4" />
+              Discover Pools
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/pools/create">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Pool
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {pools.length === 0 ? (
@@ -39,9 +47,14 @@ export default async function PoolsPage() {
             <p className="text-muted-foreground">
               You haven&apos;t joined any pools yet.
             </p>
-            <Button asChild className="mt-4" variant="outline">
-              <Link href="/pools/create">Create your first pool</Link>
-            </Button>
+            <div className="mt-4 flex justify-center gap-2">
+              <Button asChild variant="outline">
+                <Link href="/pools/discover">Discover Pools</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/pools/create">Create your first pool</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (

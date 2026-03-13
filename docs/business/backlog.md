@@ -346,6 +346,43 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - User can modify any auto-filled picks before submitting
 - Auto-fill is available during bracket creation and editing (before tournament lock)
 
+### 41. Unused Code Enforcement & Cleanup (Non-MVP) — Epic: Tech Debt
+
+**As a** developer, **I want** a lint rule that catches unused exports and dead code, plus a one-time audit to remove existing unused code, **so that** the codebase stays lean and maintainable.
+
+**Acceptance Criteria:**
+
+- **Lint enforcement:**
+  - Add a tool (e.g., `knip` or `ts-prune`) to detect unused exports, unused files, and dead code
+  - Integrate into the CI/lint pipeline so unused code is caught before merge
+  - Document the chosen tool and configuration in `docs/technical/standards.md`
+- **One-time audit:**
+  - Run the tool across the entire codebase and remove all confirmed unused exports and dead code (e.g., `getPublicPoolById` and similar)
+  - Verify removal doesn't break builds or tests
+- **Ongoing standard:**
+  - Add a standard to `docs/technical/standards.md` that exported functions/types must have at least one consumer — no speculative exports
+
+### 42. Codebase Standards Audit (Non-MVP) — Epic: Tech Debt
+
+**As a** developer, **I want** an audit of the codebase against `docs/technical/standards.md` **so that** existing code conforms to our documented conventions and any gaps are fixed.
+
+**Acceptance Criteria:**
+
+- Audit every standard in `docs/technical/standards.md` against the current codebase, including but not limited to:
+  - **Project structure**: files colocated correctly, shared components in `components/`, one component per file
+  - **Naming conventions**: files/folders kebab-case, components PascalCase, functions camelCase, constants UPPER_SNAKE_CASE, DB tables/columns snake_case
+  - **TypeScript**: no unnecessary `any`, correct use of `interface` vs `type`, `@/*` path alias used consistently, `satisfies` where appropriate
+  - **React & Next.js**: Server Components by default, no `useEffect` for data fetching, `next/image` and `next/link` used, Server Actions for mutations
+  - **Forms**: React Hook Form + Zod, schemas in `lib/validators/`
+  - **UI & Styling**: no raw color classes (only CSS variable-based), no arbitrary color values, mobile-first responsive design, no inline `style` props
+  - **Database**: queries in `lib/db/queries/` (no inline SQL), transactions for multi-step writes, parameterized queries
+  - **API Routes & Server Actions**: Zod validation at boundaries, thin actions calling shared query functions, cron auth via shared secret
+  - **Error handling**: `error.tsx` boundaries, `notFound()` usage, no internal error details leaked to client
+  - **Linting & formatting**: zero errors from `pnpm lint` and `pnpm build`
+- Document all violations found
+- Fix all violations
+- Verify fixes pass `pnpm lint`, `pnpm build`, and don't break existing functionality
+
 ### 21. Transaction Audit (Non-MVP) — Epic: Tech Debt
 
 **As a** developer, **I want to** audit all existing query functions and server actions for missing transactions **so that** data integrity is guaranteed across the app.
@@ -399,7 +436,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
   - Data is sourced automatically where possible (synced or fetched), with admin override capability
   - New team fields (records, descriptions) stored in the DB and kept in sync
 
-### 18. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
+### 18. Bracket Pool Public/Private Toggle (Non-MVP) ✅ — Epic: Public Pools
 
 **As a** pool leader, **I want to** make my pool public or private **so that** I can control who can discover and join it.
 
@@ -410,7 +447,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Public pools appear in search results
 - Toggle available at creation and in settings
 
-### 20. Public Pool Search (Non-MVP) — Epic: Public Pools
+### 20. Public Pool Search (Non-MVP) ✅ — Epic: Public Pools
 
 **As a** user, **I want to** search for public pools **so that** I can find and join open competitions.
 
@@ -647,13 +684,15 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Done        |
 | 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Done        |
 | 28  | SEO Plan & Implementation           | Branding                | No  | Done        |
-| 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |
-| 20  | Public Pool Search                  | Public Pools            | No  | Not Started |
+| 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Done        |
+| 20  | Public Pool Search                  | Public Pools            | No  | Done        |
 | 35  | Sticky Page Headers                 | Navigation UX           | No  | Done        |
 | 36  | Breadcrumb Navigation               | Navigation UX           | No  | Done        |
 | 37  | Team Mascot / Nickname Display      | Bracket UX Enhancements | No  | Not Started |
 | 38  | Admin Manual Team & Game Data Entry | Bracket UX Enhancements | No  | Not Started |
 | 40  | GitHub Repo Link in Footer          | Branding                | No  | Not Started |
+| 41  | Unused Code Enforcement & Cleanup   | Tech Debt               | No  | Not Started |
+| 42  | Codebase Standards Audit            | Tech Debt               | No  | Not Started |
 | 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
 | 19  | Theme Toggle                        | UX                      | No  | Done        |
 | 22  | Remove User Dashboard               | UX Cleanup              | No  | Done        |
@@ -664,4 +703,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 21 stories (13 done, 8 remaining)**
+**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 23 stories (15 done, 8 remaining)**

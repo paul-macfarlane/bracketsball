@@ -11,6 +11,11 @@ import {
 import { user } from "./auth-schema";
 import { DEFAULT_SCORING } from "@/lib/scoring";
 
+export const poolVisibilityEnum = pgEnum("pool_visibility", [
+  "private",
+  "public",
+]);
+
 export const poolMemberRoleEnum = pgEnum("pool_member_role", [
   "leader",
   "member",
@@ -21,6 +26,7 @@ export const pool = pgTable("pool", {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
+  visibility: poolVisibilityEnum("visibility").notNull().default("private"),
   imageUrl: text("image_url"),
   maxBracketsPerUser: integer("max_brackets_per_user").notNull().default(5),
   maxParticipants: integer("max_participants").notNull().default(50),

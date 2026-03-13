@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const POOL_VISIBILITY_OPTIONS = ["private", "public"] as const;
+export type PoolVisibility = (typeof POOL_VISIBILITY_OPTIONS)[number];
+
 export const POOL_LIMITS = {
   bracketsPerUser: { min: 1, max: 10, default: 5 },
   participants: { min: 2, max: 100, default: 50 },
@@ -17,6 +20,7 @@ export const createPoolSchema = z.object({
     .string()
     .min(1, "Pool name is required")
     .max(100, "Pool name must be 100 characters or less"),
+  visibility: z.enum(POOL_VISIBILITY_OPTIONS),
   imageUrl: z.string().url("Must be a valid URL").or(z.literal("")).optional(),
   maxBracketsPerUser: z
     .number()
@@ -62,6 +66,7 @@ export function buildUpdatePoolSchema(
       .string()
       .min(1, "Pool name is required")
       .max(100, "Pool name must be 100 characters or less"),
+    visibility: z.enum(POOL_VISIBILITY_OPTIONS),
     imageUrl: z
       .string()
       .url("Must be a valid URL")
@@ -106,3 +111,45 @@ export function buildUpdatePoolSchema(
 export type UpdatePoolFormValues = z.infer<
   ReturnType<typeof buildUpdatePoolSchema>
 >;
+
+export const searchPublicPoolsSchema = z.object({
+  search: z.string().max(100).optional(),
+  minBracketsPerUser: z
+    .number()
+    .int()
+    .min(POOL_LIMITS.bracketsPerUser.min)
+    .max(POOL_LIMITS.bracketsPerUser.max)
+    .optional(),
+  maxBracketsPerUser: z
+    .number()
+    .int()
+    .min(POOL_LIMITS.bracketsPerUser.min)
+    .max(POOL_LIMITS.bracketsPerUser.max)
+    .optional(),
+  minParticipants: z
+    .number()
+    .int()
+    .min(POOL_LIMITS.participants.min)
+    .max(POOL_LIMITS.participants.max)
+    .optional(),
+  maxParticipants: z
+    .number()
+    .int()
+    .min(POOL_LIMITS.participants.min)
+    .max(POOL_LIMITS.participants.max)
+    .optional(),
+  sort: z
+    .enum([
+      "most-members",
+      "most-available",
+      "fewest-brackets",
+      "most-brackets",
+      "alphabetical",
+    ])
+    .optional(),
+  page: z.number().int().min(1).optional(),
+});
+
+export const joinPublicPoolSchema = z.object({
+  poolId: z.string().min(1),
+});
