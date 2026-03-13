@@ -361,7 +361,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Document the chosen pattern in `docs/technical/standards.md` so future query functions follow the same approach
 - Document any functions that were fixed
 
-### 16. Manage Bracket Scoring Settings (Non-MVP) — Epic: Pool Settings
+### 16. Manage Bracket Scoring Settings (Non-MVP) ✅ — Epic: Pool Settings
 
 **As a** pool leader, **I want to** customize scoring per round **so that** I can tailor the pool's competitiveness.
 
@@ -644,7 +644,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Done        |
 | 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Done        |
 | 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
-| 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
+| 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Done        |
 | 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Done        |
 | 28  | SEO Plan & Implementation           | Branding                | No  | Done        |
 | 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |

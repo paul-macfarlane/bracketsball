@@ -25,6 +25,16 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { DEFAULT_SCORING } from "@/lib/scoring";
 
+const SCORING_FIELDS = [
+  { name: "scoringFirstFour" as const, label: "First Four" },
+  { name: "scoringRound64" as const, label: "Round of 64" },
+  { name: "scoringRound32" as const, label: "Round of 32" },
+  { name: "scoringSweet16" as const, label: "Sweet 16" },
+  { name: "scoringElite8" as const, label: "Elite 8" },
+  { name: "scoringFinalFour" as const, label: "Final Four" },
+  { name: "scoringChampionship" as const, label: "Championship" },
+] as const;
+
 interface PoolSettingsFormProps {
   poolId: string;
   defaultValues: {
@@ -32,6 +42,13 @@ interface PoolSettingsFormProps {
     imageUrl: string;
     maxBracketsPerUser: number;
     maxParticipants: number;
+    scoringFirstFour: number;
+    scoringRound64: number;
+    scoringRound32: number;
+    scoringSweet16: number;
+    scoringElite8: number;
+    scoringFinalFour: number;
+    scoringChampionship: number;
   };
   memberCount: number;
   maxBracketCountInPool: number;
@@ -183,39 +200,51 @@ export function PoolSettingsForm({
         <Separator />
 
         <div>
-          <h3 className="mb-3 text-sm font-medium">Scoring</h3>
-          <p className="mb-3 text-xs text-muted-foreground">
-            Scoring customization will be available in a future update.
-          </p>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">First Four</span>
-              <span>{DEFAULT_SCORING.firstFour} pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Round of 64</span>
-              <span>{DEFAULT_SCORING.round64} pt</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Round of 32</span>
-              <span>{DEFAULT_SCORING.round32} pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Sweet 16</span>
-              <span>{DEFAULT_SCORING.sweet16} pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Elite 8</span>
-              <span>{DEFAULT_SCORING.elite8} pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Final Four</span>
-              <span>{DEFAULT_SCORING.finalFour} pts</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Championship</span>
-              <span>{DEFAULT_SCORING.championship} pts</span>
-            </div>
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-medium">Scoring (points per round)</h3>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                form.setValue("scoringFirstFour", DEFAULT_SCORING.firstFour);
+                form.setValue("scoringRound64", DEFAULT_SCORING.round64);
+                form.setValue("scoringRound32", DEFAULT_SCORING.round32);
+                form.setValue("scoringSweet16", DEFAULT_SCORING.sweet16);
+                form.setValue("scoringElite8", DEFAULT_SCORING.elite8);
+                form.setValue("scoringFinalFour", DEFAULT_SCORING.finalFour);
+                form.setValue(
+                  "scoringChampionship",
+                  DEFAULT_SCORING.championship,
+                );
+              }}
+            >
+              Reset to Defaults
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {SCORING_FIELDS.map(({ name, label }) => (
+              <FormField
+                key={name}
+                control={form.control}
+                name={name}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{label}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={POOL_LIMITS.scoring.min}
+                        max={POOL_LIMITS.scoring.max}
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
           </div>
         </div>
 
