@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -5,6 +6,15 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { LoginButtons } from "./login-buttons";
 import { SiteFooter } from "@/components/site-footer";
+
+export const metadata: Metadata = {
+  title: "Sign In",
+  description:
+    "Sign in to Bracketsball to create pools, fill brackets, and compete with friends during March Madness.",
+  alternates: {
+    canonical: "/login",
+  },
+};
 
 export default async function LoginPage({
   searchParams,

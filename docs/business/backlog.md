@@ -293,7 +293,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 - Sync frequency is suitable for live tournament updates (e.g., every few minutes during game days)
 - Verify sync works end-to-end in production before the tournament starts
 
-### 39. Validate Cron Sync Performance (MVP) — Epic: Pre-Tournament Setup
+### 39. Validate Cron Sync Performance (MVP) ✅ — Epic: Pre-Tournament Setup
 
 **As the** product owner, **I want to** validate that the ESPN sync cron job completes well within a 30-second timeout **so that** syncs don't fail or get killed mid-transaction in production.
 
@@ -399,20 +399,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
   - Data is sourced automatically where possible (synced or fetched), with admin override capability
   - New team fields (records, descriptions) stored in the DB and kept in sync
 
-### 28. SEO Plan & Implementation (Non-MVP) — Epic: Branding
-
-**As the** product owner, **I want** the app to be discoverable via search engines **so that** organic traffic can find Bracketsball.
-
-**Acceptance Criteria:**
-
-- Metadata: proper `<title>`, `<meta description>`, and Open Graph / Twitter Card tags on all public pages (splash page, login)
-- `robots.txt` allows crawling of public pages, disallows authenticated app routes
-- `sitemap.xml` generated for public pages
-- Structured data (JSON-LD) for the splash page (WebApplication or SoftwareApplication schema)
-- Canonical URLs set on all pages
-- Lighthouse SEO score ≥ 90 on the splash page
-- Document the SEO strategy and any ongoing tasks in `docs/technical/seo-plan.md`
-
 ### 18. Bracket Pool Public/Private Toggle (Non-MVP) — Epic: Public Pools
 
 **As a** pool leader, **I want to** make my pool public or private **so that** I can control who can discover and join it.
@@ -481,6 +467,20 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 ---
 
 ## Completed Non-MVP Stories
+
+### 28. SEO Plan & Implementation (Non-MVP) ✅ — Epic: Branding
+
+**As the** product owner, **I want** the app to be discoverable via search engines **so that** organic traffic can find Bracketsball.
+
+**Acceptance Criteria:**
+
+- Metadata: proper `<title>`, `<meta description>`, and Open Graph / Twitter Card tags on all public pages (splash page, login)
+- `robots.txt` allows crawling of public pages, disallows authenticated app routes
+- `sitemap.xml` generated for public pages
+- Structured data (JSON-LD) for the splash page (WebApplication or SoftwareApplication schema)
+- Canonical URLs set on all pages
+- Lighthouse SEO score ≥ 90 on the splash page
+- Document the SEO strategy and any ongoing tasks in `docs/technical/seo-plan.md`
 
 ### 26. Fix Bracket Submit Double-Click (Non-MVP) ✅ — Epic: Bug Fixes
 
@@ -639,14 +639,14 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 14  | View Individual Bracket Detail      | Bracket Visibility      | Yes | Done        |
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
 | 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | In Progress |
-| 39  | Validate Cron Sync Performance      | Pre-Tournament Setup    | Yes | Not Started |
+| 39  | Validate Cron Sync Performance      | Pre-Tournament Setup    | Yes | Done        |
 | 32  | Update External Services Branding   | Branding                | Yes | Done        |
 | 26  | Fix Bracket Submit Double-Click     | Bug Fixes               | No  | Done        |
 | 25  | Auto-Fill Bracket Picks             | Auto-Fill Bracket       | No  | Done        |
 | 21  | Transaction Audit                   | Tech Debt               | No  | Not Started |
 | 16  | Manage Bracket Scoring Settings     | Pool Settings           | No  | Not Started |
 | 33  | Team & Game Info in Bracket Builder | Bracket UX Enhancements | No  | Done        |
-| 28  | SEO Plan & Implementation           | Branding                | No  | Not Started |
+| 28  | SEO Plan & Implementation           | Branding                | No  | Done        |
 | 18  | Bracket Pool Public/Private Toggle  | Public Pools            | No  | Not Started |
 | 20  | Public Pool Search                  | Public Pools            | No  | Not Started |
 | 35  | Sticky Page Headers                 | Navigation UX           | No  | Done        |
@@ -664,4 +664,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 20 stories (18 done, 2 remaining)** | **Post-MVP: 21 stories (12 done, 9 remaining)**
+**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 21 stories (13 done, 8 remaining)**

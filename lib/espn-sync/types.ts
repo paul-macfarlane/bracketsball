@@ -43,9 +43,16 @@ export interface TournamentDataSource {
   ): Promise<SyncGame[]>;
 }
 
+export interface SyncTiming {
+  espnFetchMs: number;
+  dbTransactionMs: number;
+  standingsRecalcMs: number;
+}
+
 export interface SyncResult {
   gamesUpdated: number;
   gamesSkipped: number;
   teamsUpserted: number;
   errors: string[];
+  timing?: SyncTiming;
 }

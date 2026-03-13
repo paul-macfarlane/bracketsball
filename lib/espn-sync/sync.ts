@@ -31,8 +31,17 @@ export async function syncTournament(
   adapter: TournamentDataSource,
   date: string,
 ): Promise<SyncResult> {
+  const fetchStart = performance.now();
   const espnGames = await adapter.fetchGamesByDate(date);
-  return syncGamesToDB(tournamentId, espnGames);
+  const espnFetchMs = Math.round(performance.now() - fetchStart);
+
+  const result = await syncGamesToDB(tournamentId, espnGames);
+
+  if (result.timing) {
+    result.timing.espnFetchMs = espnFetchMs;
+  }
+
+  return result;
 }
 
 /**
@@ -65,6 +74,7 @@ async function syncGamesToDB(
     gamesSkipped: 0,
     teamsUpserted: 0,
     errors: [],
+    timing: { espnFetchMs: 0, dbTransactionMs: 0, standingsRecalcMs: 0 },
   };
 
   if (espnGames.length === 0) {
@@ -94,6 +104,7 @@ async function syncGamesToDB(
   );
 
   // Process each ESPN game
+  const txStart = performance.now();
   await db.transaction(async (tx) => {
     for (const espnGame of espnGames) {
       try {
@@ -255,14 +266,19 @@ async function syncGamesToDB(
       }
     }
   });
+  result.timing!.dbTransactionMs = Math.round(performance.now() - txStart);
 
   // Sync standings after all updates
+  const standingsStart = performance.now();
   try {
     await syncStandingsForTournament(tournamentId);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     result.errors.push(`Standings sync error: ${message}`);
   }
+  result.timing!.standingsRecalcMs = Math.round(
+    performance.now() - standingsStart,
+  );
 
   return result;
 }

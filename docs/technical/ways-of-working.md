@@ -65,7 +65,7 @@ Example: `/pre-review 9-create-bracket-entry`
 This skill automates the full pre-review process:
 
 1. **Self-code review** — launches a separate agent to review changes against acceptance criteria and code standards (transactions, security, naming)
-2. **Automated checks** — runs `pnpm format`, `pnpm lint`, and `pnpm build`, fixing issues as needed
+2. **Automated checks** — runs `pnpm format`, `pnpm lint`, `pnpm build`, and `pnpm test`, fixing issues as needed
 3. **Acceptance criteria verification** — confirms all criteria from `docs/business/backlog.md` are met
 4. **Task file update** — adds a `## Verification` section with results
 
@@ -74,6 +74,7 @@ If you need to run individual checks manually:
 - `pnpm format` — auto-format all files with Prettier
 - `pnpm lint` — must pass with zero errors and zero warnings
 - `pnpm build` — must compile with zero TypeScript errors
+- `pnpm test` — must pass with zero failures
 
 > **Note:** The auto-format hook in `.claude/settings.json` runs Prettier automatically on every file Claude edits, so formatting issues should be rare.
 
