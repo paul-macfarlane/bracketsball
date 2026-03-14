@@ -530,7 +530,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - On compact views (matchup cards), continue showing short name only
 - Admin can edit mascot via team management UI
 
-### 38. Admin Manual Team & Game Data Entry (Non-MVP) — Epic: Bracket UX Enhancements
+### 38. Admin Manual Team & Game Data Entry (Non-MVP) ✅ — Epic: Bracket UX Enhancements
 
 **As an** admin, **I want to** manually enter and edit team stats and game details **so that** I can fill in data ESPN doesn't provide (e.g., conference record, strength of schedule, NET ranking) and correct any inaccuracies.
 
@@ -739,7 +739,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 35  | Sticky Page Headers                 | Navigation UX           | No  | Done        |
 | 36  | Breadcrumb Navigation               | Navigation UX           | No  | Done        |
 | 37  | Team Mascot / Nickname Display      | Bracket UX Enhancements | No  | Done        |
-| 38  | Admin Manual Team & Game Data Entry | Bracket UX Enhancements | No  | Not Started |
+| 38  | Admin Manual Team & Game Data Entry | Bracket UX Enhancements | No  | Done        |
 | 40  | GitHub Repo Link in Footer          | Branding                | No  | Done        |
 | 41  | Unused Code Enforcement & Cleanup   | Tech Debt               | No  | Not Started |
 | 42  | Codebase Standards Audit            | Tech Debt               | No  | Not Started |
@@ -755,4 +755,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 25 stories (18 done, 7 remaining)**
+**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 25 stories (19 done, 6 remaining)**
