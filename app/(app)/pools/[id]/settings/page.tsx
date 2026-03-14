@@ -101,7 +101,7 @@ export default async function PoolSettingsPage({
       </Card>
 
       <div className="mt-8">
-        <DeletePoolForm poolId={id} />
+        <DeletePoolForm poolId={id} poolName={poolData.pool.name} />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { eq, and, ne } from "drizzle-orm";
 
 import { db } from "@/lib/db";
-import { user, session, account } from "@/lib/db/schema";
+import { user, session, account, poolMember } from "@/lib/db/schema";
 
 export async function getUserById(id: string) {
   const result = await db.select().from(user).where(eq(user.id, id)).limit(1);
@@ -44,6 +44,7 @@ export async function anonymizeAndDeactivateUser(userId: string) {
       })
       .where(eq(user.id, userId));
 
+    await tx.delete(poolMember).where(eq(poolMember.userId, userId));
     await tx.delete(session).where(eq(session.userId, userId));
     await tx.delete(account).where(eq(account.userId, userId));
   });
