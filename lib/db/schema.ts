@@ -10,6 +10,7 @@ export {
 } from "./auth-schema";
 
 export {
+  poolVisibilityEnum,
   pool,
   poolMember,
   poolInvite,

@@ -81,6 +81,7 @@ export default async function PoolSettingsPage({
               poolId={id}
               defaultValues={{
                 name: poolData.pool.name,
+                visibility: poolData.pool.visibility,
                 imageUrl: poolData.pool.imageUrl ?? "",
                 maxBracketsPerUser: poolData.pool.maxBracketsPerUser,
                 maxParticipants: poolData.pool.maxParticipants,

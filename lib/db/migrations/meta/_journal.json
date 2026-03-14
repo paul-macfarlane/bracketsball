@@ -71,6 +71,13 @@
       "when": 1773198344753,
       "tag": "0009_wet_phantom_reporter",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1773373401513,
+      "tag": "0010_overconfident_wilson_fisk",
+      "breakpoints": true
     }
   ]
 }

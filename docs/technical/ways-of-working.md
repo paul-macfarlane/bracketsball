@@ -34,7 +34,21 @@ Update the checklist and "Changes Made" section as you go. This is the single so
 
 ---
 
-## 2. Implementation Decision Log
+## 2. Clarifying Questions
+
+Before writing code, review the acceptance criteria and ask clarifying questions when:
+
+- Requirements are ambiguous or could be interpreted multiple ways
+- There are UX decisions not specified in the story (e.g., where a feature lives in the UI, confirmation flows)
+- Edge cases aren't covered by the acceptance criteria
+- Implementation could go in meaningfully different directions
+- The story depends on or affects other in-progress or planned work
+
+Ask questions upfront rather than making assumptions. It's faster to align early than to rework later. Record any answers in the task file under `## Open Questions` (resolved).
+
+---
+
+## 3. Implementation Decision Log
 
 Record non-obvious decisions in the task file under a `## Decisions` section.
 
@@ -52,7 +66,7 @@ Keep entries short. Only log decisions where the "why" isn't obvious from the co
 
 ---
 
-## 3. Pre-Review (Self-Code Review + Checklist)
+## 4. Pre-Review (Self-Code Review + Checklist)
 
 Before marking a task `ready-for-review`, run the `/pre-review` skill:
 
@@ -80,7 +94,7 @@ If you need to run individual checks manually:
 
 ---
 
-## 4. Human Review
+## 5. Human Review
 
 After automated checks pass and the task is marked `ready-for-review`:
 
@@ -93,7 +107,7 @@ Do not merge or mark `done` without human approval.
 
 ---
 
-## 5. Feedback Loop
+## 6. Feedback Loop
 
 When feedback is given during a Claude Code session (corrections, preferences, patterns to follow or avoid):
 

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   buildUpdatePoolSchema,
   POOL_LIMITS,
+  POOL_VISIBILITY_OPTIONS,
   type UpdatePoolFormValues,
 } from "@/lib/validators/pool";
 import { updatePoolSettings } from "./actions";
@@ -22,6 +23,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { DEFAULT_SCORING } from "@/lib/scoring";
 
@@ -39,6 +47,7 @@ interface PoolSettingsFormProps {
   poolId: string;
   defaultValues: {
     name: string;
+    visibility: "private" | "public";
     imageUrl: string;
     maxBracketsPerUser: number;
     maxParticipants: number;
@@ -96,6 +105,36 @@ export function PoolSettingsForm({
               <FormControl>
                 <Input placeholder="My Bracket Pool" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="visibility"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Visibility</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select visibility" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {POOL_VISIBILITY_OPTIONS.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option === "private" ? "Private" : "Public"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                {field.value === "public"
+                  ? "Anyone can find and join this pool."
+                  : "Only people with an invite link can join."}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
