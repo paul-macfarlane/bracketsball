@@ -39,12 +39,15 @@ import {
   autoFillBracketAction,
   clearBracketAction,
 } from "@/app/(app)/pools/[id]/brackets/actions";
+import { CountdownTimer } from "@/components/countdown-timer";
 import type { AutoFillStrategy } from "@/lib/bracket-auto-fill";
 import {
   getPointsForRound,
   calculateBracketScores,
   type PoolScoring,
 } from "@/lib/scoring";
+
+import { formatOrdinal } from "@/lib/utils";
 
 interface BracketEditorProps {
   bracketEntryId: string;
@@ -57,8 +60,10 @@ interface BracketEditorProps {
   poolId: string;
   bracketPositions?: BracketPositions;
   tournamentStarted: boolean;
+  bracketLockTime?: string | null;
   poolScoring?: PoolScoring;
   poolName?: string;
+  rankInfo?: { rank: number; totalEntries: number } | null;
 }
 
 export function BracketEditor({
@@ -72,8 +77,10 @@ export function BracketEditor({
   poolId,
   bracketPositions,
   tournamentStarted,
+  bracketLockTime,
   poolScoring,
   poolName,
+  rankInfo,
 }: BracketEditorProps) {
   const router = useRouter();
   const [name, setName] = useState(bracketName);
@@ -256,8 +263,13 @@ export function BracketEditor({
 
   return (
     <div>
-      {/* Locked banner */}
-      {isLocked && (
+      {/* Lock status: countdown or locked banner */}
+      {bracketLockTime && (
+        <div className="mb-4">
+          <CountdownTimer lockTime={bracketLockTime} />
+        </div>
+      )}
+      {isLocked && !bracketLockTime && (
         <div className="mb-4 rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
           The tournament has started. Bracket editing is locked.
         </div>
@@ -293,6 +305,14 @@ export function BracketEditor({
           {/* Row 2: Stats + actions */}
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-2 text-sm">
+              {rankInfo && (
+                <>
+                  <span className="font-semibold">
+                    {formatOrdinal(rankInfo.rank)}/{rankInfo.totalEntries}
+                  </span>
+                  <span className="text-muted-foreground">|</span>
+                </>
+              )}
               {scores && (
                 <>
                   <span className="font-semibold">

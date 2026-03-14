@@ -71,12 +71,6 @@ export function BracketFullView({
     return eliminated;
   }, [games]);
 
-  // Tournament has started if any game is no longer scheduled
-  const tournamentStarted = useMemo(
-    () => games.some((g) => g.status !== "scheduled"),
-    [games],
-  );
-
   const LEFT_REGIONS = useMemo(
     () => [bracketPositions.topLeft, bracketPositions.bottomLeft],
     [bracketPositions.topLeft, bracketPositions.bottomLeft],
@@ -217,7 +211,6 @@ export function BracketFullView({
         venueCity={game.venueCity}
         venueState={game.venueState}
         eliminatedTeamIds={eliminatedTeamIds}
-        tournamentStarted={tournamentStarted}
         actualTeam1Id={game.team1Id}
         actualTeam2Id={game.team2Id}
       />
@@ -245,7 +238,6 @@ export function BracketFullView({
               sideHasFirstFour={sideHasFirstFour.left}
               roundPointsMap={roundPointsMap}
               eliminatedTeamIds={eliminatedTeamIds}
-              tournamentStarted={tournamentStarted}
             />
           ))}
         </div>
@@ -298,7 +290,6 @@ export function BracketFullView({
               sideHasFirstFour={sideHasFirstFour.right}
               roundPointsMap={roundPointsMap}
               eliminatedTeamIds={eliminatedTeamIds}
-              tournamentStarted={tournamentStarted}
             />
           ))}
         </div>
@@ -321,7 +312,6 @@ interface RegionBracketProps {
   sideHasFirstFour: boolean;
   roundPointsMap?: Map<string, number>;
   eliminatedTeamIds: Set<string>;
-  tournamentStarted: boolean;
 }
 
 function RegionBracket({
@@ -338,7 +328,6 @@ function RegionBracket({
   sideHasFirstFour,
   roundPointsMap,
   eliminatedTeamIds,
-  tournamentStarted,
 }: RegionBracketProps) {
   const orderedRounds = direction === "rtl" ? [...rounds].reverse() : rounds;
 
@@ -371,7 +360,6 @@ function RegionBracket({
                 showFirstFourColumn={showFirstFourColumn}
                 roundPointsMap={roundPointsMap}
                 eliminatedTeamIds={eliminatedTeamIds}
-                tournamentStarted={tournamentStarted}
               />
             );
           }
@@ -388,7 +376,6 @@ function RegionBracket({
               disabled={disabled}
               roundPointsMap={roundPointsMap}
               eliminatedTeamIds={eliminatedTeamIds}
-              tournamentStarted={tournamentStarted}
             />
           );
         })}
@@ -409,7 +396,6 @@ interface R64WithFirstFourProps {
   showFirstFourColumn: boolean;
   roundPointsMap?: Map<string, number>;
   eliminatedTeamIds: Set<string>;
-  tournamentStarted: boolean;
 }
 
 /** Resolve picked team data, looking up by ID if not one of the displayed teams */
@@ -441,7 +427,6 @@ function R64WithFirstFour({
   showFirstFourColumn,
   roundPointsMap,
   eliminatedTeamIds,
-  tournamentStarted,
 }: R64WithFirstFourProps) {
   const hasAnyFirstFour = r64Games.some((g) => firstFourByR64Game.has(g.id));
 
@@ -512,7 +497,6 @@ function R64WithFirstFour({
                       venueCity={ffGame.venueCity}
                       venueState={ffGame.venueState}
                       eliminatedTeamIds={eliminatedTeamIds}
-                      tournamentStarted={tournamentStarted}
                       actualTeam1Id={ffGame.team1Id}
                       actualTeam2Id={ffGame.team2Id}
                     />
@@ -551,7 +535,6 @@ function R64WithFirstFour({
                   venueCity={r64Game.venueCity}
                   venueState={r64Game.venueState}
                   eliminatedTeamIds={eliminatedTeamIds}
-                  tournamentStarted={tournamentStarted}
                   actualTeam1Id={r64Game.team1Id}
                   actualTeam2Id={r64Game.team2Id}
                 />
@@ -574,7 +557,6 @@ interface RoundColumnProps {
   disabled: boolean;
   roundPointsMap?: Map<string, number>;
   eliminatedTeamIds: Set<string>;
-  tournamentStarted: boolean;
 }
 
 function RoundColumn({
@@ -587,7 +569,6 @@ function RoundColumn({
   disabled,
   roundPointsMap,
   eliminatedTeamIds,
-  tournamentStarted,
 }: RoundColumnProps) {
   return (
     <div className="flex flex-1 flex-col px-1">
@@ -624,7 +605,6 @@ function RoundColumn({
               venueCity={game.venueCity}
               venueState={game.venueState}
               eliminatedTeamIds={eliminatedTeamIds}
-              tournamentStarted={tournamentStarted}
               actualTeam1Id={game.team1Id}
               actualTeam2Id={game.team2Id}
             />

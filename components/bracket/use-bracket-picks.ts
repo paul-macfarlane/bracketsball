@@ -183,8 +183,16 @@ export function useBracketPicks({
     setPicks(new Map());
   }, []);
 
-  const totalGames = games.length;
-  const pickedGames = picks.size;
+  // Exclude games that have already started — users can't pick those
+  const pickableGameIds = useMemo(
+    () =>
+      new Set(games.filter((g) => g.status === "scheduled").map((g) => g.id)),
+    [games],
+  );
+  const totalGames = pickableGameIds.size;
+  const pickedGames = [...picks.keys()].filter((id) =>
+    pickableGameIds.has(id),
+  ).length;
 
   return {
     picks,

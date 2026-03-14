@@ -9,6 +9,7 @@ import { BracketFullView } from "./bracket-full-view";
 import type { BracketPositions } from "./bracket-full-view";
 import type { BracketGame, BracketTeam, BracketPick } from "./types";
 import { getPointsForRound, type PoolScoring } from "@/lib/scoring";
+import { formatOrdinal } from "@/lib/utils";
 
 interface BracketViewerProps {
   bracketName: string;
@@ -22,6 +23,7 @@ interface BracketViewerProps {
   poolScoring: PoolScoring;
   poolId?: string;
   poolName?: string;
+  rankInfo?: { rank: number; totalEntries: number } | null;
 }
 
 export function BracketViewer({
@@ -36,6 +38,7 @@ export function BracketViewer({
   poolScoring,
   poolId,
   poolName,
+  rankInfo,
 }: BracketViewerProps) {
   const picks = useMemo(
     () => new Map(picksList.map((p) => [p.tournamentGameId, p.pickedTeamId])),
@@ -127,6 +130,14 @@ export function BracketViewer({
             </Badge>
           </div>
           <div className="flex items-center gap-2 text-sm">
+            {rankInfo && (
+              <>
+                <span className="font-semibold">
+                  {formatOrdinal(rankInfo.rank)}/{rankInfo.totalEntries}
+                </span>
+                <span className="text-muted-foreground">|</span>
+              </>
+            )}
             <span className="font-semibold">Points: {totalPoints}</span>
             <span className="text-muted-foreground">|</span>
             <span className="text-muted-foreground">

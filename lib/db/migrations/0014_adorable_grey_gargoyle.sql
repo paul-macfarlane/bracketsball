@@ -1,0 +1,2 @@
+ALTER TABLE "tournament" ADD COLUMN IF NOT EXISTS "bracket_lock_time" timestamp;--> statement-breakpoint
+ALTER TABLE "tournament" ADD COLUMN IF NOT EXISTS "bracket_lock_time_manual" boolean DEFAULT false NOT NULL;

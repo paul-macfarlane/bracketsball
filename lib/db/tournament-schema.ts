@@ -71,6 +71,10 @@ export const tournament = pgTable(
     bracketBottomRightRegion: tournamentRegionEnum(
       "bracket_bottom_right_region",
     ),
+    bracketLockTime: timestamp("bracket_lock_time"),
+    bracketLockTimeManual: boolean("bracket_lock_time_manual")
+      .notNull()
+      .default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
