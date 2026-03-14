@@ -1,18 +1,7 @@
-import {
-  eq,
-  and,
-  count,
-  ne,
-  ilike,
-  desc,
-  asc,
-  sql,
-  gte,
-  lte,
-} from "drizzle-orm";
+import { eq, and, count, ilike, desc, asc, sql, gte, lte } from "drizzle-orm";
 
 import { db } from "@/lib/db";
-import { pool, poolMember, tournament, tournamentGame } from "@/lib/db/schema";
+import { pool, poolMember, tournament } from "@/lib/db/schema";
 import type { PoolVisibility } from "@/lib/validators/pool";
 
 interface CreatePoolData {
@@ -157,26 +146,19 @@ export async function getMaxBracketCountInPool(
 }
 
 export async function hasTournamentStarted(): Promise<boolean> {
+  const lockTime = await getBracketLockTime();
+  if (!lockTime) return false;
+  return new Date() >= lockTime;
+}
+
+export async function getBracketLockTime(): Promise<Date | null> {
   const [activeTournament] = await db
-    .select({ id: tournament.id })
+    .select({ bracketLockTime: tournament.bracketLockTime })
     .from(tournament)
     .where(eq(tournament.isActive, true))
     .limit(1);
 
-  if (!activeTournament) return false;
-
-  const [startedGame] = await db
-    .select({ id: tournamentGame.id })
-    .from(tournamentGame)
-    .where(
-      and(
-        eq(tournamentGame.tournamentId, activeTournament.id),
-        ne(tournamentGame.status, "scheduled"),
-      ),
-    )
-    .limit(1);
-
-  return !!startedGame;
+  return activeTournament?.bracketLockTime ?? null;
 }
 
 export type PublicPoolSortOption =
@@ -325,6 +307,15 @@ export async function joinPublicPool(
   poolId: string,
   userId: string,
 ): Promise<{ success: true } | { success: false; error: string }> {
+  // Check lock before entering transaction (uses db directly, not tx)
+  const tournamentStarted = await hasTournamentStarted();
+  if (tournamentStarted) {
+    return {
+      success: false,
+      error: "Cannot join pools after the tournament has started.",
+    };
+  }
+
   return db.transaction(async (tx) => {
     const [poolData] = await tx
       .select({
@@ -364,33 +355,6 @@ export async function joinPublicPool(
 
     if (memberCountResult.count >= poolData.maxParticipants) {
       return { success: false, error: "This pool is full." };
-    }
-
-    // Check if tournament has started
-    const [activeTournament] = await tx
-      .select({ id: tournament.id })
-      .from(tournament)
-      .where(eq(tournament.isActive, true))
-      .limit(1);
-
-    if (activeTournament) {
-      const [startedGame] = await tx
-        .select({ id: tournamentGame.id })
-        .from(tournamentGame)
-        .where(
-          and(
-            eq(tournamentGame.tournamentId, activeTournament.id),
-            ne(tournamentGame.status, "scheduled"),
-          ),
-        )
-        .limit(1);
-
-      if (startedGame) {
-        return {
-          success: false,
-          error: "Cannot join pools after the tournament has started.",
-        };
-      }
     }
 
     await tx.insert(poolMember).values({

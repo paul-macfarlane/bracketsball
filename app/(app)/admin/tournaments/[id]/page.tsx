@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { ToggleActiveButton } from "./toggle-active-button";
 import { DeleteTournamentButton } from "./delete-tournament-button";
 import { BracketPositionsForm } from "./bracket-positions-form";
+import { BracketLockTimeForm } from "./bracket-lock-time-form";
 
 export default async function TournamentDetailPage({
   params,
@@ -92,6 +93,14 @@ export default async function TournamentDetailPage({
             </CardHeader>
           </Card>
         </Link>
+      </div>
+
+      <div className="mt-6">
+        <BracketLockTimeForm
+          tournamentId={id}
+          initialLockTime={tournament.bracketLockTime?.toISOString() ?? null}
+          isManual={tournament.bracketLockTimeManual}
+        />
       </div>
 
       <div className="mt-6">

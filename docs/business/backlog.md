@@ -281,6 +281,35 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ---
 
+## Epic: Tournament Lock
+
+### 46. Bracket Lock at Round of 64 Start (MVP)
+
+**As a** user, **I want** all bracket creation, editing, pool management, and invite functionality to lock when the Round of 64 begins **so that** the competition is fair and mirrors how real bracket challenges work.
+
+**Acceptance Criteria:**
+
+- **Lock deadline stored on tournament:** Add a `bracketLockTime` field to the tournament table, representing the scheduled start time of the first Round of 64 game
+  - This time is auto-calculated from game schedule data (earliest R64 game `startTime`) during ESPN sync
+  - Admin can manually override the lock time via the admin UI
+- **Global app-wide lock:** Once the current time passes `bracketLockTime`, the following actions are blocked (backend enforcement + UI indicators):
+  - Creating or editing bracket entries (picks and tiebreaker)
+  - Submitting or unsubmitting brackets
+  - Deleting brackets
+  - Auto-filling or clearing bracket picks
+  - Creating pools or editing pool settings (name, scoring, max brackets, max participants)
+  - Creating invite links or sending in-app invites
+  - Joining pools (via invite link or public search)
+- **First Four is NOT locked:** Users can still create/edit brackets while First Four games are in progress — the lock only applies at the R64 scheduled start time
+- **Draft brackets at lock time:** Unsubmitted (draft) brackets remain visible but are permanently locked as incomplete — they cannot earn points or appear in standings. Users must submit before the deadline for their bracket to be eligible
+- **Countdown timer UI:** Display a countdown to the lock deadline on bracket creation/editing pages and pool detail pages so users know when the deadline is
+  - Shows days, hours, minutes remaining
+  - After lock, displays "Brackets are locked" instead of countdown
+- **Admin override:** Admin can manually adjust the `bracketLockTime` via the admin tournament UI (e.g., if the tournament start is delayed)
+- **Replace existing lock logic:** The current `hasTournamentStarted()` function (which checks if any game has moved off "scheduled" status) is replaced with a time-based check against `bracketLockTime`
+
+---
+
 ## Epic: Pre-Tournament Setup
 
 ### 34. Configure ESPN Sync Cron Jobs (MVP) — Epic: Pre-Tournament Setup
@@ -742,6 +771,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 13  | View Pool Standings                 | Bracket Visibility      | Yes | Done        |
 | 14  | View Individual Bracket Detail      | Bracket Visibility      | Yes | Done        |
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
+| 46  | Bracket Lock at R64 Start           | Tournament Lock         | Yes | Not Started |
 | 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | In Progress |
 | 39  | Validate Cron Sync Performance      | Pre-Tournament Setup    | Yes | Done        |
 | 32  | Update External Services Branding   | Branding                | Yes | Done        |
@@ -773,4 +803,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 26 stories (20 done, 6 remaining)**
+**MVP Total: 21 stories (19 done, 2 remaining)** | **Post-MVP: 26 stories (20 done, 6 remaining)**

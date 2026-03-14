@@ -166,7 +166,6 @@ interface MatchupCardProps {
   venueCity?: string | null;
   venueState?: string | null;
   eliminatedTeamIds?: Set<string>;
-  tournamentStarted?: boolean;
   actualTeam1Id?: string | null;
   actualTeam2Id?: string | null;
   pickedTeamData?: BracketTeam | null;
@@ -190,18 +189,19 @@ export function MatchupCard({
   venueCity,
   venueState,
   eliminatedTeamIds,
-  tournamentStarted = false,
   actualTeam1Id,
   actualTeam2Id,
   pickedTeamData: pickedTeamDataProp,
 }: MatchupCardProps) {
   const [showComparison, setShowComparison] = useState(false);
-  const canPick = !disabled && !!team1 && !!team2;
   const isFinal = gameStatus === "final";
   const isInProgress = gameStatus === "in_progress";
   const isLive = isFinal || isInProgress;
+  const isGameStarted = isLive;
+  const canPick = !disabled && !isGameStarted && !!team1 && !!team2;
   const hasBothTeams = !!team1 && !!team2;
-  const viewMode = tournamentStarted;
+  // View mode: when the game has started OR when the bracket is globally locked
+  const viewMode = isGameStarted || disabled;
 
   // Resolve the picked team object — may not be one of the displayed teams
   // if the team was eliminated and the actual game has different teams
@@ -279,8 +279,8 @@ export function MatchupCard({
   const displayTeam1Score = isLive && team1Score != null ? team1Score : null;
   const displayTeam2Score = isLive && team2Score != null ? team2Score : null;
 
-  // Footer: show compare only before tournament starts
-  const showCompare = !tournamentStarted && hasBothTeams;
+  // Footer: show compare for games that haven't started and bracket isn't locked
+  const showCompare = !isGameStarted && !disabled && hasBothTeams;
 
   return (
     <>

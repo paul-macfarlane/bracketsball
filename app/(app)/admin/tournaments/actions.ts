@@ -435,6 +435,59 @@ export async function updateGameAction(
   revalidatePath(`/admin/tournaments/${tournamentId}/games`);
 }
 
+export async function updateBracketLockTimeAction(
+  tournamentId: string,
+  lockTime: string | null,
+) {
+  await requireAdmin();
+
+  const bracketLockTime = lockTime ? new Date(lockTime) : null;
+
+  if (lockTime && isNaN(bracketLockTime!.getTime())) {
+    return { error: "Invalid date format" };
+  }
+
+  const result = await updateTournament(tournamentId, {
+    bracketLockTime,
+    bracketLockTimeManual: true,
+  });
+
+  if (!result) {
+    return { error: "Tournament not found" };
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+}
+
+export async function resetBracketLockTimeAction(
+  tournamentId: string,
+): Promise<{ error: string } | undefined> {
+  await requireAdmin();
+
+  // Recalculate from R64 game schedule and clear manual flag
+  const games = await getTournamentGames(tournamentId);
+  const r64Games = games.filter((g) => g.round === "round_of_64");
+  const startTimes = r64Games
+    .map((g) => g.startTime)
+    .filter((t): t is Date => t !== null);
+
+  const earliestR64 =
+    startTimes.length > 0
+      ? new Date(Math.min(...startTimes.map((t) => t.getTime())))
+      : null;
+
+  const result = await updateTournament(tournamentId, {
+    bracketLockTime: earliestR64,
+    bracketLockTimeManual: false,
+  });
+
+  if (!result) {
+    return { error: "Tournament not found" };
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+}
+
 export async function updateTournamentTeamStatsAction(
   tournamentId: string,
   tournamentTeamId: string,

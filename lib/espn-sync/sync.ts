@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import {
@@ -284,7 +284,49 @@ async function syncGamesToDB(
     performance.now() - standingsStart,
   );
 
+  // Auto-update bracket lock time from earliest R64 start time
+  await updateBracketLockTimeFromSchedule(tournamentId);
+
   return result;
+}
+
+/**
+ * Auto-calculate bracketLockTime from the earliest R64 game startTime.
+ * Skips update if the admin has manually set the lock time.
+ */
+async function updateBracketLockTimeFromSchedule(
+  tournamentId: string,
+): Promise<void> {
+  const [tournamentData] = await db
+    .select({ bracketLockTimeManual: tournament.bracketLockTimeManual })
+    .from(tournament)
+    .where(eq(tournament.id, tournamentId));
+
+  if (!tournamentData || tournamentData.bracketLockTimeManual) return;
+
+  const r64Games = await db
+    .select({ startTime: tournamentGame.startTime })
+    .from(tournamentGame)
+    .where(
+      and(
+        eq(tournamentGame.tournamentId, tournamentId),
+        eq(tournamentGame.round, "round_of_64"),
+      ),
+    );
+
+  const startTimes = r64Games
+    .map((g) => g.startTime)
+    .filter((t): t is Date => t !== null);
+
+  const earliestR64 =
+    startTimes.length > 0
+      ? new Date(Math.min(...startTimes.map((t) => t.getTime())))
+      : null;
+
+  await db
+    .update(tournament)
+    .set({ bracketLockTime: earliestR64 })
+    .where(eq(tournament.id, tournamentId));
 }
 
 async function upsertTeam(

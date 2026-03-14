@@ -3,14 +3,20 @@ import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
 import { getPoolById } from "@/lib/db/queries/pools";
-import { getBracketEntryById } from "@/lib/db/queries/bracket-entries";
-import { getPicksForEntry } from "@/lib/db/queries/bracket-entries";
+import {
+  getBracketEntryById,
+  getPicksForEntry,
+  getPoolStandings,
+} from "@/lib/db/queries/bracket-entries";
 import {
   getTournamentById,
   getTournamentGames,
   getTournamentTeams,
 } from "@/lib/db/queries/tournaments";
-import { hasTournamentStarted } from "@/lib/db/queries/pools";
+import {
+  hasTournamentStarted,
+  getBracketLockTime,
+} from "@/lib/db/queries/pools";
 import { BracketEditor } from "@/components/bracket/bracket-editor";
 import { BracketViewer } from "@/components/bracket/bracket-viewer";
 import type { BracketTeam } from "@/components/bracket/types";
@@ -49,14 +55,21 @@ export default async function BracketPage({
     notFound();
   }
 
-  const [tournamentData, games, tournamentTeamsRaw, picks, tournamentStarted] =
-    await Promise.all([
-      getTournamentById(entry.tournamentId),
-      getTournamentGames(entry.tournamentId),
-      getTournamentTeams(entry.tournamentId),
-      getPicksForEntry(bracketId),
-      hasTournamentStarted(),
-    ]);
+  const [
+    tournamentData,
+    games,
+    tournamentTeamsRaw,
+    picks,
+    tournamentStarted,
+    bracketLockTime,
+  ] = await Promise.all([
+    getTournamentById(entry.tournamentId),
+    getTournamentGames(entry.tournamentId),
+    getTournamentTeams(entry.tournamentId),
+    getPicksForEntry(bracketId),
+    hasTournamentStarted(),
+    getBracketLockTime(),
+  ]);
 
   const tournamentTeams: BracketTeam[] = tournamentTeamsRaw.map((tt) => ({
     id: tt.teamId,
@@ -117,6 +130,20 @@ export default async function BracketPage({
     scoringChampionship: poolData.pool.scoringChampionship,
   };
 
+  // Get rank info for this bracket (only for submitted entries)
+  let rankInfo: { rank: number; totalEntries: number } | null = null;
+  if (entry.status === "submitted") {
+    const standings = await getPoolStandings(
+      poolId,
+      entry.tournamentId,
+      poolScoring,
+    );
+    const standing = standings.find((s) => s.id === bracketId);
+    if (standing) {
+      rankInfo = { rank: standing.rank, totalEntries: standings.length };
+    }
+  }
+
   return (
     <div className="mx-auto max-w-7xl">
       {isOwner ? (
@@ -131,8 +158,10 @@ export default async function BracketPage({
           poolId={poolId}
           bracketPositions={bracketPositions}
           tournamentStarted={tournamentStarted}
+          bracketLockTime={bracketLockTime?.toISOString() ?? null}
           poolScoring={poolScoring}
           poolName={poolData.pool.name}
+          rankInfo={rankInfo}
         />
       ) : (
         <BracketViewer
@@ -147,6 +176,7 @@ export default async function BracketPage({
           poolScoring={poolScoring}
           poolId={poolId}
           poolName={poolData.pool.name}
+          rankInfo={rankInfo}
         />
       )}
     </div>

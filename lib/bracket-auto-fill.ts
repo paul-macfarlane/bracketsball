@@ -40,6 +40,15 @@ export function autoFillBracket(
     // Skip if already picked
     if (pickMap.has(game.id)) continue;
 
+    // For games already started/finished, record the actual winner so
+    // downstream games can resolve their teams, but don't generate a pick
+    if (game.status === "in_progress" || game.status === "final") {
+      if (game.winnerTeamId) {
+        pickMap.set(game.id, game.winnerTeamId);
+      }
+      continue;
+    }
+
     // Resolve teams for this game
     const team1 = resolveTeam(game, "team1", pickMap, games, teamMap);
     const team2 = resolveTeam(game, "team2", pickMap, games, teamMap);

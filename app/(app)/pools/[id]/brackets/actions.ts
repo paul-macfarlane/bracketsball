@@ -154,6 +154,14 @@ export async function savePickAction(
   }
 
   // All writes in a single transaction
+  const games = await getTournamentGames(entry.tournamentId);
+
+  // Block picks for games that have already started (e.g. First Four)
+  const targetGame = games.find((g) => g.id === parsed.data.tournamentGameId);
+  if (targetGame && targetGame.status !== "scheduled") {
+    return { error: "This game has already started" };
+  }
+
   await db.transaction(async (tx) => {
     // Save the pick
     await savePickQuery(
@@ -165,7 +173,6 @@ export async function savePickAction(
 
     // Find downstream games that depend on this game and clear any picks
     // where the picked team is no longer valid
-    const games = await getTournamentGames(entry.tournamentId);
     const picks = await getPicksForEntry(parsed.data.bracketEntryId, tx);
     const pickMap = new Map(picks.map((p) => [p.tournamentGameId, p]));
 
@@ -266,15 +273,19 @@ export async function submitBracketAction(bracketEntryId: string) {
     return { error: "Tiebreaker score is required" };
   }
 
-  // Check all games are picked
+  // Check all pickable games are picked (exclude started/finished games)
   const games = await getTournamentGames(entry.tournamentId);
   const picks = await getPicksForEntry(parsed.data.bracketEntryId);
 
-  const totalGames = games.length;
+  const pickableGames = games.filter((g) => g.status === "scheduled");
+  const pickableGameIds = new Set(pickableGames.map((g) => g.id));
+  const pickedPickableCount = picks.filter((p) =>
+    pickableGameIds.has(p.tournamentGameId),
+  ).length;
 
-  if (picks.length < totalGames) {
+  if (pickedPickableCount < pickableGames.length) {
     return {
-      error: `All ${totalGames} games must be picked before submitting (${picks.length} picked)`,
+      error: `All ${pickableGames.length} games must be picked before submitting (${pickedPickableCount} picked)`,
     };
   }
 

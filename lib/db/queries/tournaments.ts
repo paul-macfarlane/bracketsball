@@ -54,6 +54,8 @@ export async function updateTournament(
     bracketBottomLeftRegion?: "south" | "east" | "west" | "midwest" | null;
     bracketTopRightRegion?: "south" | "east" | "west" | "midwest" | null;
     bracketBottomRightRegion?: "south" | "east" | "west" | "midwest" | null;
+    bracketLockTime?: Date | null;
+    bracketLockTimeManual?: boolean;
   },
 ) {
   return db.transaction(async (tx) => {

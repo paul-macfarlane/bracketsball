@@ -14,7 +14,11 @@ import {
   getPoolStandings,
 } from "@/lib/db/queries/bracket-entries";
 import { getActiveTournament } from "@/lib/db/queries/tournaments";
-import { hasTournamentStarted } from "@/lib/db/queries/pools";
+import {
+  hasTournamentStarted,
+  getBracketLockTime,
+} from "@/lib/db/queries/pools";
+import { CountdownTimer } from "@/components/countdown-timer";
 import {
   canAccessPoolPage,
   canPerformPoolAction,
@@ -68,10 +72,12 @@ export default async function PoolDetailPage({
   const remainingCapacity =
     poolData.pool.maxParticipants - poolData.memberCount;
 
-  const [activeTournament, tournamentStarted] = await Promise.all([
-    getActiveTournament(),
-    hasTournamentStarted(),
-  ]);
+  const [activeTournament, tournamentStarted, bracketLockTime] =
+    await Promise.all([
+      getActiveTournament(),
+      hasTournamentStarted(),
+      getBracketLockTime(),
+    ]);
   const bracketEntries = activeTournament
     ? await getBracketEntriesByPoolAndUser(id, session.user.id)
     : [];
@@ -118,6 +124,12 @@ export default async function PoolDetailPage({
           </div>
         </div>
       </StickySubHeader>
+
+      {bracketLockTime && (
+        <div className="mb-6">
+          <CountdownTimer lockTime={bracketLockTime.toISOString()} />
+        </div>
+      )}
 
       {/* Standings — front and center */}
       {activeTournament && (
