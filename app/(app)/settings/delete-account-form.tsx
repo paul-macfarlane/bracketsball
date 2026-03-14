@@ -5,8 +5,17 @@ import { toast } from "sonner";
 
 import { deleteAccount } from "./actions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Card,
   CardContent,
@@ -15,22 +24,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const CONFIRMATION_TEXT = "DELETE";
-
 export function DeleteAccountForm() {
-  const [confirmation, setConfirmation] = useState("");
   const [isPending, setIsPending] = useState(false);
-
-  const isConfirmed = confirmation === CONFIRMATION_TEXT;
+  const [open, setOpen] = useState(false);
 
   async function handleDelete() {
-    if (!isConfirmed) return;
-
     setIsPending(true);
     try {
       const result = await deleteAccount();
       if (result?.error) {
         toast.error(result.error);
+        setOpen(false);
       }
     } catch {
       // redirect throws in server actions, which is expected
@@ -44,33 +48,43 @@ export function DeleteAccountForm() {
       <CardHeader>
         <CardTitle className="text-destructive">Delete Account</CardTitle>
         <CardDescription>
-          Permanently delete your account. This action cannot be undone. Your
-          brackets and pool memberships will be anonymized.
+          Permanently delete your account. This action cannot be undone. You
+          will be removed from all pools. Your bracket entries will be kept for
+          historical standings but shown as &quot;Deleted User&quot;.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="confirmation">
-            Type{" "}
-            <span className="font-mono font-bold">{CONFIRMATION_TEXT}</span> to
-            confirm
-          </Label>
-          <Input
-            id="confirmation"
-            value={confirmation}
-            onChange={(e) => setConfirmation(e.target.value)}
-            placeholder={CONFIRMATION_TEXT}
-            autoComplete="off"
-          />
-        </div>
-        <Button
-          variant="destructive"
-          className="w-full"
-          disabled={!isConfirmed || isPending}
-          onClick={handleDelete}
-        >
-          {isPending ? "Deleting..." : "Delete My Account"}
-        </Button>
+      <CardContent>
+        <AlertDialog open={open} onOpenChange={setOpen}>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" className="w-full">
+              Delete My Account
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete your account. You will be removed
+                from all pools. Your bracket entries will be kept for historical
+                standings but shown as &quot;Deleted User&quot;. This action
+                cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDelete();
+                }}
+                disabled={isPending}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isPending ? "Deleting..." : "Delete My Account"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );

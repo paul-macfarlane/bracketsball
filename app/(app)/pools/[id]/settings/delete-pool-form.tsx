@@ -15,13 +15,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const CONFIRMATION_TEXT = "DELETE";
-
-export function DeletePoolForm({ poolId }: { poolId: string }) {
+export function DeletePoolForm({
+  poolId,
+  poolName,
+}: {
+  poolId: string;
+  poolName: string;
+}) {
   const [confirmation, setConfirmation] = useState("");
   const [isPending, setIsPending] = useState(false);
 
-  const isConfirmed = confirmation === CONFIRMATION_TEXT;
+  const isConfirmed = confirmation === poolName;
 
   async function handleDelete() {
     if (!isConfirmed) return;
@@ -51,15 +55,14 @@ export function DeletePoolForm({ poolId }: { poolId: string }) {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="delete-confirmation">
-            Type{" "}
-            <span className="font-mono font-bold">{CONFIRMATION_TEXT}</span> to
-            confirm
+            Type the pool name{" "}
+            <span className="font-mono font-bold">{poolName}</span> to confirm
           </Label>
           <Input
             id="delete-confirmation"
             value={confirmation}
             onChange={(e) => setConfirmation(e.target.value)}
-            placeholder={CONFIRMATION_TEXT}
+            placeholder={poolName}
             autoComplete="off"
           />
         </div>
