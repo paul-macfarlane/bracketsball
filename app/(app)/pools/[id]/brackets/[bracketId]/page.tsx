@@ -63,6 +63,7 @@ export default async function BracketPage({
     name: tt.teamName,
     shortName: tt.teamShortName,
     abbreviation: tt.teamAbbreviation,
+    mascot: tt.teamMascot,
     logoUrl: tt.teamLogoUrl,
     seed: tt.seed,
     region: tt.region,

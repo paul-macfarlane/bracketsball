@@ -290,16 +290,18 @@ async function upsertTeam(
     name: string;
     shortName: string;
     abbreviation: string;
+    mascot: string | null;
     logoUrl: string | null;
   },
   cache: Map<string, typeof team.$inferSelect>,
 ): Promise<string> {
   const existing = cache.get(syncTeam.espnId);
   if (existing) {
-    // Update if name changed
+    // Update if name or mascot changed
     if (
       existing.name !== syncTeam.name ||
-      existing.shortName !== syncTeam.shortName
+      existing.shortName !== syncTeam.shortName ||
+      existing.mascot !== syncTeam.mascot
     ) {
       await tx
         .update(team)
@@ -307,6 +309,7 @@ async function upsertTeam(
           name: syncTeam.name,
           shortName: syncTeam.shortName,
           abbreviation: syncTeam.abbreviation,
+          mascot: syncTeam.mascot,
           logoUrl: syncTeam.logoUrl,
         })
         .where(eq(team.id, existing.id));
@@ -321,6 +324,7 @@ async function upsertTeam(
       name: syncTeam.name,
       shortName: syncTeam.shortName,
       abbreviation: syncTeam.abbreviation,
+      mascot: syncTeam.mascot,
       logoUrl: syncTeam.logoUrl,
       espnId: syncTeam.espnId,
     })
@@ -330,6 +334,7 @@ async function upsertTeam(
         name: syncTeam.name,
         shortName: syncTeam.shortName,
         abbreviation: syncTeam.abbreviation,
+        mascot: syncTeam.mascot,
         logoUrl: syncTeam.logoUrl,
       },
     })

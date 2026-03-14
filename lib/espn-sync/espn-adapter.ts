@@ -69,6 +69,7 @@ function parseEvent(event: ESPNEvent): SyncGame | null {
       name: comp.team.location ?? comp.team.displayName,
       shortName: comp.team.shortDisplayName,
       abbreviation: comp.team.abbreviation,
+      mascot: comp.team.name ?? null,
       logoUrl: `https://a.espncdn.com/i/teamlogos/ncaa/500/${comp.team.id}.png`,
       seed,
     };

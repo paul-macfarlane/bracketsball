@@ -36,6 +36,7 @@ export function TeamForm({
       name: "",
       shortName: "",
       abbreviation: "",
+      mascot: "",
       logoUrl: "",
       espnId: "",
     },
@@ -96,6 +97,20 @@ export function TeamForm({
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="mascot"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mascot / Nickname (optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="Huskies" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
