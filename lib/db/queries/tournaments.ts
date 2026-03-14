@@ -142,6 +142,36 @@ export async function removeTeamFromTournament(id: string) {
   await db.delete(tournamentTeam).where(eq(tournamentTeam.id, id));
 }
 
+export async function updateTournamentTeamStats(
+  id: string,
+  data: {
+    overallWins?: number | null;
+    overallLosses?: number | null;
+    conferenceWins?: number | null;
+    conferenceLosses?: number | null;
+    conferenceName?: string | null;
+    ppg?: number | null;
+    oppPpg?: number | null;
+    fgPct?: number | null;
+    threePtPct?: number | null;
+    ftPct?: number | null;
+    reboundsPerGame?: number | null;
+    assistsPerGame?: number | null;
+    stealsPerGame?: number | null;
+    blocksPerGame?: number | null;
+    turnoversPerGame?: number | null;
+    apRanking?: number | null;
+    strengthOfSchedule?: number | null;
+  },
+) {
+  const [result] = await db
+    .update(tournamentTeam)
+    .set(data)
+    .where(eq(tournamentTeam.id, id))
+    .returning();
+  return result ?? null;
+}
+
 export async function getTournamentGames(tournamentId: string) {
   return db
     .select({

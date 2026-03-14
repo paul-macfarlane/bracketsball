@@ -65,9 +65,37 @@ export const updateGameSchema = z.object({
   team1Score: z.number().int().min(0).nullable().optional(),
   team2Score: z.number().int().min(0).nullable().optional(),
   status: z.enum(["scheduled", "in_progress", "final"]).optional(),
+  startTime: z.string().nullable().optional(),
+  venueName: z.string().max(200).nullable().optional(),
+  venueCity: z.string().max(100).nullable().optional(),
+  venueState: z.string().max(100).nullable().optional(),
 });
 
 export type UpdateGameFormValues = z.infer<typeof updateGameSchema>;
+
+export const updateTournamentTeamStatsSchema = z.object({
+  overallWins: z.number().int().min(0).nullable().optional(),
+  overallLosses: z.number().int().min(0).nullable().optional(),
+  conferenceWins: z.number().int().min(0).nullable().optional(),
+  conferenceLosses: z.number().int().min(0).nullable().optional(),
+  conferenceName: z.string().max(100).nullable().optional(),
+  ppg: z.number().min(0).nullable().optional(),
+  oppPpg: z.number().min(0).nullable().optional(),
+  fgPct: z.number().min(0).max(100).nullable().optional(),
+  threePtPct: z.number().min(0).max(100).nullable().optional(),
+  ftPct: z.number().min(0).max(100).nullable().optional(),
+  reboundsPerGame: z.number().min(0).nullable().optional(),
+  assistsPerGame: z.number().min(0).nullable().optional(),
+  stealsPerGame: z.number().min(0).nullable().optional(),
+  blocksPerGame: z.number().min(0).nullable().optional(),
+  turnoversPerGame: z.number().min(0).nullable().optional(),
+  apRanking: z.number().int().min(1).max(25).nullable().optional(),
+  strengthOfSchedule: z.number().nullable().optional(),
+});
+
+export type UpdateTournamentTeamStatsFormValues = z.infer<
+  typeof updateTournamentTeamStatsSchema
+>;
 
 export const bracketPositionsSchema = z
   .object({

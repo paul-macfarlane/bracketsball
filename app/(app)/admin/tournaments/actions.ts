@@ -9,6 +9,7 @@ import {
   createTournamentSchema,
   addTournamentTeamSchema,
   updateGameSchema,
+  updateTournamentTeamStatsSchema,
   bracketPositionsSchema,
 } from "@/lib/validators/tournament";
 import { db } from "@/lib/db";
@@ -20,6 +21,7 @@ import {
   deleteTournament,
   addTeamToTournament,
   updateTournamentTeam,
+  updateTournamentTeamStats,
   removeTeamFromTournament,
   getTournamentTeams,
   getTournamentGames,
@@ -367,7 +369,15 @@ export async function updateGameAction(
     };
   }
 
-  const updateData = { ...parsed.data, winnerTeamId };
+  // Build update data, converting startTime string to Date
+  const { startTime: startTimeStr, ...restData } = parsed.data;
+  const updateData: Record<string, unknown> = {
+    ...restData,
+    winnerTeamId,
+  };
+  if (startTimeStr !== undefined) {
+    updateData.startTime = startTimeStr ? new Date(startTimeStr) : null;
+  }
 
   const nextGame = games.find(
     (g) => g.sourceGame1Id === gameId || g.sourceGame2Id === gameId,
@@ -423,4 +433,23 @@ export async function updateGameAction(
   });
 
   revalidatePath(`/admin/tournaments/${tournamentId}/games`);
+}
+
+export async function updateTournamentTeamStatsAction(
+  tournamentId: string,
+  tournamentTeamId: string,
+  formData: unknown,
+) {
+  await requireAdmin();
+  const parsed = updateTournamentTeamStatsSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const result = await updateTournamentTeamStats(tournamentTeamId, parsed.data);
+  if (!result) {
+    return { error: "Tournament team not found" };
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
 }

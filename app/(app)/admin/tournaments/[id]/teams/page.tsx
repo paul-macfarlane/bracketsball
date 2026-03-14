@@ -19,6 +19,7 @@ import { REGION_DISPLAY_NAMES } from "@/lib/validators/tournament";
 import { getTournamentGames } from "@/lib/db/queries/tournaments";
 import { AddTeamForm } from "./add-team-form";
 import { EditTeamButton } from "./edit-team-button";
+import { EditTeamStatsButton } from "./edit-team-stats-button";
 import { RemoveTeamButton } from "./remove-team-button";
 
 export default async function TournamentTeamsPage({
@@ -136,6 +137,30 @@ export default async function TournamentTeamsPage({
                               tournamentTeamId={tt.id}
                               currentSeed={tt.seed}
                               currentRegion={tt.region}
+                            />
+                            <EditTeamStatsButton
+                              tournamentId={id}
+                              tournamentTeamId={tt.id}
+                              teamName={tt.teamName}
+                              currentStats={{
+                                overallWins: tt.overallWins,
+                                overallLosses: tt.overallLosses,
+                                conferenceWins: tt.conferenceWins,
+                                conferenceLosses: tt.conferenceLosses,
+                                conferenceName: tt.conferenceName,
+                                ppg: tt.ppg,
+                                oppPpg: tt.oppPpg,
+                                fgPct: tt.fgPct,
+                                threePtPct: tt.threePtPct,
+                                ftPct: tt.ftPct,
+                                reboundsPerGame: tt.reboundsPerGame,
+                                assistsPerGame: tt.assistsPerGame,
+                                stealsPerGame: tt.stealsPerGame,
+                                blocksPerGame: tt.blocksPerGame,
+                                turnoversPerGame: tt.turnoversPerGame,
+                                apRanking: tt.apRanking,
+                                strengthOfSchedule: tt.strengthOfSchedule,
+                              }}
                             />
                             <RemoveTeamButton
                               tournamentId={id}
