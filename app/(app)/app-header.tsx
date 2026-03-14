@@ -87,14 +87,14 @@ export function AppHeader({ session, pendingInviteCount }: AppHeaderProps) {
 
         {/* Right: user menu (desktop) + hamburger (mobile) */}
         <div className="flex items-center gap-2">
-          {/* Desktop invite bell */}
+          {/* Desktop notifications bell */}
           <Button
             variant="ghost"
             size="icon"
             className="relative hidden md:inline-flex"
             asChild
           >
-            <Link href="/invites">
+            <Link href="/notifications">
               <Bell className="h-5 w-5" />
               {pendingInviteCount > 0 && (
                 <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium text-destructive-foreground">
@@ -102,7 +102,7 @@ export function AppHeader({ session, pendingInviteCount }: AppHeaderProps) {
                 </span>
               )}
               <span className="sr-only">
-                Invites
+                Notifications
                 {pendingInviteCount > 0 && ` (${pendingInviteCount} pending)`}
               </span>
             </Link>
@@ -210,9 +210,9 @@ export function AppHeader({ session, pendingInviteCount }: AppHeaderProps) {
                 {/* User actions */}
                 <nav className="flex flex-col gap-1">
                   <Link
-                    href="/invites"
+                    href="/notifications"
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent ${pathname === "/invites" ? "bg-accent font-medium" : ""}`}
+                    className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent ${pathname === "/notifications" ? "bg-accent font-medium" : ""}`}
                   >
                     <div className="relative">
                       <Bell className="h-4 w-4" />
@@ -222,7 +222,7 @@ export function AppHeader({ session, pendingInviteCount }: AppHeaderProps) {
                         </span>
                       )}
                     </div>
-                    Invites
+                    Notifications
                     {pendingInviteCount > 0 && (
                       <span className="text-xs text-muted-foreground">
                         ({pendingInviteCount})

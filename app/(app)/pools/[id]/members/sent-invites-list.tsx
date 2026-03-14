@@ -30,9 +30,14 @@ interface SentInvite {
 interface SentInvitesListProps {
   poolId: string;
   invites: SentInvite[];
+  tournamentStarted: boolean;
 }
 
-export function SentInvitesList({ poolId, invites }: SentInvitesListProps) {
+export function SentInvitesList({
+  poolId,
+  invites,
+  tournamentStarted,
+}: SentInvitesListProps) {
   const router = useRouter();
 
   async function handleCancel(inviteId: string) {
@@ -66,10 +71,12 @@ export function SentInvitesList({ poolId, invites }: SentInvitesListProps) {
               Direct invites sent to users for this pool
             </CardDescription>
           </div>
-          <InviteUserDialog
-            poolId={poolId}
-            onInviteSent={() => router.refresh()}
-          />
+          {!tournamentStarted && (
+            <InviteUserDialog
+              poolId={poolId}
+              onInviteSent={() => router.refresh()}
+            />
+          )}
         </div>
       </CardHeader>
       <CardContent>

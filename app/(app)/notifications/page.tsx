@@ -14,7 +14,7 @@ import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { StickySubHeader } from "@/components/sticky-sub-header";
 import { InviteResponseList } from "./invite-response-list";
 
-export default async function InvitesPage() {
+export default async function NotificationsPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -28,13 +28,16 @@ export default async function InvitesPage() {
   return (
     <div className="mx-auto max-w-3xl">
       <StickySubHeader>
-        <PageBreadcrumbs crumbs={[{ label: "Invites" }]} className="mb-2" />
-        <h1 className="text-2xl font-bold">Invites</h1>
+        <PageBreadcrumbs
+          crumbs={[{ label: "Notifications" }]}
+          className="mb-2"
+        />
+        <h1 className="text-2xl font-bold">Notifications</h1>
       </StickySubHeader>
 
       <Card>
         <CardHeader>
-          <CardTitle>Pending Invites</CardTitle>
+          <CardTitle>Pool Invites</CardTitle>
           <CardDescription>
             {invites.length} pending invite{invites.length !== 1 ? "s" : ""}
           </CardDescription>

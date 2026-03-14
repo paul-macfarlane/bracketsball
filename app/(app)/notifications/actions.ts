@@ -1,15 +1,11 @@
 "use server";
 
 import { headers } from "next/headers";
-import { z } from "zod";
 
 import { auth } from "@/lib/auth";
 import { respondToPoolUserInvite } from "@/lib/db/queries/pool-user-invites";
-
-const respondToInviteInputSchema = z.object({
-  inviteId: z.string().min(1),
-  response: z.enum(["accepted", "declined"]),
-});
+import { hasTournamentStarted } from "@/lib/db/queries/pools";
+import { respondToInviteInputSchema } from "@/lib/validators/pool-user-invite";
 
 export async function respondToInviteAction(
   inviteId: string,
@@ -29,6 +25,15 @@ export async function respondToInviteAction(
   });
   if (!inputParsed.success) {
     return { error: "Invalid input" };
+  }
+
+  if (inputParsed.data.response === "accepted") {
+    const tournamentStarted = await hasTournamentStarted();
+    if (tournamentStarted) {
+      return {
+        error: "Pools cannot be joined after the tournament has started",
+      };
+    }
   }
 
   const result = await respondToPoolUserInvite(

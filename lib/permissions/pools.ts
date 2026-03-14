@@ -19,8 +19,8 @@ const poolActionPermissions: Record<PoolAction, Set<PoolMemberRole>> = {
   "delete-invite": new Set(["leader"]),
   "change-member-role": new Set(["leader"]),
   "remove-member": new Set(["leader"]),
-  "send-user-invite": new Set(["leader", "member"]),
-  "cancel-user-invite": new Set(["leader", "member"]),
+  "send-user-invite": new Set(["leader"]),
+  "cancel-user-invite": new Set(["leader"]),
 };
 
 export function canPerformPoolAction(

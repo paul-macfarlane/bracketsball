@@ -21,9 +21,11 @@ import {
   getSentInvitesForPool,
 } from "@/lib/db/queries/pool-user-invites";
 import {
-  sendPoolUserInviteSchema,
-  searchUsersSchema,
+  searchUsersInputSchema,
+  sendUserInviteInputSchema,
+  cancelUserInviteInputSchema,
 } from "@/lib/validators/pool-user-invite";
+import { hasTournamentStarted } from "@/lib/db/queries/pools";
 
 const changeMemberRoleInputSchema = z.object({
   poolId: z.string().min(1),
@@ -152,11 +154,6 @@ export async function leavePoolAction(poolId: string) {
   return { success: true, poolDeleted: result.poolDeleted };
 }
 
-const searchUsersInputSchema = z.object({
-  poolId: z.string().min(1),
-  formData: searchUsersSchema,
-});
-
 export async function searchUsersForInviteAction(
   poolId: string,
   query: string,
@@ -182,6 +179,12 @@ export async function searchUsersForInviteAction(
     return { error: "Pool not found" };
   }
 
+  if (!canPerformPoolAction(poolData.membership.role, "send-user-invite")) {
+    return {
+      error: "You do not have permission to search for users to invite",
+    };
+  }
+
   // Get existing member IDs and pending invite user IDs to exclude
   const members = await getPoolMembers(inputParsed.data.poolId);
   const memberUserIds = members.map((m) => m.userId);
@@ -197,11 +200,6 @@ export async function searchUsersForInviteAction(
 
   return { success: true, users };
 }
-
-const sendUserInviteInputSchema = z.object({
-  poolId: z.string().min(1),
-  formData: sendPoolUserInviteSchema,
-});
 
 export async function sendPoolUserInviteAction(poolId: string, userId: string) {
   const session = await auth.api.getSession({
@@ -227,6 +225,12 @@ export async function sendPoolUserInviteAction(poolId: string, userId: string) {
 
   if (!canPerformPoolAction(poolData.membership.role, "send-user-invite")) {
     return { error: "You do not have permission to send invites" };
+  }
+
+  // Block invites after tournament has started
+  const tournamentStarted = await hasTournamentStarted();
+  if (tournamentStarted) {
+    return { error: "Cannot send invites after the tournament has started" };
   }
 
   // Check pool capacity
@@ -258,11 +262,6 @@ export async function sendPoolUserInviteAction(poolId: string, userId: string) {
 
   return { success: true };
 }
-
-const cancelUserInviteInputSchema = z.object({
-  poolId: z.string().min(1),
-  inviteId: z.string().min(1),
-});
 
 export async function cancelPoolUserInviteAction(
   poolId: string,

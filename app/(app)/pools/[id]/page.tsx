@@ -64,7 +64,7 @@ export default async function PoolDetailPage({
   );
   const invites = isLeader ? await getPoolInvitesByPoolId(id) : [];
   const members = await getPoolMembers(id);
-  const sentUserInvites = await getSentInvitesForPool(id);
+  const sentUserInvites = isLeader ? await getSentInvitesForPool(id) : [];
   const remainingCapacity =
     poolData.pool.maxParticipants - poolData.memberCount;
 
@@ -192,9 +192,15 @@ export default async function PoolDetailPage({
           currentMembershipId={poolData.membership.id}
         />
       </div>
-      <div className="mt-6">
-        <SentInvitesList poolId={id} invites={sentUserInvites} />
-      </div>
+      {isLeader && (
+        <div className="mt-6">
+          <SentInvitesList
+            poolId={id}
+            invites={sentUserInvites}
+            tournamentStarted={tournamentStarted}
+          />
+        </div>
+      )}
       {isLeader && !tournamentStarted && (
         <div className="mt-6">
           <InviteList
