@@ -231,7 +231,7 @@ export async function syncTeamStatsAction(tournamentId: string) {
     return { error: "Tournament not found." };
   }
 
-  const result = await syncTeamStats(tournamentId);
+  const result = await syncTeamStats(tournamentId, undefined, tournament.year);
 
   revalidatePath(`/admin/tournaments/${tournamentId}/games`);
   return {

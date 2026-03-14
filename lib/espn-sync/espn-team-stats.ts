@@ -67,6 +67,11 @@ interface ESPNStatsResponse {
   stats?: {
     categories?: ESPNStatCategory[];
   };
+  // Team metadata (available when ?season= is used)
+  team?: {
+    recordSummary?: string; // e.g. "21-13"
+    standingSummary?: string; // e.g. "6th in Big 12"
+  };
 }
 
 interface ESPNStatCategory {
@@ -138,7 +143,10 @@ function findRecordStats(
   return { wins, losses };
 }
 
-async function fetchTeamInfo(espnId: string): Promise<{
+async function fetchTeamInfo(
+  espnId: string,
+  season?: number,
+): Promise<{
   overallWins: number | null;
   overallLosses: number | null;
   conferenceWins: number | null;
@@ -146,7 +154,9 @@ async function fetchTeamInfo(espnId: string): Promise<{
   conferenceName: string | null;
   oppPpg: number | null;
 }> {
-  const url = `${ESPN_TEAMS_URL}/${espnId}`;
+  const url = season
+    ? `${ESPN_TEAMS_URL}/${espnId}?season=${season}`
+    : `${ESPN_TEAMS_URL}/${espnId}`;
   const response = await fetch(url, {
     headers: { "User-Agent": "Bracketsball/1.0" },
   });
@@ -212,7 +222,7 @@ async function fetchTeamInfo(espnId: string): Promise<{
   };
 }
 
-async function fetchTeamStatistics(espnId: string): Promise<{
+interface TeamStatisticsResult {
   ppg: number | null;
   fgPct: number | null;
   threePtPct: number | null;
@@ -222,8 +232,34 @@ async function fetchTeamStatistics(espnId: string): Promise<{
   stealsPerGame: number | null;
   blocksPerGame: number | null;
   turnoversPerGame: number | null;
-}> {
-  const url = `${ESPN_TEAMS_URL}/${espnId}/statistics`;
+  // Record info from statistics endpoint (season-aware, unlike team info endpoint)
+  overallWins: number | null;
+  overallLosses: number | null;
+  conferenceName: string | null;
+}
+
+const EMPTY_STATISTICS: TeamStatisticsResult = {
+  ppg: null,
+  fgPct: null,
+  threePtPct: null,
+  ftPct: null,
+  reboundsPerGame: null,
+  assistsPerGame: null,
+  stealsPerGame: null,
+  blocksPerGame: null,
+  turnoversPerGame: null,
+  overallWins: null,
+  overallLosses: null,
+  conferenceName: null,
+};
+
+async function fetchTeamStatistics(
+  espnId: string,
+  season?: number,
+): Promise<TeamStatisticsResult> {
+  const url = season
+    ? `${ESPN_TEAMS_URL}/${espnId}/statistics?season=${season}`
+    : `${ESPN_TEAMS_URL}/${espnId}/statistics`;
   const response = await fetch(url, {
     headers: { "User-Agent": "Bracketsball/1.0" },
   });
@@ -232,33 +268,32 @@ async function fetchTeamStatistics(espnId: string): Promise<{
     console.warn(
       `[espn-stats] Failed to fetch stats for ${espnId}: ${response.status}`,
     );
-    return {
-      ppg: null,
-      fgPct: null,
-      threePtPct: null,
-      ftPct: null,
-      reboundsPerGame: null,
-      assistsPerGame: null,
-      stealsPerGame: null,
-      blocksPerGame: null,
-      turnoversPerGame: null,
-    };
+    return EMPTY_STATISTICS;
   }
 
   const data: ESPNStatsResponse = await response.json();
   const categories = data.stats?.categories ?? data.results?.stats?.categories;
   if (!categories) {
-    return {
-      ppg: null,
-      fgPct: null,
-      threePtPct: null,
-      ftPct: null,
-      reboundsPerGame: null,
-      assistsPerGame: null,
-      stealsPerGame: null,
-      blocksPerGame: null,
-      turnoversPerGame: null,
-    };
+    return EMPTY_STATISTICS;
+  }
+
+  // Parse record from statistics endpoint team metadata (season-aware)
+  let overallWins: number | null = null;
+  let overallLosses: number | null = null;
+  let conferenceName: string | null = null;
+
+  if (data.team?.recordSummary) {
+    const parts = data.team.recordSummary.split("-").map(Number);
+    if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+      overallWins = parts[0];
+      overallLosses = parts[1];
+    }
+  }
+  if (data.team?.standingSummary) {
+    const match = data.team.standingSummary.match(/(?:in|of)\s+(.+)$/i);
+    if (match) {
+      conferenceName = match[1].trim();
+    }
   }
 
   return {
@@ -275,13 +310,19 @@ async function fetchTeamStatistics(espnId: string): Promise<{
     stealsPerGame: findStatValue(categories, "defensive", "avgSteals"),
     blocksPerGame: findStatValue(categories, "defensive", "avgBlocks"),
     turnoversPerGame: findStatValue(categories, "offensive", "avgTurnovers"),
+    overallWins,
+    overallLosses,
+    conferenceName,
   };
 }
 
-async function fetchAPRankings(): Promise<Map<string, number>> {
+async function fetchAPRankings(season?: number): Promise<Map<string, number>> {
   const rankings = new Map<string, number>();
   try {
-    const response = await fetch(ESPN_RANKINGS_URL, {
+    const url = season
+      ? `${ESPN_RANKINGS_URL}?season=${season}`
+      : ESPN_RANKINGS_URL;
+    const response = await fetch(url, {
       headers: { "User-Agent": "Bracketsball/1.0" },
     });
     if (!response.ok) return rankings;
@@ -305,16 +346,33 @@ async function fetchAPRankings(): Promise<Map<string, number>> {
 export async function fetchTeamStats(
   espnId: string,
   apRankings?: Map<string, number>,
+  season?: number,
 ): Promise<TeamStats> {
-  const [info, statistics] = await Promise.all([
-    fetchTeamInfo(espnId),
-    fetchTeamStatistics(espnId),
-  ]);
+  const statistics = await fetchTeamStatistics(espnId, season);
+
+  // Only call the team info endpoint for the current season. It doesn't
+  // support the ?season param (always returns current-season data), so for
+  // historical seasons we'd get wrong data. Better to have some fields null
+  // than display the wrong season's stats.
+  const info = season ? null : await fetchTeamInfo(espnId);
 
   return {
     espnId,
-    ...info,
-    ...statistics,
+    overallWins: statistics.overallWins ?? info?.overallWins ?? null,
+    overallLosses: statistics.overallLosses ?? info?.overallLosses ?? null,
+    conferenceWins: info?.conferenceWins ?? null,
+    conferenceLosses: info?.conferenceLosses ?? null,
+    conferenceName: statistics.conferenceName ?? info?.conferenceName ?? null,
+    oppPpg: info?.oppPpg ?? null,
+    ppg: statistics.ppg,
+    fgPct: statistics.fgPct,
+    threePtPct: statistics.threePtPct,
+    ftPct: statistics.ftPct,
+    reboundsPerGame: statistics.reboundsPerGame,
+    assistsPerGame: statistics.assistsPerGame,
+    stealsPerGame: statistics.stealsPerGame,
+    blocksPerGame: statistics.blocksPerGame,
+    turnoversPerGame: statistics.turnoversPerGame,
     apRanking: apRankings?.get(espnId) ?? null,
   };
 }
@@ -326,12 +384,13 @@ export async function fetchTeamStats(
 export async function fetchAllTeamStats(
   espnIds: string[],
   onProgress?: (completed: number, total: number, teamName?: string) => void,
+  season?: number,
 ): Promise<TeamStats[]> {
-  const apRankings = await fetchAPRankings();
+  const apRankings = await fetchAPRankings(season);
   const results: TeamStats[] = [];
 
   for (let i = 0; i < espnIds.length; i++) {
-    const stats = await fetchTeamStats(espnIds[i], apRankings);
+    const stats = await fetchTeamStats(espnIds[i], apRankings, season);
     results.push(stats);
     onProgress?.(i + 1, espnIds.length);
 

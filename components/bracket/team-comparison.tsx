@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { TeamLogo } from "@/components/team-logo";
 import type { BracketTeam, TeamStats } from "./types";
 
 interface TeamComparisonProps {
@@ -139,14 +140,12 @@ export function TeamComparison({
         {/* Team Headers */}
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <div className="flex flex-col items-center gap-1 text-center">
-            {team1.logoUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={team1.logoUrl}
-                alt={team1.abbreviation}
-                className="h-12 w-12 object-contain"
-              />
-            )}
+            <TeamLogo
+              logoUrl={team1.logoUrl}
+              darkLogoUrl={team1.darkLogoUrl}
+              alt={team1.abbreviation}
+              className="h-12 w-12 object-contain"
+            />
             <span className="text-xs text-muted-foreground">
               #{team1.seed} seed
             </span>
@@ -167,14 +166,12 @@ export function TeamComparison({
           </div>
           <span className="text-lg font-bold text-muted-foreground">vs</span>
           <div className="flex flex-col items-center gap-1 text-center">
-            {team2.logoUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={team2.logoUrl}
-                alt={team2.abbreviation}
-                className="h-12 w-12 object-contain"
-              />
-            )}
+            <TeamLogo
+              logoUrl={team2.logoUrl}
+              darkLogoUrl={team2.darkLogoUrl}
+              alt={team2.abbreviation}
+              className="h-12 w-12 object-contain"
+            />
             <span className="text-xs text-muted-foreground">
               #{team2.seed} seed
             </span>

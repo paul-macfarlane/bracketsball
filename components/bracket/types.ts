@@ -45,6 +45,7 @@ export interface BracketTeam {
   abbreviation: string;
   mascot: string | null;
   logoUrl: string | null;
+  darkLogoUrl: string | null;
   seed: number;
   region: string;
   stats?: TeamStats;

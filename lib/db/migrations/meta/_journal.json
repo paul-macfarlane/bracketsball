@@ -92,6 +92,13 @@
       "when": 1773455623567,
       "tag": "0012_careful_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1773461343678,
+      "tag": "0013_mature_white_queen",
+      "breakpoints": true
     }
   ]
 }

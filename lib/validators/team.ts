@@ -6,6 +6,11 @@ export const teamSchema = z.object({
   abbreviation: z.string().min(1, "Abbreviation is required").max(10),
   mascot: z.string().max(50).optional(),
   logoUrl: z.string().url("Must be a valid URL").or(z.literal("")).optional(),
+  darkLogoUrl: z
+    .string()
+    .url("Must be a valid URL")
+    .or(z.literal(""))
+    .optional(),
   espnId: z.string().optional(),
 });
 

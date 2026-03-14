@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TeamLogo } from "@/components/team-logo";
 import { DeleteTeamButton } from "./delete-team-button";
 
 export default async function TeamsPage({
@@ -67,10 +68,12 @@ export default async function TeamsPage({
                 <TableRow key={t.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      {t.logoUrl && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.logoUrl} alt={t.name} className="h-6 w-6" />
-                      )}
+                      <TeamLogo
+                        logoUrl={t.logoUrl}
+                        darkLogoUrl={t.darkLogoUrl}
+                        alt={t.name}
+                        className="h-6 w-6"
+                      />
                       {t.name}
                     </div>
                   </TableCell>

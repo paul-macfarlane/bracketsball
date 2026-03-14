@@ -23,6 +23,7 @@ export async function createTeam(data: {
   abbreviation: string;
   mascot?: string;
   logoUrl?: string;
+  darkLogoUrl?: string;
   espnId?: string;
 }) {
   const [result] = await db.insert(team).values(data).returning();
@@ -37,6 +38,7 @@ export async function updateTeam(
     abbreviation?: string;
     mascot?: string | null;
     logoUrl?: string | null;
+    darkLogoUrl?: string | null;
     espnId?: string | null;
   },
 ) {

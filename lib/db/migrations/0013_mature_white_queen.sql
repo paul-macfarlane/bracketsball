@@ -1,0 +1,1 @@
+ALTER TABLE "team" ADD COLUMN "dark_logo_url" text;

@@ -44,6 +44,7 @@ export default async function EditTeamPage({
               abbreviation: team.abbreviation,
               mascot: team.mascot ?? "",
               logoUrl: team.logoUrl ?? "",
+              darkLogoUrl: team.darkLogoUrl ?? "",
               espnId: team.espnId ?? "",
             }}
             onSubmit={handleSubmit}

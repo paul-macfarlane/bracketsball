@@ -57,6 +57,7 @@ function buildStatsUpdate(stats: TeamStats): TournamentTeamUpdate {
 export async function syncTeamStats(
   tournamentId: string,
   onProgress?: (completed: number, total: number) => void,
+  season?: number,
 ): Promise<TeamStatsSyncResult> {
   const result: TeamStatsSyncResult = {
     teamsUpdated: 0,
@@ -92,7 +93,7 @@ export async function syncTeamStats(
 
   // Fetch stats from ESPN
   const espnIds = teamsWithEspnId.map((t) => t.espnId!);
-  const allStats = await fetchAllTeamStats(espnIds, onProgress);
+  const allStats = await fetchAllTeamStats(espnIds, onProgress, season);
 
   // Build lookup
   const statsByEspnId = new Map<string, TeamStats>();

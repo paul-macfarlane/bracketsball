@@ -625,11 +625,15 @@ async function main() {
   console.log("\n[5/6] Syncing team stats from ESPN...");
   const { syncTeamStats } = await import("../lib/espn-sync/sync-team-stats");
 
-  const statsResult = await syncTeamStats(tournamentId, (completed, total) => {
-    if (completed % 10 === 0 || completed === total) {
-      console.log(`  Stats progress: ${completed}/${total} teams`);
-    }
-  });
+  const statsResult = await syncTeamStats(
+    tournamentId,
+    (completed, total) => {
+      if (completed % 10 === 0 || completed === total) {
+        console.log(`  Stats progress: ${completed}/${total} teams`);
+      }
+    },
+    year,
+  );
 
   console.log(
     `  Teams updated: ${statsResult.teamsUpdated} | Skipped: ${statsResult.teamsSkipped}`,

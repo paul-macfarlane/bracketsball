@@ -18,6 +18,7 @@ export interface SyncTeam {
   abbreviation: string;
   mascot: string | null;
   logoUrl: string | null;
+  darkLogoUrl: string | null;
   seed: number;
 }
 

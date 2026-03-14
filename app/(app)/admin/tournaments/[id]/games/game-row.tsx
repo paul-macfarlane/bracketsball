@@ -13,12 +13,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TeamLogo } from "@/components/team-logo";
 import { updateGameAction } from "../../actions";
 
 interface TeamInfo {
   name: string;
   seed: number;
   logoUrl: string | null;
+  darkLogoUrl: string | null;
 }
 
 interface GameRowProps {
@@ -107,10 +109,12 @@ export function GameRow({
     if (!teamInfo) return <span className="text-muted-foreground">TBD</span>;
     return (
       <span className="flex items-center gap-1.5">
-        {teamInfo.logoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={teamInfo.logoUrl} alt={teamInfo.name} className="h-4 w-4" />
-        )}
+        <TeamLogo
+          logoUrl={teamInfo.logoUrl}
+          darkLogoUrl={teamInfo.darkLogoUrl}
+          alt={teamInfo.name}
+          className="h-4 w-4"
+        />
         <span className="font-mono text-xs text-muted-foreground">
           ({teamInfo.seed})
         </span>

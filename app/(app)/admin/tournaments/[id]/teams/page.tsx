@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { REGION_DISPLAY_NAMES } from "@/lib/validators/tournament";
 import { getTournamentGames } from "@/lib/db/queries/tournaments";
+import { TeamLogo } from "@/components/team-logo";
 import { AddTeamForm } from "./add-team-form";
 import { EditTeamButton } from "./edit-team-button";
 import { EditTeamStatsButton } from "./edit-team-stats-button";
@@ -116,14 +117,12 @@ export default async function TournamentTeamsPage({
                         <TableCell className="font-mono">{tt.seed}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {tt.teamLogoUrl && (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={tt.teamLogoUrl}
-                                alt={tt.teamName}
-                                className="h-5 w-5"
-                              />
-                            )}
+                            <TeamLogo
+                              logoUrl={tt.teamLogoUrl}
+                              darkLogoUrl={tt.teamDarkLogoUrl}
+                              alt={tt.teamName}
+                              className="h-5 w-5"
+                            />
                             {tt.teamName}
                             <span className="text-muted-foreground">
                               ({tt.teamAbbreviation})
