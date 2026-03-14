@@ -31,6 +31,10 @@ interface GameRowProps {
     team2Score: number | null;
     winnerTeamId: string | null;
     status: "scheduled" | "in_progress" | "final";
+    startTime: Date | null;
+    venueName: string | null;
+    venueCity: string | null;
+    venueState: string | null;
   };
   team1: TeamInfo | null;
   team2: TeamInfo | null;
@@ -43,6 +47,17 @@ const STATUS_COLORS = {
   in_progress: "default",
   final: "outline",
 } as const;
+
+function formatDateTimeLocal(date: Date | null): string {
+  if (!date) return "";
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
 
 export function GameRow({
   game,
@@ -60,6 +75,13 @@ export function GameRow({
     game.team2Score?.toString() ?? "",
   );
   const [status, setStatus] = useState(game.status);
+  const [startTime, setStartTime] = useState(
+    formatDateTimeLocal(game.startTime),
+  );
+  const [venueName, setVenueName] = useState(game.venueName ?? "");
+  const [venueCity, setVenueCity] = useState(game.venueCity ?? "");
+  const [venueState, setVenueState] = useState(game.venueState ?? "");
+
   async function handleSave() {
     setIsPending(true);
 
@@ -67,6 +89,10 @@ export function GameRow({
       team1Score: team1Score ? parseInt(team1Score, 10) : null,
       team2Score: team2Score ? parseInt(team2Score, 10) : null,
       status,
+      startTime: startTime || null,
+      venueName: venueName || null,
+      venueCity: venueCity || null,
+      venueState: venueState || null,
     });
     if (result?.error) {
       toast.error(result.error);
@@ -97,7 +123,7 @@ export function GameRow({
 
   if (isEditing) {
     return (
-      <div className="rounded-md border p-3 space-y-3">
+      <div className="space-y-3 rounded-md border p-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           {region && <span>{region}</span>}
           <span>Game {game.gameNumber}</span>
@@ -143,6 +169,60 @@ export function GameRow({
               <SelectItem value="final">Final</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div className="border-t pt-3">
+          <label className="mb-2 block text-xs font-semibold text-muted-foreground">
+            Game Details
+          </label>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium">
+                Start Time
+              </label>
+              <Input
+                type="datetime-local"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="h-8"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium">
+                Venue Name
+              </label>
+              <Input
+                type="text"
+                value={venueName}
+                onChange={(e) => setVenueName(e.target.value)}
+                className="h-8"
+                placeholder="e.g. Lucas Oil Stadium"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium">
+                Venue City
+              </label>
+              <Input
+                type="text"
+                value={venueCity}
+                onChange={(e) => setVenueCity(e.target.value)}
+                className="h-8"
+                placeholder="e.g. Indianapolis"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium">
+                Venue State
+              </label>
+              <Input
+                type="text"
+                value={venueState}
+                onChange={(e) => setVenueState(e.target.value)}
+                className="h-8"
+                placeholder="e.g. IN"
+              />
+            </div>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button size="sm" onClick={handleSave} disabled={isPending}>

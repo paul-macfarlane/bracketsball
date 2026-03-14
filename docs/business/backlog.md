@@ -333,6 +333,45 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 44. Stats-Based Bracket Generation (Non-MVP) — Epic: Auto-Fill Bracket
+
+**As a** pool member, **I want to** generate bracket picks based on team stats with customizable category weights **so that** I can create data-driven brackets tailored to my strategy preferences.
+
+**Acceptance Criteria:**
+
+- **Entry point — Auto-fill "Custom" option:**
+  - A 4th option, "Custom", is added to the existing auto-fill dropdown (alongside Chalk, Weighted Random, Random)
+  - Selecting "Custom" opens a dedicated modal/dialog for configuring stats-based generation
+- **Stat categories available for weighting:**
+  - PPG, Opponent PPG, FG%, 3PT%, FT%, Rebounds per Game, Assists per Game, Steals per Game, Blocks per Game, Turnovers per Game
+  - For Opponent PPG and Turnovers per Game, lower values are treated as better (inverted)
+- **Presets:**
+  - User can select from predefined presets that auto-populate weights:
+    - **Offense-Heavy**: PPG, FG%, 3PT%, FT% weighted high
+    - **Defense-Heavy**: Opponent PPG (inverted), Steals, Blocks, Turnovers (inverted) weighted high
+    - **Balanced**: even weight across all stat categories
+    - **Rebounding & Hustle**: Rebounds, Steals, Blocks weighted high
+  - Selecting a preset populates the custom weight controls, which the user can further adjust
+- **Custom weights:**
+  - User can manually adjust the weight for each stat category
+  - UI should make it intuitive to see which stats are emphasized (implementation detail left to developer discretion — e.g., sliders, numeric inputs, or tiered dropdowns)
+- **Chaos level (upset probability):**
+  - User selects a chaos level that controls how likely upsets are: **Low**, **Medium**, **High**
+  - Low: stats-favored team wins almost always; High: significant randomness, more upsets
+  - This replaces a simple deterministic/probabilistic toggle — all levels introduce some probability, but Low is near-deterministic
+- **Generation behavior:**
+  - Populates all remaining unpicked games in the bracket (same as existing auto-fill)
+  - Games are resolved in round order so earlier-round picks feed into later rounds
+  - User can modify any generated picks before submitting
+  - Available during bracket creation and editing (before tournament lock)
+- **Missing stats handling:**
+  - If a stat category has no data for one or both teams in a matchup, that category is skipped and remaining categories determine the pick
+  - If no stat data is available for either team, falls back to seed-based logic
+- **Single-game pick from team comparison:**
+  - When viewing the team comparison dialog for a specific matchup in the bracket builder, a "Pick by Stats" button is available
+  - Clicking it uses the stats-based logic (with the user's last-used preset/custom config and chaos level) to auto-pick the winner for that single game
+  - If no prior config has been set, defaults to Balanced preset with Low chaos
+
 ### 25. Auto-Fill Bracket Picks (Non-MVP) — Epic: Auto-Fill Bracket
 
 **As a** pool member, **I want to** auto-fill my bracket with generated picks **so that** I can quickly create an entry without manually picking every game.
@@ -491,7 +530,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - On compact views (matchup cards), continue showing short name only
 - Admin can edit mascot via team management UI
 
-### 38. Admin Manual Team & Game Data Entry (Non-MVP) — Epic: Bracket UX Enhancements
+### 38. Admin Manual Team & Game Data Entry (Non-MVP) ✅ — Epic: Bracket UX Enhancements
 
 **As an** admin, **I want to** manually enter and edit team stats and game details **so that** I can fill in data ESPN doesn't provide (e.g., conference record, strength of schedule, NET ranking) and correct any inaccuracies.
 
@@ -700,11 +739,12 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 35  | Sticky Page Headers                 | Navigation UX           | No  | Done        |
 | 36  | Breadcrumb Navigation               | Navigation UX           | No  | Done        |
 | 37  | Team Mascot / Nickname Display      | Bracket UX Enhancements | No  | Done        |
-| 38  | Admin Manual Team & Game Data Entry | Bracket UX Enhancements | No  | Not Started |
+| 38  | Admin Manual Team & Game Data Entry | Bracket UX Enhancements | No  | Done        |
 | 40  | GitHub Repo Link in Footer          | Branding                | No  | Done        |
 | 41  | Unused Code Enforcement & Cleanup   | Tech Debt               | No  | Not Started |
 | 42  | Codebase Standards Audit            | Tech Debt               | No  | Not Started |
 | 43  | Improved Delete Confirmations       | UX                      | No  | Done        |
+| 44  | Stats-Based Bracket Generation      | Auto-Fill Bracket       | No  | Not Started |
 | 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
 | 19  | Theme Toggle                        | UX                      | No  | Done        |
 | 22  | Remove User Dashboard               | UX Cleanup              | No  | Done        |
@@ -715,4 +755,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 24 stories (18 done, 6 remaining)**
+**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 25 stories (19 done, 6 remaining)**

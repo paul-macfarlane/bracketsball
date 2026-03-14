@@ -198,14 +198,18 @@ async function syncGamesToDB(
           }
         }
 
-        // 5. Update game
+        // 5. Update game (only write non-null fields to avoid overwriting manual edits)
         const updateData: Record<string, unknown> = {
           espnEventId: espnGame.espnEventId,
-          startTime: espnGame.startTime,
-          venueName: espnGame.venue.name,
-          venueCity: espnGame.venue.city,
-          venueState: espnGame.venue.state,
         };
+        if (espnGame.startTime != null)
+          updateData.startTime = espnGame.startTime;
+        if (espnGame.venue.name != null)
+          updateData.venueName = espnGame.venue.name;
+        if (espnGame.venue.city != null)
+          updateData.venueCity = espnGame.venue.city;
+        if (espnGame.venue.state != null)
+          updateData.venueState = espnGame.venue.state;
 
         if (!scheduleOnly) {
           updateData.status = espnGame.status;
