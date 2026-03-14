@@ -95,7 +95,7 @@ export default async function TournamentTeamsPage({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[60px]">Seed</TableHead>
+                    <TableHead className="w-15">Seed</TableHead>
                     <TableHead>Team</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>

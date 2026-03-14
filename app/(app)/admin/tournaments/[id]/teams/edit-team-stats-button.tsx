@@ -197,7 +197,7 @@ export function EditTeamStatsButton({
                   id="ppg"
                   type="number"
                   min={0}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.ppg ?? ""}
                   {...register("ppg", { setValueAs: numericSetValueAs })}
                 />
@@ -208,7 +208,7 @@ export function EditTeamStatsButton({
                   id="oppPpg"
                   type="number"
                   min={0}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.oppPpg ?? ""}
                   {...register("oppPpg", { setValueAs: numericSetValueAs })}
                 />
@@ -226,7 +226,7 @@ export function EditTeamStatsButton({
                   type="number"
                   min={0}
                   max={100}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.fgPct ?? ""}
                   {...register("fgPct", { setValueAs: numericSetValueAs })}
                 />
@@ -238,7 +238,7 @@ export function EditTeamStatsButton({
                   type="number"
                   min={0}
                   max={100}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.threePtPct ?? ""}
                   {...register("threePtPct", {
                     setValueAs: numericSetValueAs,
@@ -252,7 +252,7 @@ export function EditTeamStatsButton({
                   type="number"
                   min={0}
                   max={100}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.ftPct ?? ""}
                   {...register("ftPct", { setValueAs: numericSetValueAs })}
                 />
@@ -269,7 +269,7 @@ export function EditTeamStatsButton({
                   id="reboundsPerGame"
                   type="number"
                   min={0}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.reboundsPerGame ?? ""}
                   {...register("reboundsPerGame", {
                     setValueAs: numericSetValueAs,
@@ -282,7 +282,7 @@ export function EditTeamStatsButton({
                   id="assistsPerGame"
                   type="number"
                   min={0}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.assistsPerGame ?? ""}
                   {...register("assistsPerGame", {
                     setValueAs: numericSetValueAs,
@@ -295,7 +295,7 @@ export function EditTeamStatsButton({
                   id="stealsPerGame"
                   type="number"
                   min={0}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.stealsPerGame ?? ""}
                   {...register("stealsPerGame", {
                     setValueAs: numericSetValueAs,
@@ -308,7 +308,7 @@ export function EditTeamStatsButton({
                   id="blocksPerGame"
                   type="number"
                   min={0}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.blocksPerGame ?? ""}
                   {...register("blocksPerGame", {
                     setValueAs: numericSetValueAs,
@@ -321,7 +321,7 @@ export function EditTeamStatsButton({
                   id="turnoversPerGame"
                   type="number"
                   min={0}
-                  step={0.1}
+                  step="any"
                   defaultValue={currentStats.turnoversPerGame ?? ""}
                   {...register("turnoversPerGame", {
                     setValueAs: numericSetValueAs,
@@ -351,7 +351,7 @@ export function EditTeamStatsButton({
                 <Input
                   id="strengthOfSchedule"
                   type="number"
-                  step={0.01}
+                  step="any"
                   defaultValue={currentStats.strengthOfSchedule ?? ""}
                   {...register("strengthOfSchedule", {
                     setValueAs: numericSetValueAs,
