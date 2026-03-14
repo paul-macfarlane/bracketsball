@@ -37,12 +37,17 @@ export async function getBracketEntryById(
 export async function getBracketEntriesByPoolAndUser(
   poolId: string,
   userId: string,
+  tournamentId: string,
 ) {
   return db
     .select()
     .from(bracketEntry)
     .where(
-      and(eq(bracketEntry.poolId, poolId), eq(bracketEntry.userId, userId)),
+      and(
+        eq(bracketEntry.poolId, poolId),
+        eq(bracketEntry.userId, userId),
+        eq(bracketEntry.tournamentId, tournamentId),
+      ),
     )
     .orderBy(bracketEntry.createdAt);
 }
@@ -50,24 +55,37 @@ export async function getBracketEntriesByPoolAndUser(
 export async function getBracketEntryCountForUser(
   poolId: string,
   userId: string,
+  tournamentId: string,
 ) {
   const [result] = await db
     .select({ count: count() })
     .from(bracketEntry)
     .where(
-      and(eq(bracketEntry.poolId, poolId), eq(bracketEntry.userId, userId)),
+      and(
+        eq(bracketEntry.poolId, poolId),
+        eq(bracketEntry.userId, userId),
+        eq(bracketEntry.tournamentId, tournamentId),
+      ),
     );
   return result.count;
 }
 
-export async function getMaxBracketCountForPool(poolId: string) {
+export async function getMaxBracketCountForPool(
+  poolId: string,
+  tournamentId: string,
+) {
   const entries = await db
     .select({
       userId: bracketEntry.userId,
       count: count(),
     })
     .from(bracketEntry)
-    .where(eq(bracketEntry.poolId, poolId))
+    .where(
+      and(
+        eq(bracketEntry.poolId, poolId),
+        eq(bracketEntry.tournamentId, tournamentId),
+      ),
+    )
     .groupBy(bracketEntry.userId);
 
   if (entries.length === 0) return 0;

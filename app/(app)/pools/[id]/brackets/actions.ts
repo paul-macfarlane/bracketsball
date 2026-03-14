@@ -75,7 +75,11 @@ export async function createBracketEntryAction(
     return { error: "Tournament has already started" };
   }
 
-  const entryCount = await getBracketEntryCountForUser(poolId, session.user.id);
+  const entryCount = await getBracketEntryCountForUser(
+    poolId,
+    session.user.id,
+    tournament.id,
+  );
   if (entryCount >= poolData.pool.maxBracketsPerUser) {
     return {
       error: `You have reached the maximum of ${poolData.pool.maxBracketsPerUser} brackets for this pool`,
