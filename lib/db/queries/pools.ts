@@ -140,9 +140,10 @@ export async function deletePool(poolId: string) {
 
 export async function getMaxBracketCountInPool(
   poolId: string,
+  tournamentId: string,
 ): Promise<number> {
   const { getMaxBracketCountForPool } = await import("./bracket-entries");
-  return getMaxBracketCountForPool(poolId);
+  return getMaxBracketCountForPool(poolId, tournamentId);
 }
 
 export async function hasTournamentStarted(): Promise<boolean> {

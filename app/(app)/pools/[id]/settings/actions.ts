@@ -15,6 +15,7 @@ import {
   deletePool,
   hasTournamentStarted,
 } from "@/lib/db/queries/pools";
+import { getActiveTournament } from "@/lib/db/queries/tournaments";
 
 const updatePoolSettingsInputSchema = z.object({
   poolId: z.string().min(1),
@@ -52,10 +53,16 @@ export async function updatePoolSettings(poolId: string, formData: unknown) {
     return { error: "Settings cannot be changed after the tournament starts" };
   }
 
-  const memberCount = await getPoolMemberCount(inputParsed.data.poolId);
-  const maxBracketCount = await getMaxBracketCountInPool(
-    inputParsed.data.poolId,
-  );
+  const [memberCount, activeTournament] = await Promise.all([
+    getPoolMemberCount(inputParsed.data.poolId),
+    getActiveTournament(),
+  ]);
+  const maxBracketCount = activeTournament
+    ? await getMaxBracketCountInPool(
+        inputParsed.data.poolId,
+        activeTournament.id,
+      )
+    : 0;
 
   const schema = buildUpdatePoolSchema(memberCount, maxBracketCount);
   const parsed = schema.safeParse(inputParsed.data.formData);

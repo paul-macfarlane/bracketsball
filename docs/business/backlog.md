@@ -362,7 +362,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
-### 47. Filter Pool Data by Active Tournament (Non-MVP) — Epic: Multi-Season Support
+### 47. Filter Pool Data by Active Tournament (Non-MVP) ✅ — Epic: Multi-Season Support
 
 **As a** pool member, **I want** my pool's bracket list and related data to only show entries for the current active tournament **so that** I don't see stale brackets from previous tournaments when a new season starts.
 
@@ -560,7 +560,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Selected users receive an in-app invite notification
 - Invited users can accept or decline
 
-### 45. Dark/Light Mode Team Icons (Non-MVP) ✅ — Epic: Bracket UX Enhancements 
+### 45. Dark/Light Mode Team Icons (Non-MVP) ✅ — Epic: Bracket UX Enhancements
 
 **As a** user, **I want** team logos to display appropriately for my current theme (light or dark mode) **so that** logos remain clear and visually correct regardless of my theme preference.
 
@@ -806,7 +806,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 43  | Improved Delete Confirmations         | UX                      | No  | Done        |
 | 44  | Stats-Based Bracket Generation        | Auto-Fill Bracket       | No  | Not Started |
 | 45  | Dark/Light Mode Team Icons            | Bracket UX Enhancements | No  | Done        |
-| 47  | Filter Pool Data by Active Tournament | Multi-Season Support    | No  | Not Started |
+| 47  | Filter Pool Data by Active Tournament | Multi-Season Support    | No  | Done        |
 | 17  | In-App User Invites                   | Pool Members            | No  | Done        |
 | 19  | Theme Toggle                          | UX                      | No  | Done        |
 | 22  | Remove User Dashboard                 | UX Cleanup              | No  | Done        |
@@ -817,4 +817,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)       | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages                 | Branding                | No  | Done        |
 
-**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 27 stories (22 done, 5 remaining)**
+**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 27 stories (23 done, 4 remaining)**

@@ -79,10 +79,18 @@ export default async function PoolDetailPage({
       getBracketLockTime(),
     ]);
   const bracketEntries = activeTournament
-    ? await getBracketEntriesByPoolAndUser(id, session.user.id)
+    ? await getBracketEntriesByPoolAndUser(
+        id,
+        session.user.id,
+        activeTournament.id,
+      )
     : [];
   const bracketCount = activeTournament
-    ? await getBracketEntryCountForUser(id, session.user.id)
+    ? await getBracketEntryCountForUser(
+        id,
+        session.user.id,
+        activeTournament.id,
+      )
     : 0;
   const canCreateBracket =
     !!activeTournament &&

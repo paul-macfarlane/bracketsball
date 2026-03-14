@@ -9,6 +9,7 @@ import {
   getMaxBracketCountInPool,
   hasTournamentStarted,
 } from "@/lib/db/queries/pools";
+import { getActiveTournament } from "@/lib/db/queries/tournaments";
 import { canAccessPoolPage } from "@/lib/permissions/pools";
 import {
   Card,
@@ -45,8 +46,13 @@ export default async function PoolSettingsPage({
     notFound();
   }
 
-  const tournamentStarted = await hasTournamentStarted();
-  const maxBracketCountInPool = await getMaxBracketCountInPool(id);
+  const [tournamentStarted, activeTournament] = await Promise.all([
+    hasTournamentStarted(),
+    getActiveTournament(),
+  ]);
+  const maxBracketCountInPool = activeTournament
+    ? await getMaxBracketCountInPool(id, activeTournament.id)
+    : 0;
 
   return (
     <div className="mx-auto max-w-5xl">
