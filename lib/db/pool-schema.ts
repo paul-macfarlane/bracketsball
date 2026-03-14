@@ -16,6 +16,12 @@ export const poolVisibilityEnum = pgEnum("pool_visibility", [
   "public",
 ]);
 
+export const poolUserInviteStatusEnum = pgEnum("pool_user_invite_status", [
+  "pending",
+  "accepted",
+  "declined",
+]);
+
 export const poolMemberRoleEnum = pgEnum("pool_member_role", [
   "leader",
   "member",
@@ -106,9 +112,36 @@ export const poolInvite = pgTable(
   ],
 );
 
+export const poolUserInvite = pgTable(
+  "pool_user_invite",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    poolId: text("pool_id")
+      .notNull()
+      .references(() => pool.id, { onDelete: "cascade" }),
+    invitedBy: text("invited_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    invitedUserId: text("invited_user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    status: poolUserInviteStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    respondedAt: timestamp("responded_at"),
+  },
+  (table) => [
+    index("pool_user_invite_pool_id_idx").on(table.poolId),
+    index("pool_user_invite_invited_user_id_idx").on(table.invitedUserId),
+    index("pool_user_invite_invited_by_idx").on(table.invitedBy),
+  ],
+);
+
 export const poolRelations = relations(pool, ({ many }) => ({
   members: many(poolMember),
   invites: many(poolInvite),
+  userInvites: many(poolUserInvite),
 }));
 
 export const poolMemberRelations = relations(poolMember, ({ one }) => ({
@@ -130,5 +163,22 @@ export const poolInviteRelations = relations(poolInvite, ({ one }) => ({
   creator: one(user, {
     fields: [poolInvite.createdBy],
     references: [user.id],
+  }),
+}));
+
+export const poolUserInviteRelations = relations(poolUserInvite, ({ one }) => ({
+  pool: one(pool, {
+    fields: [poolUserInvite.poolId],
+    references: [pool.id],
+  }),
+  sender: one(user, {
+    fields: [poolUserInvite.invitedBy],
+    references: [user.id],
+    relationName: "sentUserInvites",
+  }),
+  recipient: one(user, {
+    fields: [poolUserInvite.invitedUserId],
+    references: [user.id],
+    relationName: "receivedUserInvites",
   }),
 }));

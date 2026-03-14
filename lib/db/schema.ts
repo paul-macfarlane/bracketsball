@@ -11,12 +11,15 @@ export {
 
 export {
   poolVisibilityEnum,
+  poolUserInviteStatusEnum,
   pool,
   poolMember,
   poolInvite,
+  poolUserInvite,
   poolRelations,
   poolMemberRelations,
   poolInviteRelations,
+  poolUserInviteRelations,
 } from "./pool-schema";
 
 export {

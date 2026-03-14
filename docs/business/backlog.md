@@ -518,6 +518,23 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Selected users receive an in-app invite notification
 - Invited users can accept or decline
 
+### 45. Dark/Light Mode Team Icons (Non-MVP) — Epic: Bracket UX Enhancements
+
+**As a** user, **I want** team logos to display appropriately for my current theme (light or dark mode) **so that** logos remain clear and visually correct regardless of my theme preference.
+
+**Acceptance Criteria:**
+
+- **Investigation phase:** Check ESPN API responses for dark-mode logo variants (ESPN typically provides both light and dark logo URLs per team) and document findings
+- **Data model update:** If ESPN provides dark-mode logos, add a `darkLogoUrl` (or equivalent) field to the team table and sync it from ESPN
+- **ESPN sync update:** Update the ESPN sync adapter to pull and store the dark-mode logo URL alongside the existing logo URL
+- **Frontend display:** Update all team logo rendering across the app to use the appropriate logo based on the user's current theme (light/dark mode):
+  - Bracket builder (matchup cards, team comparison dialog)
+  - Bracket viewer (read-only bracket detail)
+  - Pool standings (champion pick column)
+  - Admin team management UI
+- **Theme-aware logic:** Use `next-themes` (already integrated) to detect the current theme and select the correct logo URL
+- **Fallback:** If a dark-mode logo is unavailable for a team, fall back to the standard logo URL
+
 ### 37. Team Mascot / Nickname Display (Non-MVP) ✅ — Epic: Bracket UX Enhancements
 
 **As a** user, **I want to** see team mascots alongside school names **so that** teams feel more identifiable and the app feels more like a real sports experience.
@@ -745,7 +762,8 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 42  | Codebase Standards Audit            | Tech Debt               | No  | Not Started |
 | 43  | Improved Delete Confirmations       | UX                      | No  | Done        |
 | 44  | Stats-Based Bracket Generation      | Auto-Fill Bracket       | No  | Not Started |
-| 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
+| 45  | Dark/Light Mode Team Icons          | Bracket UX Enhancements | No  | Not Started |
+| 17  | In-App User Invites                 | Pool Members            | No  | Done        |
 | 19  | Theme Toggle                        | UX                      | No  | Done        |
 | 22  | Remove User Dashboard               | UX Cleanup              | No  | Done        |
 | 23  | Remove Admin Dashboard              | UX Cleanup              | No  | Done        |
@@ -755,4 +773,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 25 stories (19 done, 6 remaining)**
+**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 26 stories (20 done, 6 remaining)**

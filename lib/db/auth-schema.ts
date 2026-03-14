@@ -7,7 +7,7 @@ import {
   index,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { poolMember } from "./pool-schema";
+import { poolMember, poolUserInvite } from "./pool-schema";
 
 export const appRoleEnum = pgEnum("app_role", ["user", "admin"]);
 
@@ -89,6 +89,10 @@ export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   poolMemberships: many(poolMember),
+  sentUserInvites: many(poolUserInvite, { relationName: "sentUserInvites" }),
+  receivedUserInvites: many(poolUserInvite, {
+    relationName: "receivedUserInvites",
+  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({

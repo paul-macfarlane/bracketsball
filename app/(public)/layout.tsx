@@ -5,6 +5,7 @@ import { auth, type Session } from "@/lib/auth";
 import { AppHeader } from "@/app/(app)/app-header";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import { getPendingInviteCountForUser } from "@/lib/db/queries/pool-user-invites";
 
 export default async function PublicLayout({
   children,
@@ -15,10 +16,17 @@ export default async function PublicLayout({
     headers: await headers(),
   });
 
+  const pendingInviteCount = session
+    ? await getPendingInviteCountForUser(session.user.id)
+    : 0;
+
   return (
     <div className="flex min-h-screen flex-col">
       {session ? (
-        <AppHeader session={session as Session} />
+        <AppHeader
+          session={session as Session}
+          pendingInviteCount={pendingInviteCount}
+        />
       ) : (
         <header className="sticky top-0 z-50 border-b bg-background">
           <div className="container mx-auto flex h-14 items-center justify-between px-4">
