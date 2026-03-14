@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu, User, Settings, LogOut } from "lucide-react";
+import { Menu, User, Settings, LogOut, Bell } from "lucide-react";
 import {
   ThemeToggleDropdown,
   ThemeToggleMobile,
@@ -32,6 +32,7 @@ import { Separator } from "@/components/ui/separator";
 
 interface AppHeaderProps {
   session: Session;
+  pendingInviteCount: number;
 }
 
 const navLinks = [{ href: "/pools", label: "Pools" }] as const;
@@ -41,7 +42,7 @@ const adminNavLinks = [
   { href: "/admin", label: "Admin" },
 ] as const;
 
-export function AppHeader({ session }: AppHeaderProps) {
+export function AppHeader({ session, pendingInviteCount }: AppHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -86,6 +87,27 @@ export function AppHeader({ session }: AppHeaderProps) {
 
         {/* Right: user menu (desktop) + hamburger (mobile) */}
         <div className="flex items-center gap-2">
+          {/* Desktop invite bell */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative hidden md:inline-flex"
+            asChild
+          >
+            <Link href="/invites">
+              <Bell className="h-5 w-5" />
+              {pendingInviteCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium text-destructive-foreground">
+                  {pendingInviteCount}
+                </span>
+              )}
+              <span className="sr-only">
+                Invites
+                {pendingInviteCount > 0 && ` (${pendingInviteCount} pending)`}
+              </span>
+            </Link>
+          </Button>
+
           {/* Desktop user dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -187,6 +209,26 @@ export function AppHeader({ session }: AppHeaderProps) {
 
                 {/* User actions */}
                 <nav className="flex flex-col gap-1">
+                  <Link
+                    href="/invites"
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent ${pathname === "/invites" ? "bg-accent font-medium" : ""}`}
+                  >
+                    <div className="relative">
+                      <Bell className="h-4 w-4" />
+                      {pendingInviteCount > 0 && (
+                        <span className="absolute -right-1.5 -top-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-0.5 text-[9px] font-medium text-destructive-foreground">
+                          {pendingInviteCount}
+                        </span>
+                      )}
+                    </div>
+                    Invites
+                    {pendingInviteCount > 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        ({pendingInviteCount})
+                      </span>
+                    )}
+                  </Link>
                   <Link
                     href="/profile"
                     onClick={() => setMobileOpen(false)}

@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { getPoolById } from "@/lib/db/queries/pools";
 import { getPoolInvitesByPoolId } from "@/lib/db/queries/pool-invites";
 import { getPoolMembers } from "@/lib/db/queries/pool-members";
+import { getSentInvitesForPool } from "@/lib/db/queries/pool-user-invites";
 import {
   getBracketEntriesByPoolAndUser,
   getBracketEntryCountForUser,
@@ -29,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InviteList } from "./invites/invite-list";
 import { MemberList } from "./members/member-list";
+import { SentInvitesList } from "./members/sent-invites-list";
 import { CreateBracketDialog } from "./brackets/create-bracket-dialog";
 import { StandingsTable } from "@/components/pool/standings-table";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
@@ -62,6 +64,7 @@ export default async function PoolDetailPage({
   );
   const invites = isLeader ? await getPoolInvitesByPoolId(id) : [];
   const members = await getPoolMembers(id);
+  const sentUserInvites = await getSentInvitesForPool(id);
   const remainingCapacity =
     poolData.pool.maxParticipants - poolData.memberCount;
 
@@ -188,6 +191,9 @@ export default async function PoolDetailPage({
           isLeader={isLeader}
           currentMembershipId={poolData.membership.id}
         />
+      </div>
+      <div className="mt-6">
+        <SentInvitesList poolId={id} invites={sentUserInvites} />
       </div>
       {isLeader && !tournamentStarted && (
         <div className="mt-6">
