@@ -38,6 +38,7 @@ export function TeamForm({
       abbreviation: "",
       mascot: "",
       logoUrl: "",
+      darkLogoUrl: "",
       espnId: "",
     },
   });
@@ -121,6 +122,23 @@ export function TeamForm({
               <FormControl>
                 <Input
                   placeholder="https://a.espncdn.com/i/teamlogos/ncaa/500/41.png"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="darkLogoUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Dark Logo URL (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/41.png"
                   {...field}
                 />
               </FormControl>

@@ -6,6 +6,7 @@ import { Check, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BracketTeam } from "./types";
 import { TeamComparison } from "./team-comparison";
+import { TeamLogo } from "@/components/team-logo";
 
 type PickStatus = "correct" | "incorrect" | "eliminated" | "pending" | null;
 
@@ -102,18 +103,16 @@ function TeamSlot({
     >
       {team ? (
         <>
-          {team.logoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={team.logoUrl}
-              alt={team.abbreviation}
-              className={cn(
-                "h-4 w-4 shrink-0 object-contain",
-                !viewMode && isSelected && "brightness-0 invert",
-                isDimmed && "opacity-50",
-              )}
-            />
-          )}
+          <TeamLogo
+            logoUrl={team.logoUrl}
+            darkLogoUrl={team.darkLogoUrl}
+            alt={team.abbreviation}
+            className={cn(
+              "h-4 w-4 shrink-0 object-contain",
+              !viewMode && isSelected && "brightness-0 invert",
+              isDimmed && "opacity-50",
+            )}
+          />
           <span
             className={cn(
               "min-w-[1.25rem] text-xs font-medium text-muted-foreground",

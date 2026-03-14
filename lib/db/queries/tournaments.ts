@@ -89,6 +89,7 @@ export async function getTournamentTeams(tournamentId: string) {
       teamAbbreviation: team.abbreviation,
       teamMascot: team.mascot,
       teamLogoUrl: team.logoUrl,
+      teamDarkLogoUrl: team.darkLogoUrl,
       overallWins: tournamentTeam.overallWins,
       overallLosses: tournamentTeam.overallLosses,
       conferenceWins: tournamentTeam.conferenceWins,

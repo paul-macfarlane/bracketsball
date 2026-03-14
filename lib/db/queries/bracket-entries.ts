@@ -318,6 +318,7 @@ export async function getPoolStandings(
     teamShortName: string;
     teamMascot: string | null;
     teamLogoUrl: string | null;
+    teamDarkLogoUrl: string | null;
   }[] = [];
   if (championshipGame) {
     const champPickRows = allPicks.filter(
@@ -332,6 +333,7 @@ export async function getPoolStandings(
           shortName: team.shortName,
           mascot: team.mascot,
           logoUrl: team.logoUrl,
+          darkLogoUrl: team.darkLogoUrl,
         })
         .from(team)
         .where(inArray(team.id, champTeamIds));
@@ -347,6 +349,7 @@ export async function getPoolStandings(
             teamShortName: t.shortName,
             teamMascot: t.mascot,
             teamLogoUrl: t.logoUrl,
+            teamDarkLogoUrl: t.darkLogoUrl,
           };
         })
         .filter(
@@ -359,6 +362,7 @@ export async function getPoolStandings(
             teamShortName: string;
             teamMascot: string | null;
             teamLogoUrl: string | null;
+            teamDarkLogoUrl: string | null;
           } => p !== null,
         );
     }

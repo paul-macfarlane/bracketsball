@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserDisplay } from "@/components/user-display";
+import { TeamLogo } from "@/components/team-logo";
 
 export interface StandingsEntry {
   id: string;
@@ -28,6 +29,7 @@ export interface StandingsEntry {
     teamShortName: string;
     teamMascot: string | null;
     teamLogoUrl: string | null;
+    teamDarkLogoUrl: string | null;
   } | null;
 }
 
@@ -176,11 +178,10 @@ function ChampionDisplay({
     : championPick.teamShortName;
   if (championPick.teamLogoUrl) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={championPick.teamLogoUrl}
+      <TeamLogo
+        logoUrl={championPick.teamLogoUrl}
+        darkLogoUrl={championPick.teamDarkLogoUrl}
         alt={displayName}
-        title={displayName}
         className="h-6 w-6 object-contain"
       />
     );

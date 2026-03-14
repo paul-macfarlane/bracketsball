@@ -97,6 +97,7 @@ export default async function TournamentGamesPage({
                             name: team1.teamName,
                             seed: team1.seed,
                             logoUrl: team1.teamLogoUrl,
+                            darkLogoUrl: team1.teamDarkLogoUrl,
                           }
                         : null
                     }
@@ -106,6 +107,7 @@ export default async function TournamentGamesPage({
                             name: team2.teamName,
                             seed: team2.seed,
                             logoUrl: team2.teamLogoUrl,
+                            darkLogoUrl: team2.teamDarkLogoUrl,
                           }
                         : null
                     }

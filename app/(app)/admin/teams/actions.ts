@@ -25,12 +25,13 @@ export async function createTeamAction(formData: unknown) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { logoUrl, espnId, mascot, ...rest } = parsed.data;
+  const { logoUrl, darkLogoUrl, espnId, mascot, ...rest } = parsed.data;
 
   await createTeam({
     ...rest,
     mascot: mascot || undefined,
     logoUrl: logoUrl || undefined,
+    darkLogoUrl: darkLogoUrl || undefined,
     espnId: espnId || undefined,
   });
 
@@ -44,12 +45,13 @@ export async function updateTeamAction(id: string, formData: unknown) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { logoUrl, espnId, mascot, ...rest } = parsed.data;
+  const { logoUrl, darkLogoUrl, espnId, mascot, ...rest } = parsed.data;
 
   const result = await updateTeam(id, {
     ...rest,
     mascot: mascot || null,
     logoUrl: logoUrl || null,
+    darkLogoUrl: darkLogoUrl || null,
     espnId: espnId || null,
   });
 

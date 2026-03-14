@@ -386,6 +386,7 @@ export async function autoFillBracketAction(
     abbreviation: tt.teamAbbreviation,
     mascot: tt.teamMascot,
     logoUrl: tt.teamLogoUrl,
+    darkLogoUrl: tt.teamDarkLogoUrl,
     seed: tt.seed,
     region: tt.region,
   }));
