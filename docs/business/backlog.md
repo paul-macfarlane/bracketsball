@@ -283,7 +283,7 @@ Derived from [Original Vision](./originalVision.md). Items are organized by epic
 
 ## Epic: Tournament Lock
 
-### 46. Bracket Lock at Round of 64 Start (MVP)
+### 46. Bracket Lock at Round of 64 Start (MVP) ✅
 
 **As a** user, **I want** all bracket creation, editing, pool management, and invite functionality to lock when the Round of 64 begins **so that** the competition is fair and mirrors how real bracket challenges work.
 
@@ -771,7 +771,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 13  | View Pool Standings                 | Bracket Visibility      | Yes | Done        |
 | 14  | View Individual Bracket Detail      | Bracket Visibility      | Yes | Done        |
 | 15  | Live Bracket Scoring & Standings    | Scoring & Standings     | Yes | Done        |
-| 46  | Bracket Lock at R64 Start           | Tournament Lock         | Yes | Not Started |
+| 46  | Bracket Lock at R64 Start           | Tournament Lock         | Yes | Done        |
 | 34  | Configure ESPN Sync Cron Jobs       | Pre-Tournament Setup    | Yes | In Progress |
 | 39  | Validate Cron Sync Performance      | Pre-Tournament Setup    | Yes | Done        |
 | 32  | Update External Services Branding   | Branding                | Yes | Done        |
@@ -803,4 +803,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 21 stories (19 done, 2 remaining)** | **Post-MVP: 26 stories (20 done, 6 remaining)**
+**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 26 stories (20 done, 6 remaining)**
