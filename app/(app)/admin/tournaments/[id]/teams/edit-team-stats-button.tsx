@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -12,8 +12,6 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -24,35 +22,35 @@ import {
 } from "@/lib/validators/tournament";
 import { updateTournamentTeamStatsAction } from "../../actions";
 
-interface TeamStats {
-  overallWins: number | null;
-  overallLosses: number | null;
-  conferenceWins: number | null;
-  conferenceLosses: number | null;
-  conferenceName: string | null;
-  ppg: number | null;
-  oppPpg: number | null;
-  fgPct: number | null;
-  threePtPct: number | null;
-  ftPct: number | null;
-  reboundsPerGame: number | null;
-  assistsPerGame: number | null;
-  stealsPerGame: number | null;
-  blocksPerGame: number | null;
-  turnoversPerGame: number | null;
-  apRanking: number | null;
-  strengthOfSchedule: number | null;
-}
-
 interface EditTeamStatsButtonProps {
   tournamentId: string;
   tournamentTeamId: string;
   teamName: string;
-  currentStats: TeamStats;
+  currentStats: {
+    overallWins: number | null;
+    overallLosses: number | null;
+    conferenceWins: number | null;
+    conferenceLosses: number | null;
+    conferenceName: string | null;
+    ppg: number | null;
+    oppPpg: number | null;
+    fgPct: number | null;
+    threePtPct: number | null;
+    ftPct: number | null;
+    reboundsPerGame: number | null;
+    assistsPerGame: number | null;
+    stealsPerGame: number | null;
+    blocksPerGame: number | null;
+    turnoversPerGame: number | null;
+    apRanking: number | null;
+    strengthOfSchedule: number | null;
+  };
 }
 
-function numToStr(value: number | null | undefined): string {
-  return value !== null && value !== undefined ? String(value) : "";
+function numericSetValueAs(v: string) {
+  if (v === "" || v === undefined || v === null) return null;
+  const n = Number(v);
+  return isNaN(n) ? null : n;
 }
 
 export function EditTeamStatsButton({
@@ -62,53 +60,34 @@ export function EditTeamStatsButton({
   currentStats,
 }: EditTeamStatsButtonProps) {
   const [open, setOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const { register, handleSubmit, formState } =
-    useForm<UpdateTournamentTeamStatsFormValues>({
-      resolver: zodResolver(updateTournamentTeamStatsSchema),
-      defaultValues: {
-        overallWins: currentStats.overallWins,
-        overallLosses: currentStats.overallLosses,
-        conferenceWins: currentStats.conferenceWins,
-        conferenceLosses: currentStats.conferenceLosses,
-        conferenceName: currentStats.conferenceName,
-        ppg: currentStats.ppg,
-        oppPpg: currentStats.oppPpg,
-        fgPct: currentStats.fgPct,
-        threePtPct: currentStats.threePtPct,
-        ftPct: currentStats.ftPct,
-        reboundsPerGame: currentStats.reboundsPerGame,
-        assistsPerGame: currentStats.assistsPerGame,
-        stealsPerGame: currentStats.stealsPerGame,
-        blocksPerGame: currentStats.blocksPerGame,
-        turnoversPerGame: currentStats.turnoversPerGame,
-        apRanking: currentStats.apRanking,
-        strengthOfSchedule: currentStats.strengthOfSchedule,
-      },
-    });
-
-  const intField = (name: keyof UpdateTournamentTeamStatsFormValues) =>
-    register(name, {
-      setValueAs: (v: string) => {
-        if (v === "" || v === undefined) return null;
-        const n = parseInt(v, 10);
-        return isNaN(n) ? null : n;
-      },
-    });
-
-  const floatField = (name: keyof UpdateTournamentTeamStatsFormValues) =>
-    register(name, {
-      setValueAs: (v: string) => {
-        if (v === "" || v === undefined) return null;
-        const n = parseFloat(v);
-        return isNaN(n) ? null : n;
-      },
-    });
-
-  const strField = (name: keyof UpdateTournamentTeamStatsFormValues) =>
-    register(name, {
-      setValueAs: (v: string) => v || null,
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<UpdateTournamentTeamStatsFormValues>({
+    resolver: zodResolver(updateTournamentTeamStatsSchema),
+    defaultValues: {
+      overallWins: currentStats.overallWins,
+      overallLosses: currentStats.overallLosses,
+      conferenceWins: currentStats.conferenceWins,
+      conferenceLosses: currentStats.conferenceLosses,
+      conferenceName: currentStats.conferenceName,
+      ppg: currentStats.ppg,
+      oppPpg: currentStats.oppPpg,
+      fgPct: currentStats.fgPct,
+      threePtPct: currentStats.threePtPct,
+      ftPct: currentStats.ftPct,
+      reboundsPerGame: currentStats.reboundsPerGame,
+      assistsPerGame: currentStats.assistsPerGame,
+      stealsPerGame: currentStats.stealsPerGame,
+      blocksPerGame: currentStats.blocksPerGame,
+      turnoversPerGame: currentStats.turnoversPerGame,
+      apRanking: currentStats.apRanking,
+      strengthOfSchedule: currentStats.strengthOfSchedule,
+    },
+  });
 
   async function onSubmit(data: UpdateTournamentTeamStatsFormValues) {
     const result = await updateTournamentTeamStatsAction(
@@ -127,304 +106,262 @@ export function EditTeamStatsButton({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" title="Edit stats">
+        <Button variant="ghost" size="sm" title="Edit Stats">
           <BarChart3 className="h-4 w-4" />
-          <span className="sr-only">Stats</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit Stats — {teamName}</DialogTitle>
-          <DialogDescription>
-            Update team statistics. Empty fields will be saved as blank.
-          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Records Section */}
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6"
+        >
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
-              Records
-            </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <h3 className="mb-2 text-sm font-semibold">Records</h3>
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="overallWins" className="mb-1 text-xs">
-                  Overall W
-                </Label>
+                <Label htmlFor="overallWins">Overall Wins</Label>
                 <Input
                   id="overallWins"
                   type="number"
                   min={0}
                   step={1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.overallWins)}
-                  {...intField("overallWins")}
+                  defaultValue={currentStats.overallWins ?? ""}
+                  {...register("overallWins", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
               <div>
-                <Label htmlFor="overallLosses" className="mb-1 text-xs">
-                  Overall L
-                </Label>
+                <Label htmlFor="overallLosses">Overall Losses</Label>
                 <Input
                   id="overallLosses"
                   type="number"
                   min={0}
                   step={1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.overallLosses)}
-                  {...intField("overallLosses")}
+                  defaultValue={currentStats.overallLosses ?? ""}
+                  {...register("overallLosses", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
               <div>
-                <Label htmlFor="conferenceWins" className="mb-1 text-xs">
-                  Conf W
-                </Label>
+                <Label htmlFor="conferenceWins">Conference Wins</Label>
                 <Input
                   id="conferenceWins"
                   type="number"
                   min={0}
                   step={1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.conferenceWins)}
-                  {...intField("conferenceWins")}
+                  defaultValue={currentStats.conferenceWins ?? ""}
+                  {...register("conferenceWins", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
               <div>
-                <Label htmlFor="conferenceLosses" className="mb-1 text-xs">
-                  Conf L
-                </Label>
+                <Label htmlFor="conferenceLosses">Conference Losses</Label>
                 <Input
                   id="conferenceLosses"
                   type="number"
                   min={0}
                   step={1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.conferenceLosses)}
-                  {...intField("conferenceLosses")}
+                  defaultValue={currentStats.conferenceLosses ?? ""}
+                  {...register("conferenceLosses", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="conferenceName">Conference Name</Label>
+                <Input
+                  id="conferenceName"
+                  type="text"
+                  defaultValue={currentStats.conferenceName ?? ""}
+                  {...register("conferenceName", {
+                    setValueAs: (v: string) => (v === "" ? null : v),
+                  })}
                 />
               </div>
             </div>
-            <div className="mt-3">
-              <Label htmlFor="conferenceName" className="mb-1 text-xs">
-                Conference Name
-              </Label>
-              <Input
-                id="conferenceName"
-                type="text"
-                className="h-8"
-                defaultValue={currentStats.conferenceName ?? ""}
-                {...strField("conferenceName")}
-              />
-            </div>
           </div>
 
-          {/* Scoring Section */}
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
-              Scoring
-            </h3>
+            <h3 className="mb-2 text-sm font-semibold">Scoring</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="ppg" className="mb-1 text-xs">
-                  PPG
-                </Label>
+                <Label htmlFor="ppg">PPG</Label>
                 <Input
                   id="ppg"
                   type="number"
                   min={0}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.ppg)}
-                  {...floatField("ppg")}
+                  defaultValue={currentStats.ppg ?? ""}
+                  {...register("ppg", { setValueAs: numericSetValueAs })}
                 />
               </div>
               <div>
-                <Label htmlFor="oppPpg" className="mb-1 text-xs">
-                  Opp PPG
-                </Label>
+                <Label htmlFor="oppPpg">Opp PPG</Label>
                 <Input
                   id="oppPpg"
                   type="number"
                   min={0}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.oppPpg)}
-                  {...floatField("oppPpg")}
+                  defaultValue={currentStats.oppPpg ?? ""}
+                  {...register("oppPpg", { setValueAs: numericSetValueAs })}
                 />
               </div>
             </div>
           </div>
 
-          {/* Shooting Section */}
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
-              Shooting
-            </h3>
+            <h3 className="mb-2 text-sm font-semibold">Shooting</h3>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label htmlFor="fgPct" className="mb-1 text-xs">
-                  FG%
-                </Label>
+                <Label htmlFor="fgPct">FG%</Label>
                 <Input
                   id="fgPct"
                   type="number"
                   min={0}
                   max={100}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.fgPct)}
-                  {...floatField("fgPct")}
+                  defaultValue={currentStats.fgPct ?? ""}
+                  {...register("fgPct", { setValueAs: numericSetValueAs })}
                 />
               </div>
               <div>
-                <Label htmlFor="threePtPct" className="mb-1 text-xs">
-                  3PT%
-                </Label>
+                <Label htmlFor="threePtPct">3PT%</Label>
                 <Input
                   id="threePtPct"
                   type="number"
                   min={0}
                   max={100}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.threePtPct)}
-                  {...floatField("threePtPct")}
+                  defaultValue={currentStats.threePtPct ?? ""}
+                  {...register("threePtPct", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
               <div>
-                <Label htmlFor="ftPct" className="mb-1 text-xs">
-                  FT%
-                </Label>
+                <Label htmlFor="ftPct">FT%</Label>
                 <Input
                   id="ftPct"
                   type="number"
                   min={0}
                   max={100}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.ftPct)}
-                  {...floatField("ftPct")}
+                  defaultValue={currentStats.ftPct ?? ""}
+                  {...register("ftPct", { setValueAs: numericSetValueAs })}
                 />
               </div>
             </div>
           </div>
 
-          {/* Per Game Section */}
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
-              Per Game
-            </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <h3 className="mb-2 text-sm font-semibold">Per Game</h3>
+            <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label htmlFor="reboundsPerGame" className="mb-1 text-xs">
-                  RPG
-                </Label>
+                <Label htmlFor="reboundsPerGame">RPG</Label>
                 <Input
                   id="reboundsPerGame"
                   type="number"
                   min={0}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.reboundsPerGame)}
-                  {...floatField("reboundsPerGame")}
+                  defaultValue={currentStats.reboundsPerGame ?? ""}
+                  {...register("reboundsPerGame", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
               <div>
-                <Label htmlFor="assistsPerGame" className="mb-1 text-xs">
-                  APG
-                </Label>
+                <Label htmlFor="assistsPerGame">APG</Label>
                 <Input
                   id="assistsPerGame"
                   type="number"
                   min={0}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.assistsPerGame)}
-                  {...floatField("assistsPerGame")}
+                  defaultValue={currentStats.assistsPerGame ?? ""}
+                  {...register("assistsPerGame", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
               <div>
-                <Label htmlFor="stealsPerGame" className="mb-1 text-xs">
-                  SPG
-                </Label>
+                <Label htmlFor="stealsPerGame">SPG</Label>
                 <Input
                   id="stealsPerGame"
                   type="number"
                   min={0}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.stealsPerGame)}
-                  {...floatField("stealsPerGame")}
+                  defaultValue={currentStats.stealsPerGame ?? ""}
+                  {...register("stealsPerGame", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
               <div>
-                <Label htmlFor="blocksPerGame" className="mb-1 text-xs">
-                  BPG
-                </Label>
+                <Label htmlFor="blocksPerGame">BPG</Label>
                 <Input
                   id="blocksPerGame"
                   type="number"
                   min={0}
                   step={0.1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.blocksPerGame)}
-                  {...floatField("blocksPerGame")}
+                  defaultValue={currentStats.blocksPerGame ?? ""}
+                  {...register("blocksPerGame", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="turnoversPerGame">TOPG</Label>
+                <Input
+                  id="turnoversPerGame"
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  defaultValue={currentStats.turnoversPerGame ?? ""}
+                  {...register("turnoversPerGame", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
             </div>
-            <div className="mt-3 w-1/2 sm:w-1/4">
-              <Label htmlFor="turnoversPerGame" className="mb-1 text-xs">
-                TOPG
-              </Label>
-              <Input
-                id="turnoversPerGame"
-                type="number"
-                min={0}
-                step={0.1}
-                className="h-8"
-                defaultValue={numToStr(currentStats.turnoversPerGame)}
-                {...floatField("turnoversPerGame")}
-              />
-            </div>
           </div>
 
-          {/* Rankings Section */}
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
-              Rankings
-            </h3>
+            <h3 className="mb-2 text-sm font-semibold">Rankings</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="apRanking" className="mb-1 text-xs">
-                  AP Ranking
-                </Label>
+                <Label htmlFor="apRanking">AP Ranking</Label>
                 <Input
                   id="apRanking"
                   type="number"
                   min={1}
                   max={25}
                   step={1}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.apRanking)}
-                  {...intField("apRanking")}
+                  defaultValue={currentStats.apRanking ?? ""}
+                  {...register("apRanking", { setValueAs: numericSetValueAs })}
                 />
               </div>
               <div>
-                <Label htmlFor="strengthOfSchedule" className="mb-1 text-xs">
-                  SOS
-                </Label>
+                <Label htmlFor="strengthOfSchedule">SOS</Label>
                 <Input
                   id="strengthOfSchedule"
                   type="number"
-                  step={0.001}
-                  className="h-8"
-                  defaultValue={numToStr(currentStats.strengthOfSchedule)}
-                  {...floatField("strengthOfSchedule")}
+                  step={0.01}
+                  defaultValue={currentStats.strengthOfSchedule ?? ""}
+                  {...register("strengthOfSchedule", {
+                    setValueAs: numericSetValueAs,
+                  })}
                 />
               </div>
             </div>
           </div>
 
-          <DialogFooter>
+          <div className="flex justify-end gap-2">
             <Button
               type="button"
               variant="outline"
@@ -432,10 +369,10 @@ export function EditTeamStatsButton({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={formState.isSubmitting}>
-              {formState.isSubmitting ? "Saving..." : "Save Stats"}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Stats"}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
