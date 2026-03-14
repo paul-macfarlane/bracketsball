@@ -21,6 +21,7 @@ export async function createTeam(data: {
   name: string;
   shortName: string;
   abbreviation: string;
+  mascot?: string;
   logoUrl?: string;
   espnId?: string;
 }) {
@@ -34,6 +35,7 @@ export async function updateTeam(
     name?: string;
     shortName?: string;
     abbreviation?: string;
+    mascot?: string | null;
     logoUrl?: string | null;
     espnId?: string | null;
   },

@@ -151,6 +151,11 @@ export function TeamComparison({
               #{team1.seed} seed
             </span>
             <span className="font-semibold">{team1.shortName}</span>
+            {team1.mascot && (
+              <span className="text-xs text-muted-foreground">
+                {team1.mascot}
+              </span>
+            )}
             {s1?.conferenceName && (
               <span className="text-xs text-muted-foreground">
                 {s1.conferenceName}
@@ -174,6 +179,11 @@ export function TeamComparison({
               #{team2.seed} seed
             </span>
             <span className="font-semibold">{team2.shortName}</span>
+            {team2.mascot && (
+              <span className="text-xs text-muted-foreground">
+                {team2.mascot}
+              </span>
+            )}
             {s2?.conferenceName && (
               <span className="text-xs text-muted-foreground">
                 {s2.conferenceName}

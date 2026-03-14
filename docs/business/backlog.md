@@ -458,6 +458,17 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Only pools with available capacity are shown
 - User can join directly from search results
 
+### 43. Improved Delete Confirmations (Non-MVP) — Epic: UX
+
+**As a** user, **I want** delete confirmations to be appropriately protective **so that** I don't accidentally delete important data.
+
+**Acceptance Criteria:**
+
+- **Pool deletion:** Confirmation dialog requires the user to type the pool name before the delete button is enabled
+- **Account deletion:** Confirmation uses a simple popup modal with a confirm/cancel button (no typing required)
+- Both confirmations clearly warn the user about what will be permanently removed
+- Delete button remains disabled until the confirmation condition is met (pool name typed for pools, button click for account)
+
 ### 17. In-App User Invites (Non-MVP) — Epic: Pool Members
 
 **As a** pool member, **I want to** invite existing users by searching for them **so that** I don't need to share a link externally.
@@ -468,7 +479,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Selected users receive an in-app invite notification
 - Invited users can accept or decline
 
-### 37. Team Mascot / Nickname Display (Non-MVP) — Epic: Bracket UX Enhancements
+### 37. Team Mascot / Nickname Display (Non-MVP) ✅ — Epic: Bracket UX Enhancements
 
 **As a** user, **I want to** see team mascots alongside school names **so that** teams feel more identifiable and the app feels more like a real sports experience.
 
@@ -688,11 +699,12 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 20  | Public Pool Search                  | Public Pools            | No  | Done        |
 | 35  | Sticky Page Headers                 | Navigation UX           | No  | Done        |
 | 36  | Breadcrumb Navigation               | Navigation UX           | No  | Done        |
-| 37  | Team Mascot / Nickname Display      | Bracket UX Enhancements | No  | Not Started |
+| 37  | Team Mascot / Nickname Display      | Bracket UX Enhancements | No  | Done        |
 | 38  | Admin Manual Team & Game Data Entry | Bracket UX Enhancements | No  | Not Started |
 | 40  | GitHub Repo Link in Footer          | Branding                | No  | Not Started |
 | 41  | Unused Code Enforcement & Cleanup   | Tech Debt               | No  | Not Started |
 | 42  | Codebase Standards Audit            | Tech Debt               | No  | Not Started |
+| 43  | Improved Delete Confirmations       | UX                      | No  | Not Started |
 | 17  | In-App User Invites                 | Pool Members            | No  | Not Started |
 | 19  | Theme Toggle                        | UX                      | No  | Done        |
 | 22  | Remove User Dashboard               | UX Cleanup              | No  | Done        |
@@ -703,4 +715,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)     | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages               | Branding                | No  | Done        |
 
-**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 23 stories (15 done, 8 remaining)**
+**MVP Total: 20 stories (19 done, 1 remaining)** | **Post-MVP: 24 stories (16 done, 8 remaining)**

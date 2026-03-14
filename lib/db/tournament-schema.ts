@@ -43,6 +43,7 @@ export const team = pgTable(
     name: text("name").notNull(),
     shortName: text("short_name").notNull(),
     abbreviation: text("abbreviation").notNull(),
+    mascot: text("mascot"),
     logoUrl: text("logo_url"),
     espnId: text("espn_id"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

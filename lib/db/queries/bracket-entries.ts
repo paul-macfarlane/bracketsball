@@ -316,6 +316,7 @@ export async function getPoolStandings(
     pickedTeamId: string;
     teamName: string;
     teamShortName: string;
+    teamMascot: string | null;
     teamLogoUrl: string | null;
   }[] = [];
   if (championshipGame) {
@@ -329,6 +330,7 @@ export async function getPoolStandings(
           id: team.id,
           name: team.name,
           shortName: team.shortName,
+          mascot: team.mascot,
           logoUrl: team.logoUrl,
         })
         .from(team)
@@ -343,6 +345,7 @@ export async function getPoolStandings(
             pickedTeamId: p.pickedTeamId,
             teamName: t.name,
             teamShortName: t.shortName,
+            teamMascot: t.mascot,
             teamLogoUrl: t.logoUrl,
           };
         })
@@ -354,6 +357,7 @@ export async function getPoolStandings(
             pickedTeamId: string;
             teamName: string;
             teamShortName: string;
+            teamMascot: string | null;
             teamLogoUrl: string | null;
           } => p !== null,
         );

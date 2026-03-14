@@ -26,6 +26,7 @@ export interface StandingsEntry {
   rank: number;
   championPick: {
     teamShortName: string;
+    teamMascot: string | null;
     teamLogoUrl: string | null;
   } | null;
 }
@@ -170,13 +171,16 @@ function ChampionDisplay({
   if (!championPick) {
     return <span className="text-xs text-muted-foreground">—</span>;
   }
+  const displayName = championPick.teamMascot
+    ? `${championPick.teamShortName} ${championPick.teamMascot}`
+    : championPick.teamShortName;
   if (championPick.teamLogoUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={championPick.teamLogoUrl}
-        alt={championPick.teamShortName}
-        title={championPick.teamShortName}
+        alt={displayName}
+        title={displayName}
         className="h-6 w-6 object-contain"
       />
     );

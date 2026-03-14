@@ -42,6 +42,7 @@ export default async function EditTeamPage({
               name: team.name,
               shortName: team.shortName,
               abbreviation: team.abbreviation,
+              mascot: team.mascot ?? "",
               logoUrl: team.logoUrl ?? "",
               espnId: team.espnId ?? "",
             }}
