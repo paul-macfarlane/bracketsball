@@ -9,6 +9,12 @@ import {
   ClipboardList,
   Share2,
   ArrowRight,
+  SlidersHorizontal,
+  Layers,
+  Check,
+  X,
+  Heart,
+  ShieldCheck,
 } from "lucide-react";
 
 import { auth } from "@/lib/auth";
@@ -24,7 +30,7 @@ function JsonLd() {
     name: "Bracketsball",
     url: siteUrl,
     description:
-      "March Madness bracket challenge — create pools, fill your bracket, and compete with friends. Free, fast, and built for the tournament.",
+      "March Madness bracket challenge — create pools, fill your bracket, and compete with friends. Free, no ads, and built for your crew.",
     applicationCategory: "SportsApplication",
     operatingSystem: "Web",
     offers: {
@@ -38,6 +44,8 @@ function JsonLd() {
       "Live scoring and standings",
       "Compete with friends",
       "Custom scoring rules",
+      "Stats-based bracket generation",
+      "Multiple brackets per pool",
     ],
   };
 
@@ -88,13 +96,13 @@ export default async function Home() {
 
         <div className="container relative mx-auto max-w-4xl text-center">
           <h1 className="font-heading text-5xl leading-tight font-bold uppercase tracking-wide md:text-7xl md:leading-tight">
-            Your Bracket.
+            The Bracket App
             <br />
-            <span className="text-brand-orange">Your Glory.</span>
+            <span className="text-brand-orange">Your Group Chat Deserves</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-primary-foreground/80 md:text-xl">
-            Create pools, fill your bracket, and compete with friends during
-            March Madness. Free, fast, and built for the tournament.
+            Not another corporate bracket site stuffed with ads. Bracketsball is
+            free, fast, and built for friends who take March Madness personally.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
@@ -103,70 +111,219 @@ export default async function Home() {
               className="bg-brand-orange px-8 text-lg text-brand-orange-foreground hover:bg-brand-orange/90"
             >
               <Link href="/login">
-                Get Started
+                Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
+          </div>
+          <p className="mt-4 text-sm text-primary-foreground/50">
+            No credit card. No app download. Just brackets.
+          </p>
+        </div>
+      </section>
+
+      {/* Why Not ESPN / Comparison Section */}
+      <section className="px-4 py-20 md:py-28">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="font-heading text-center text-3xl font-bold uppercase tracking-wide md:text-4xl">
+            Not Your Typical Bracket App
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
+            The big apps are built for millions of strangers. Bracketsball is
+            built for your crew.
+          </p>
+          <div className="mt-14 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="py-3 pr-4 font-semibold"></th>
+                  <th className="px-4 py-3 text-center font-heading text-lg font-bold text-brand-orange">
+                    Bracketsball
+                  </th>
+                  <th className="px-4 py-3 text-center font-heading text-lg font-bold text-muted-foreground">
+                    The Big Apps
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                <ComparisonRow
+                  feature="Multiple brackets per pool"
+                  detail="Up to 10 per person"
+                  us={true}
+                  them={false}
+                />
+                <ComparisonRow
+                  feature="Custom scoring rules"
+                  detail="Points per round, your way"
+                  us={true}
+                  them={false}
+                />
+                <ComparisonRow
+                  feature="Stats-based auto-fill"
+                  detail="Build a bracket strategy, not just chalk"
+                  us={true}
+                  them={false}
+                />
+                <ComparisonRow
+                  feature="No ads or data selling"
+                  detail="Indie-built, not corporate"
+                  us={true}
+                  them={false}
+                />
+                <ComparisonRow
+                  feature="No app download required"
+                  detail="Works in any browser"
+                  us={true}
+                  them={false}
+                />
+                <ComparisonRow
+                  feature="Live scoring"
+                  detail="Scores update as games happen"
+                  us={true}
+                  them={true}
+                />
+                <ComparisonRow
+                  feature="Pool standings"
+                  detail="See where everyone ranks"
+                  us={true}
+                  them={true}
+                />
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats-Based Generation Highlight */}
+      <section className="bg-secondary px-4 py-20 md:py-28">
+        <div className="container mx-auto max-w-5xl">
+          <div className="grid items-center gap-12 md:grid-cols-2">
+            <div>
+              <h2 className="font-heading text-3xl font-bold uppercase tracking-wide md:text-4xl">
+                Don&apos;t Just Pick Chalk.
+                <br />
+                <span className="text-brand-orange">Build a Strategy.</span>
+              </h2>
+              <p className="mt-4 text-muted-foreground">
+                Our stats-based bracket generator lets you auto-fill picks using
+                real team statistics. Weight what matters to you — offense,
+                defense, rebounding — and dial in your chaos level for upsets.
+              </p>
+              <ul className="mt-6 space-y-3">
+                <StatFeature text="10 stat categories with custom weights" />
+                <StatFeature text="Presets: Offense-Heavy, Defense-Heavy, Balanced, Hustle" />
+                <StatFeature text="Chaos control: pick your upset frequency" />
+                <StatFeature text="Or go manual — every pick auto-saves" />
+              </ul>
+            </div>
+            <div className="rounded-xl border bg-card p-6">
+              <StatsPreview />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Features */}
+      <section className="px-4 py-20 md:py-28">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="font-heading text-center text-3xl font-bold uppercase tracking-wide md:text-4xl">
+            Everything You Need, Nothing You Don&apos;t
+          </h2>
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <FeatureCard
+              icon={<Layers className="h-6 w-6 text-brand-orange" />}
+              title="Multiple Brackets"
+              description="Run up to 10 brackets per person in a single pool. Play chalk in one, go chaotic in another."
+            />
+            <FeatureCard
+              icon={<SlidersHorizontal className="h-6 w-6 text-brand-orange" />}
+              title="Custom Scoring"
+              description="Pool leaders set the points per round. Reward upsets, flatten the field, or go with the classic format."
+            />
+            <FeatureCard
+              icon={<Zap className="h-6 w-6 text-brand-orange" />}
+              title="Live Scoring"
+              description="Scores update automatically as game results come in. No refreshing, no manual tracking."
+            />
+            <FeatureCard
+              icon={<BarChart3 className="h-6 w-6 text-brand-orange" />}
+              title="Potential Points"
+              description="See what's still possible, not just current score. Know if you're alive or if it's over."
+            />
+            <FeatureCard
+              icon={<Share2 className="h-6 w-6 text-brand-orange" />}
+              title="One-Link Invites"
+              description="Share a link, your friends are in. No accounts to create first, no app to download."
+            />
+            <FeatureCard
+              icon={<Users className="h-6 w-6 text-brand-orange" />}
+              title="Built for Groups"
+              description="Pools of 2 to 100. Private by default. Made for the office pool, the family rivalry, the friend group."
+            />
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="px-4 py-20 md:py-28">
+      <section className="bg-secondary px-4 py-20 md:py-28">
         <div className="container mx-auto max-w-5xl">
           <h2 className="font-heading text-center text-3xl font-bold uppercase tracking-wide md:text-4xl">
-            How It Works
+            Ready in 3 Steps
           </h2>
           <div className="mt-14 grid gap-10 md:grid-cols-3">
             <Step
               number={1}
               icon={<Users className="h-8 w-8" />}
               title="Create a Pool"
-              description="Start a pool and invite your friends with a shareable link. Set your own rules and max bracket count."
+              description="Name it, set your scoring rules, and share the invite link."
             />
             <Step
               number={2}
               icon={<ClipboardList className="h-8 w-8" />}
               title="Fill Your Bracket"
-              description="Pick your winners for every game from the First Four to the Championship. Your picks auto-save as you go."
+              description="Pick winners from the First Four through the Championship. Use stats auto-fill or go with your gut."
             />
             <Step
               number={3}
               icon={<Trophy className="h-8 w-8" />}
-              title="Watch the Madness Unfold"
-              description="Scores update live as games are played. Track standings, compare brackets, and see who takes the crown."
+              title="Talk Trash, Win Glory"
+              description="Watch live scores roll in, track standings, and find out who really knows basketball."
             />
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="bg-secondary px-4 py-20 md:py-28">
-        <div className="container mx-auto max-w-5xl">
-          <h2 className="font-heading text-center text-3xl font-bold uppercase tracking-wide md:text-4xl">
-            Built for the Tournament
+      {/* Trust / Indie Section */}
+      <section className="px-4 py-20 md:py-28">
+        <div className="container mx-auto max-w-3xl text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-orange text-brand-orange-foreground">
+            <Heart className="h-8 w-8" />
+          </div>
+          <h2 className="font-heading mt-6 text-3xl font-bold uppercase tracking-wide md:text-4xl">
+            Built by a Fan, Not a Corporation
           </h2>
-          <div className="mt-14 grid gap-6 sm:grid-cols-2">
-            <FeatureCard
-              icon={<Zap className="h-6 w-6 text-brand-orange" />}
-              title="Live Scoring"
-              description="Bracket scores update automatically as game results come in. No manual tracking needed."
-            />
-            <FeatureCard
-              icon={<Users className="h-6 w-6 text-brand-orange" />}
-              title="Custom Pools"
-              description="Configure scoring rules, max brackets per person, and pool size. Your pool, your rules."
-            />
-            <FeatureCard
-              icon={<BarChart3 className="h-6 w-6 text-brand-orange" />}
-              title="Live Standings"
-              description="See where you rank with real-time standings. Track points earned and potential points remaining."
-            />
-            <FeatureCard
-              icon={<Share2 className="h-6 w-6 text-brand-orange" />}
-              title="Easy Invites"
-              description="Share a link and your friends are in. No app downloads, no complicated setup."
-            />
+          <p className="mt-4 text-muted-foreground">
+            Bracketsball is an indie project built because the big bracket sites
+            got too bloated, too ad-heavy, and too focused on massive public
+            pools nobody cares about. This is for your people.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-brand-orange" />
+              Free forever
+            </span>
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-brand-orange" />
+              No ads
+            </span>
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-brand-orange" />
+              No data selling
+            </span>
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-brand-orange" />
+              Open source
+            </span>
           </div>
         </div>
       </section>
@@ -178,8 +335,8 @@ export default async function Home() {
             March Madness Won&apos;t Wait
           </h2>
           <p className="mt-4 text-lg text-primary-foreground/80">
-            The tournament is coming. Get your pool set up and your brackets
-            filled before tip-off.
+            Get your pool set up in minutes. Invite your friends. Fill your
+            brackets. Let the madness begin.
           </p>
           <Button
             asChild
@@ -246,6 +403,118 @@ function FeatureCard({
   );
 }
 
+function ComparisonRow({
+  feature,
+  detail,
+  us,
+  them,
+}: {
+  feature: string;
+  detail: string;
+  us: boolean;
+  them: boolean;
+}) {
+  return (
+    <tr className="border-b">
+      <td className="py-3 pr-4">
+        <div className="font-medium">{feature}</div>
+        <div className="text-xs text-muted-foreground">{detail}</div>
+      </td>
+      <td className="px-4 py-3 text-center">
+        {us ? (
+          <>
+            <Check className="mx-auto h-5 w-5 text-brand-orange" />
+            <span className="sr-only">Yes</span>
+          </>
+        ) : (
+          <>
+            <X className="mx-auto h-5 w-5 text-muted-foreground/40" />
+            <span className="sr-only">No</span>
+          </>
+        )}
+      </td>
+      <td className="px-4 py-3 text-center">
+        {them ? (
+          <>
+            <Check className="mx-auto h-5 w-5 text-brand-orange" />
+            <span className="sr-only">Yes</span>
+          </>
+        ) : (
+          <>
+            <X className="mx-auto h-5 w-5 text-muted-foreground/40" />
+            <span className="sr-only">No</span>
+          </>
+        )}
+      </td>
+    </tr>
+  );
+}
+
+function StatFeature({ text }: { text: string }) {
+  return (
+    <li className="flex items-start gap-2">
+      <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange" />
+      <span className="text-sm">{text}</span>
+    </li>
+  );
+}
+
+function StatsPreview() {
+  const stats = [
+    { label: "PPG", value: 8 },
+    { label: "Opp PPG", value: 6 },
+    { label: "FG%", value: 4 },
+    { label: "3PT%", value: 3 },
+    { label: "Rebounds", value: 7 },
+    { label: "Assists", value: 5 },
+  ];
+
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-between">
+        <span className="font-heading text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          Stat Weights
+        </span>
+        <span className="rounded-full bg-brand-orange/10 px-3 py-1 text-xs font-medium text-brand-orange">
+          Offense-Heavy
+        </span>
+      </div>
+      <div className="space-y-3">
+        {stats.map((stat) => (
+          <div key={stat.label} className="flex items-center gap-3">
+            <span className="w-20 text-xs text-muted-foreground">
+              {stat.label}
+            </span>
+            <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
+              <div
+                className="absolute inset-y-0 left-0 rounded-full bg-brand-orange"
+                style={{ width: `${(stat.value / 10) * 100}%` }}
+              />
+            </div>
+            <span className="w-4 text-right text-xs font-medium">
+              {stat.value}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 flex items-center justify-between border-t pt-4">
+        <span className="text-xs text-muted-foreground">Chaos Level</span>
+        <div className="flex gap-1">
+          <span className="rounded bg-brand-orange px-2 py-0.5 text-xs font-medium text-brand-orange-foreground">
+            Low
+          </span>
+          <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+            Med
+          </span>
+          <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+            High
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BracketDecoration() {
   return (
     <svg
@@ -253,6 +522,7 @@ function BracketDecoration() {
       viewBox="0 0 800 800"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       {/* Left bracket lines */}
       <path
