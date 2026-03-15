@@ -30,6 +30,7 @@ interface CreatePoolUserInviteData {
   poolId: string;
   invitedBy: string;
   invitedUserId: string;
+  role: "leader" | "member";
 }
 
 export async function createPoolUserInvite(data: CreatePoolUserInviteData) {
@@ -39,6 +40,7 @@ export async function createPoolUserInvite(data: CreatePoolUserInviteData) {
       poolId: data.poolId,
       invitedBy: data.invitedBy,
       invitedUserId: data.invitedUserId,
+      role: data.role,
       status: "pending",
     })
     .returning();
@@ -57,6 +59,7 @@ export async function getPendingInvitesForUser(userId: string) {
       senderName: user.name,
       senderImage: user.image,
       senderUsername: user.username,
+      role: poolUserInvite.role,
       createdAt: poolUserInvite.createdAt,
     })
     .from(poolUserInvite)
@@ -99,6 +102,7 @@ export async function respondToPoolUserInvite(
         poolId: poolUserInvite.poolId,
         invitedUserId: poolUserInvite.invitedUserId,
         status: poolUserInvite.status,
+        role: poolUserInvite.role,
       })
       .from(poolUserInvite)
       .where(eq(poolUserInvite.id, inviteId))
@@ -165,11 +169,11 @@ export async function respondToPoolUserInvite(
         return { success: false, error: "This pool is full." };
       }
 
-      // Add user to pool
+      // Add user to pool with the role specified in the invite
       await tx.insert(poolMember).values({
         poolId: invite.poolId,
         userId,
-        role: "member",
+        role: invite.role,
       });
     }
 
@@ -188,6 +192,7 @@ export async function getSentInvitesForPool(poolId: string) {
     .select({
       id: poolUserInvite.id,
       status: poolUserInvite.status,
+      role: poolUserInvite.role,
       createdAt: poolUserInvite.createdAt,
       respondedAt: poolUserInvite.respondedAt,
       recipientName: user.name,

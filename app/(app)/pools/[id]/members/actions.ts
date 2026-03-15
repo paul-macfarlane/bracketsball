@@ -201,7 +201,11 @@ export async function searchUsersForInviteAction(
   return { success: true, users };
 }
 
-export async function sendPoolUserInviteAction(poolId: string, userId: string) {
+export async function sendPoolUserInviteAction(
+  poolId: string,
+  userId: string,
+  role: "leader" | "member" = "member",
+) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -212,7 +216,7 @@ export async function sendPoolUserInviteAction(poolId: string, userId: string) {
 
   const inputParsed = sendUserInviteInputSchema.safeParse({
     poolId,
-    formData: { userId },
+    formData: { userId, role },
   });
   if (!inputParsed.success) {
     return { error: "Invalid input" };
@@ -258,6 +262,7 @@ export async function sendPoolUserInviteAction(poolId: string, userId: string) {
     poolId: inputParsed.data.poolId,
     invitedBy: session.user.id,
     invitedUserId: inputParsed.data.formData.userId,
+    role: inputParsed.data.formData.role,
   });
 
   return { success: true };
