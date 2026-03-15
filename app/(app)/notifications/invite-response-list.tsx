@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Check, X, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { UserDisplay } from "@/components/user-display";
 import { respondToInviteAction } from "./actions";
 
@@ -17,6 +18,7 @@ interface PendingInvite {
   senderName: string;
   senderImage: string | null;
   senderUsername: string | null;
+  role: "leader" | "member";
   createdAt: Date;
 }
 
@@ -84,9 +86,16 @@ export function InviteResponseList({ invites }: InviteResponseListProps) {
                   size="sm"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
-                {new Date(invite.createdAt).toLocaleDateString()}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {new Date(invite.createdAt).toLocaleDateString()}
+                </p>
+                {invite.role === "leader" && (
+                  <Badge variant="default" className="text-xs">
+                    Leader
+                  </Badge>
+                )}
+              </div>
             </div>
             <div className="flex shrink-0 gap-2">
               <Button

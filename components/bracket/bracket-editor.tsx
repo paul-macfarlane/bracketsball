@@ -40,12 +40,16 @@ import {
   clearBracketAction,
 } from "@/app/(app)/pools/[id]/brackets/actions";
 import { CountdownTimer } from "@/components/countdown-timer";
-import type { AutoFillStrategy } from "@/lib/bracket-auto-fill";
+import type {
+  AutoFillStrategy,
+  StatsAutoFillConfig,
+} from "@/lib/bracket-auto-fill";
 import {
   getPointsForRound,
   calculateBracketScores,
   type PoolScoring,
 } from "@/lib/scoring";
+import { StatsAutoFillDialog } from "./stats-auto-fill-dialog";
 
 import { formatOrdinal } from "@/lib/utils";
 
@@ -90,6 +94,7 @@ export function BracketEditor({
   const [isPending, startTransition] = useTransition();
   const [isSubmitting, startSubmitTransition] = useTransition();
   const [status, setStatus] = useState(bracketStatus);
+  const [showStatsDialog, setShowStatsDialog] = useState(false);
 
   const {
     picks,
@@ -210,9 +215,16 @@ export function BracketEditor({
     });
   }
 
-  function handleAutoFill(strategy: AutoFillStrategy) {
+  function handleAutoFill(
+    strategy: AutoFillStrategy,
+    statsConfig?: StatsAutoFillConfig,
+  ) {
     startTransition(async () => {
-      const result = await autoFillBracketAction(bracketEntryId, strategy);
+      const result = await autoFillBracketAction(
+        bracketEntryId,
+        strategy,
+        statsConfig,
+      );
       if (result.error) {
         toast.error(result.error);
       } else if (result.picks) {
@@ -225,12 +237,19 @@ export function BracketEditor({
             ? "Chalk"
             : strategy === "weighted_random"
               ? "Weighted Random"
-              : "Random";
+              : strategy === "stats_custom"
+                ? "Custom Stats"
+                : "Random";
         toast.success(
           `Auto-filled ${result.picks.length} picks with ${strategyLabel} strategy.`,
         );
       }
     });
+  }
+
+  function handleStatsAutoFill(config: StatsAutoFillConfig) {
+    setShowStatsDialog(false);
+    handleAutoFill("stats_custom", config);
   }
 
   function handleClear() {
@@ -348,6 +367,9 @@ export function BracketEditor({
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleAutoFill("random")}>
                       Random (50/50)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setShowStatsDialog(true)}>
+                      Custom (Stats-Based)
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -475,6 +497,14 @@ export function BracketEditor({
           </p>
         )}
       </div>
+
+      {/* Stats-based auto-fill dialog */}
+      <StatsAutoFillDialog
+        open={showStatsDialog}
+        onOpenChange={setShowStatsDialog}
+        onGenerate={handleStatsAutoFill}
+        isPending={isPending}
+      />
     </div>
   );
 }

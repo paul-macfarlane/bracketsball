@@ -38,10 +38,38 @@ export const submitBracketSchema = z.object({
   bracketEntryId: z.string().min(1),
 });
 
-export const autoFillBracketSchema = z.object({
-  bracketEntryId: z.string().min(1),
-  strategy: z.enum(["chalk", "weighted_random", "random"]),
+const statWeightsSchema = z.object({
+  ppg: z.number().int().min(0).max(10),
+  oppPpg: z.number().int().min(0).max(10),
+  fgPct: z.number().int().min(0).max(10),
+  threePtPct: z.number().int().min(0).max(10),
+  ftPct: z.number().int().min(0).max(10),
+  reboundsPerGame: z.number().int().min(0).max(10),
+  assistsPerGame: z.number().int().min(0).max(10),
+  stealsPerGame: z.number().int().min(0).max(10),
+  blocksPerGame: z.number().int().min(0).max(10),
+  turnoversPerGame: z.number().int().min(0).max(10),
 });
+
+const statsConfigSchema = z.object({
+  weights: statWeightsSchema,
+  chaosLevel: z.enum(["low", "medium", "high"]),
+});
+
+export const autoFillBracketSchema = z
+  .object({
+    bracketEntryId: z.string().min(1),
+    strategy: z.enum(["chalk", "weighted_random", "random", "stats_custom"]),
+    statsConfig: statsConfigSchema.optional(),
+  })
+  .refine(
+    (data) =>
+      data.strategy !== "stats_custom" || data.statsConfig !== undefined,
+    {
+      message: "statsConfig is required for stats_custom strategy",
+      path: ["statsConfig"],
+    },
+  );
 
 export const clearBracketSchema = z.object({
   bracketEntryId: z.string().min(1),

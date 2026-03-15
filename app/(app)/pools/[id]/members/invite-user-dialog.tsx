@@ -14,6 +14,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { UserDisplay } from "@/components/user-display";
 import {
   searchUsersForInviteAction,
@@ -42,6 +49,7 @@ export function InviteUserDialog({
   const [searching, setSearching] = useState(false);
   const [invitedIds, setInvitedIds] = useState<Set<string>>(new Set());
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const [role, setRole] = useState<"member" | "leader">("member");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const search = useCallback(
@@ -89,7 +97,7 @@ export function InviteUserDialog({
 
   async function handleInvite(userId: string) {
     setSendingId(userId);
-    const result = await sendPoolUserInviteAction(poolId, userId);
+    const result = await sendPoolUserInviteAction(poolId, userId, role);
     setSendingId(null);
 
     if ("error" in result) {
@@ -108,6 +116,7 @@ export function InviteUserDialog({
       setQuery("");
       setResults([]);
       setInvitedIds(new Set());
+      setRole("member");
     }
   }
 
@@ -137,6 +146,22 @@ export function InviteUserDialog({
               onChange={(e) => setQuery(e.target.value)}
               className="pl-9"
             />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Invite as:</label>
+            <Select
+              value={role}
+              onValueChange={(v) => setRole(v as "member" | "leader")}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="leader">Leader</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="max-h-64 min-h-[100px] overflow-y-auto">

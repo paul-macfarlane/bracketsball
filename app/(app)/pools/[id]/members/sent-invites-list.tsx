@@ -20,6 +20,7 @@ import { cancelPoolUserInviteAction } from "./actions";
 interface SentInvite {
   id: string;
   status: "pending" | "accepted" | "declined";
+  role: "leader" | "member";
   createdAt: Date;
   respondedAt: Date | null;
   recipientName: string;
@@ -99,6 +100,11 @@ export function SentInvitesList({
                   size="sm"
                 />
                 <div className="ml-auto flex shrink-0 items-center gap-1.5">
+                  <Badge
+                    variant={invite.role === "leader" ? "default" : "secondary"}
+                  >
+                    {invite.role}
+                  </Badge>
                   <Badge variant={statusVariant(invite.status)}>
                     {invite.status}
                   </Badge>

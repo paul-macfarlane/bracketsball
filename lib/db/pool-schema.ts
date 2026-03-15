@@ -128,6 +128,7 @@ export const poolUserInvite = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     status: poolUserInviteStatusEnum("status").notNull().default("pending"),
+    role: poolMemberRoleEnum("role").notNull().default("member"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     respondedAt: timestamp("responded_at"),
   },

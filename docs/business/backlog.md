@@ -375,7 +375,19 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - **No data deletion** — previous tournament bracket entries remain in the database; they are simply not displayed in the current tournament view
 - **Future-compatible** — the approach should not preclude adding historical tournament views to pools later (e.g., a "Past Seasons" tab)
 
-### 44. Stats-Based Bracket Generation (Non-MVP) — Epic: Auto-Fill Bracket
+### 48. Direct Invite Role Selection (Non-MVP) ✅ — Epic: Pool Members
+
+**As a** pool leader, **I want to** specify the role (member or leader) when sending a direct user invite **so that** I can invite someone directly as a leader without having to change their role after they join.
+
+**Acceptance Criteria:**
+
+- When sending a direct user invite, the leader can choose whether the invitee will join as "member" (default) or "leader"
+- The selected role is stored on the invite and used when the invite is accepted
+- The sent invites list shows the assigned role for each invite
+- The invite notification shown to the recipient indicates when they are being invited as a leader
+- Existing invites default to "member" role (backward compatible)
+
+### 44. Stats-Based Bracket Generation (Non-MVP) ✅ — Epic: Auto-Fill Bracket
 
 **As a** pool member, **I want to** generate bracket picks based on team stats with customizable category weights **so that** I can create data-driven brackets tailored to my strategy preferences.
 
@@ -804,7 +816,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 41  | Unused Code Enforcement & Cleanup     | Tech Debt               | No  | Not Started |
 | 42  | Codebase Standards Audit              | Tech Debt               | No  | Not Started |
 | 43  | Improved Delete Confirmations         | UX                      | No  | Done        |
-| 44  | Stats-Based Bracket Generation        | Auto-Fill Bracket       | No  | Not Started |
+| 44  | Stats-Based Bracket Generation        | Auto-Fill Bracket       | No  | Done        |
 | 45  | Dark/Light Mode Team Icons            | Bracket UX Enhancements | No  | Done        |
 | 47  | Filter Pool Data by Active Tournament | Multi-Season Support    | No  | Done        |
 | 17  | In-App User Invites                   | Pool Members            | No  | Done        |
@@ -817,4 +829,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)       | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages                 | Branding                | No  | Done        |
 
-**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 27 stories (23 done, 4 remaining)**
+**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 27 stories (24 done, 3 remaining)**

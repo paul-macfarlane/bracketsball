@@ -1,0 +1,1 @@
+ALTER TABLE "pool_user_invite" ADD COLUMN IF NOT EXISTS "role" "pool_member_role" DEFAULT 'member' NOT NULL;
