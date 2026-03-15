@@ -30,6 +30,7 @@ import {
 import {
   autoFillBracket,
   type AutoFillStrategy,
+  type StatsAutoFillConfig,
 } from "@/lib/bracket-auto-fill";
 import type { BracketTeam } from "@/components/bracket/types";
 import {
@@ -361,6 +362,7 @@ export async function deleteBracketEntryAction(bracketEntryId: string) {
 export async function autoFillBracketAction(
   bracketEntryId: string,
   strategy: AutoFillStrategy,
+  statsConfig?: StatsAutoFillConfig,
 ) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -373,6 +375,7 @@ export async function autoFillBracketAction(
   const parsed = autoFillBracketSchema.safeParse({
     bracketEntryId,
     strategy,
+    statsConfig,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
@@ -394,6 +397,7 @@ export async function autoFillBracketAction(
     getPicksForEntry(parsed.data.bracketEntryId),
   ]);
 
+  const isStatsStrategy = parsed.data.strategy === "stats_custom";
   const tournamentTeams: BracketTeam[] = tournamentTeamsRaw.map((tt) => ({
     id: tt.teamId,
     name: tt.teamName,
@@ -404,6 +408,27 @@ export async function autoFillBracketAction(
     darkLogoUrl: tt.teamDarkLogoUrl,
     seed: tt.seed,
     region: tt.region,
+    ...(isStatsStrategy && {
+      stats: {
+        overallWins: tt.overallWins,
+        overallLosses: tt.overallLosses,
+        conferenceWins: tt.conferenceWins,
+        conferenceLosses: tt.conferenceLosses,
+        conferenceName: tt.conferenceName,
+        ppg: tt.ppg,
+        oppPpg: tt.oppPpg,
+        fgPct: tt.fgPct,
+        threePtPct: tt.threePtPct,
+        ftPct: tt.ftPct,
+        reboundsPerGame: tt.reboundsPerGame,
+        assistsPerGame: tt.assistsPerGame,
+        stealsPerGame: tt.stealsPerGame,
+        blocksPerGame: tt.blocksPerGame,
+        turnoversPerGame: tt.turnoversPerGame,
+        apRanking: tt.apRanking,
+        strengthOfSchedule: tt.strengthOfSchedule,
+      },
+    }),
   }));
 
   const bracketPicks = existingPicks.map((p) => ({
@@ -416,6 +441,7 @@ export async function autoFillBracketAction(
     tournamentTeams,
     bracketPicks,
     parsed.data.strategy,
+    parsed.data.statsConfig,
   );
 
   if (result.picks.length === 0) {
