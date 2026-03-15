@@ -41,9 +41,11 @@ export async function getPoolInviteByCode(code: string) {
       poolName: pool.name,
       poolImageUrl: pool.imageUrl,
       poolMaxParticipants: pool.maxParticipants,
+      inviterName: user.name,
     })
     .from(poolInvite)
     .innerJoin(pool, eq(poolInvite.poolId, pool.id))
+    .innerJoin(user, eq(poolInvite.createdBy, user.id))
     .where(eq(poolInvite.code, code))
     .limit(1);
 

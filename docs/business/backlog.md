@@ -789,6 +789,19 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Current page is shown as non-linked text; parent pages are clickable links
 - Consistent placement across all pages
 
+### 50. Seamless Invite Link Flow for Unauthed / New Users (Non-MVP) — Epic: Pool Members
+
+**As a** user who received an invite link, **I want to** see the pool details before signing in, and be automatically joined to the pool after I sign in or sign up **so that** accepting an invite is frictionless even if I don't have an account yet.
+
+**Acceptance Criteria:**
+
+- Unauthed users visiting an invite link can see a public preview of the invite (pool name, inviter info, role they'll join as) without being redirected to login
+- The preview page includes a CTA to sign in / sign up to accept the invite
+- After the user authenticates (sign in or first-time sign up via OAuth), they are automatically joined to the pool — no additional "Join Pool" button click required
+- After auto-join, the user is redirected to the pool detail page
+- Standard invite validations still apply (expired, max uses reached, pool full, tournament started, already a member) and are shown on the public preview when applicable
+- If the invite is invalid or expired, the unauthed user sees a clear error message without needing to sign in first
+
 ---
 
 ## Summary
@@ -845,5 +858,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 30  | Icon Pack (Favicon, App, OAuth)       | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages                 | Branding                | No  | Done        |
 | 49  | Splash Page Differentiation           | Branding                | No  | Done        |
+| 50  | Seamless Invite Flow for Unauthed     | Pool Members            | No  | Done        |
 
-**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 28 stories (28 done, 0 remaining)**
+**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 29 stories (29 done, 0 remaining)**
