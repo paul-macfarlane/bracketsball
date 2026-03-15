@@ -66,7 +66,7 @@ export default async function TournamentTeamsPage({
       </div>
 
       {locked && (
-        <div className="mb-6 rounded-md border border-yellow-500/50 bg-yellow-500/10 p-4 text-sm text-yellow-700 dark:text-yellow-400">
+        <div className="mb-6 rounded-md border border-warning/50 bg-warning/10 p-4 text-sm text-warning-foreground">
           Team roster is locked because one or more games have started. Reset
           all games to scheduled to make changes.
         </div>

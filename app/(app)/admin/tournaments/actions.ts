@@ -97,36 +97,38 @@ async function syncBracketTeams(tournamentId: string) {
 
   const r64Games = games.filter((g) => g.round === "round_of_64");
 
-  for (const game of r64Games) {
-    if (game.status !== "scheduled") continue;
-    if (!game.region) continue;
+  await db.transaction(async (tx) => {
+    for (const game of r64Games) {
+      if (game.status !== "scheduled") continue;
+      if (!game.region) continue;
 
-    const region = game.region;
-    const matchup = R64_SEED_MATCHUPS[game.gameNumber - 1];
-    if (!matchup) continue;
+      const region = game.region;
+      const matchup = R64_SEED_MATCHUPS[game.gameNumber - 1];
+      if (!matchup) continue;
 
-    const [highSeed, lowSeed] = matchup;
-    const seeds = teamLookup.get(region);
-    const ffSeeds = firstFourSeeds.get(region) ?? new Set();
+      const [highSeed, lowSeed] = matchup;
+      const seeds = teamLookup.get(region);
+      const ffSeeds = firstFourSeeds.get(region) ?? new Set();
 
-    // If this seed has a First Four game feeding into it, don't override the team
-    // (it comes from a sourceGame reference instead)
-    const team1Id =
-      game.sourceGame1Id || ffSeeds.has(highSeed)
-        ? game.team1Id
-        : (seeds?.get(highSeed) ?? null);
-    const team2Id =
-      game.sourceGame2Id || ffSeeds.has(lowSeed)
-        ? game.team2Id
-        : (seeds?.get(lowSeed) ?? null);
+      // If this seed has a First Four game feeding into it, don't override the team
+      // (it comes from a sourceGame reference instead)
+      const team1Id =
+        game.sourceGame1Id || ffSeeds.has(highSeed)
+          ? game.team1Id
+          : (seeds?.get(highSeed) ?? null);
+      const team2Id =
+        game.sourceGame2Id || ffSeeds.has(lowSeed)
+          ? game.team2Id
+          : (seeds?.get(lowSeed) ?? null);
 
-    if (team1Id !== game.team1Id || team2Id !== game.team2Id) {
-      await db
-        .update(tournamentGame)
-        .set({ team1Id, team2Id })
-        .where(eq(tournamentGame.id, game.id));
+      if (team1Id !== game.team1Id || team2Id !== game.team2Id) {
+        await tx
+          .update(tournamentGame)
+          .set({ team1Id, team2Id })
+          .where(eq(tournamentGame.id, game.id));
+      }
     }
-  }
+  });
 }
 
 export async function createTournamentAction(formData: unknown) {
@@ -299,23 +301,25 @@ export async function updateBracketPositionsAction(
           (a, b) => a.gameNumber - b.gameNumber,
         );
 
-        // FF game 1 (left side): top-left vs bottom-left
-        await db
-          .update(tournamentGame)
-          .set({
-            sourceGame1Id: topLeftE8.id,
-            sourceGame2Id: bottomLeftE8.id,
-          })
-          .where(eq(tournamentGame.id, sorted[0].id));
+        await db.transaction(async (tx) => {
+          // FF game 1 (left side): top-left vs bottom-left
+          await tx
+            .update(tournamentGame)
+            .set({
+              sourceGame1Id: topLeftE8.id,
+              sourceGame2Id: bottomLeftE8.id,
+            })
+            .where(eq(tournamentGame.id, sorted[0].id));
 
-        // FF game 2 (right side): top-right vs bottom-right
-        await db
-          .update(tournamentGame)
-          .set({
-            sourceGame1Id: topRightE8.id,
-            sourceGame2Id: bottomRightE8.id,
-          })
-          .where(eq(tournamentGame.id, sorted[1].id));
+          // FF game 2 (right side): top-right vs bottom-right
+          await tx
+            .update(tournamentGame)
+            .set({
+              sourceGame1Id: topRightE8.id,
+              sourceGame2Id: bottomRightE8.id,
+            })
+            .where(eq(tournamentGame.id, sorted[1].id));
+        });
       }
     }
   }

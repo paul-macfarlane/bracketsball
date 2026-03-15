@@ -8,7 +8,7 @@ import { db } from "@/lib/db";
 import { team, tournamentTeam } from "@/lib/db/schema";
 import { fetchAllTeamStats, type TeamStats } from "./espn-team-stats";
 
-export interface TeamStatsSyncResult {
+interface TeamStatsSyncResult {
   teamsUpdated: number;
   teamsSkipped: number;
   errors: string[];

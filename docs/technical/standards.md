@@ -85,6 +85,24 @@ docs/                   # Documentation
 - **Never skip `db:generate`.** Applying schema changes without a migration file means there's no version-controlled record of the change and production deployments will be out of sync.
 - All queries go through dedicated functions in `lib/db/queries/` — no inline SQL in components or route handlers.
 - **Use transactions for multi-step writes.** Any function that performs more than one database write (insert, update, or delete) must wrap them in `db.transaction(async (tx) => { ... })`. Use `tx` instead of `db` for all queries inside the transaction. This ensures atomicity — either all writes succeed or none do.
+- **`DbClient` pattern for composable transactions.** Query functions that may be called standalone OR as part of a larger transaction should accept an optional `client: DbClient = db` parameter (imported from `@/lib/db`). When the caller provides a transaction client, the function participates in the caller's transaction. When called standalone, it manages its own transaction. Pattern:
+
+  ```typescript
+  import { db, type DbClient } from "@/lib/db";
+
+  export async function myFunction(id: string, client: DbClient = db) {
+    const doWork = async (tx: DbClient) => {
+      // use tx for all queries
+    };
+    if (client === db) {
+      await db.transaction(doWork);
+    } else {
+      await doWork(client);
+    }
+  }
+  ```
+
+- **No speculative exports.** Exported functions and types must have at least one consumer. Use `pnpm knip` to detect unused exports. If a function is only used within its own file, don't export it.
 - Always parameterize queries. Never interpolate user input into SQL strings.
 - Use raw SQL only for complex queries that Drizzle can't express cleanly.
 
@@ -127,7 +145,8 @@ docs/                   # Documentation
 
 - **ESLint**: `eslint-config-next` (core-web-vitals + typescript) + `eslint-config-prettier` (already configured).
 - **Prettier**: Default config. Run `pnpm format` before committing.
-- All code must pass `pnpm lint` and `pnpm build` (type-checking) with zero errors.
+- **Knip**: Detects unused exports, unused files, and dead code. Run `pnpm knip` before committing. Config in `knip.config.ts`. ShadCN UI components (`components/ui/`) are excluded since they're CLI-managed.
+- All code must pass `pnpm lint`, `pnpm build` (type-checking), and `pnpm knip` with zero errors.
 
 ## Git
 

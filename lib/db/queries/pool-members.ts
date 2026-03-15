@@ -64,15 +64,6 @@ export async function getLeaderCount(poolId: string) {
   return result.count;
 }
 
-export async function getPoolMemberCount(poolId: string) {
-  const [result] = await db
-    .select({ count: count() })
-    .from(poolMember)
-    .where(eq(poolMember.poolId, poolId));
-
-  return result.count;
-}
-
 export async function leavePool(
   poolId: string,
   userId: string,

@@ -71,8 +71,6 @@ export const updateGameSchema = z.object({
   venueState: z.string().max(100).nullable().optional(),
 });
 
-export type UpdateGameFormValues = z.infer<typeof updateGameSchema>;
-
 export const updateTournamentTeamStatsSchema = z.object({
   overallWins: z.number().int().min(0).nullable().optional(),
   overallLosses: z.number().int().min(0).nullable().optional(),
@@ -116,5 +114,3 @@ export const bracketPositionsSchema = z
     },
     { message: "All four regions must be different" },
   );
-
-export type BracketPositionsFormValues = z.infer<typeof bracketPositionsSchema>;

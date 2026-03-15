@@ -133,7 +133,7 @@ export function BracketViewer({
             {rankInfo && (
               <>
                 <span className="font-semibold">
-                  {formatOrdinal(rankInfo.rank)}/{rankInfo.totalEntries}
+                  {formatOrdinal(rankInfo.rank)}
                 </span>
                 <span className="text-muted-foreground">|</span>
               </>

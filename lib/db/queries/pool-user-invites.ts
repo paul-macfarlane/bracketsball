@@ -191,17 +191,20 @@ export async function getSentInvitesForPool(poolId: string) {
   return db
     .select({
       id: poolUserInvite.id,
-      status: poolUserInvite.status,
       role: poolUserInvite.role,
       createdAt: poolUserInvite.createdAt,
-      respondedAt: poolUserInvite.respondedAt,
       recipientName: user.name,
       recipientImage: user.image,
       recipientUsername: user.username,
     })
     .from(poolUserInvite)
     .innerJoin(user, eq(poolUserInvite.invitedUserId, user.id))
-    .where(eq(poolUserInvite.poolId, poolId))
+    .where(
+      and(
+        eq(poolUserInvite.poolId, poolId),
+        eq(poolUserInvite.status, "pending"),
+      ),
+    )
     .orderBy(poolUserInvite.createdAt);
 }
 

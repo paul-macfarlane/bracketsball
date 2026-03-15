@@ -35,6 +35,7 @@ Run these commands sequentially and report results:
 1. `pnpm format` — auto-format all files
 2. `pnpm lint` — must pass with zero errors and zero warnings
 3. `pnpm build` — must compile with zero TypeScript errors
+4. `pnpm knip` — must pass with zero unused exports or files
 
 If any check fails, fix the issue and re-run until all pass.
 
@@ -58,6 +59,7 @@ Add a `## Verification` section to the task file:
 - Format: run
 - Lint: pass/fail
 - Build: pass/fail
+- Knip: pass/fail
 - Acceptance criteria: all met / <list gaps>
 ```
 

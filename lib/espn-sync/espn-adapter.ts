@@ -118,7 +118,7 @@ function parseEvent(event: ESPNEvent): SyncGame | null {
   };
 }
 
-export async function fetchESPNScoreboard(
+async function fetchESPNScoreboard(
   date: string,
 ): Promise<ESPNScoreboardResponse> {
   const dateFormatted = date.replace(/-/g, "");

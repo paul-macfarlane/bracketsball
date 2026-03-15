@@ -19,10 +19,8 @@ import { cancelPoolUserInviteAction } from "./actions";
 
 interface SentInvite {
   id: string;
-  status: "pending" | "accepted" | "declined";
   role: "leader" | "member";
   createdAt: Date;
-  respondedAt: Date | null;
   recipientName: string;
   recipientImage: string | null;
   recipientUsername: string | null;
@@ -51,17 +49,6 @@ export function SentInvitesList({
     router.refresh();
   }
 
-  const statusVariant = (status: SentInvite["status"]) => {
-    switch (status) {
-      case "pending":
-        return "secondary" as const;
-      case "accepted":
-        return "default" as const;
-      case "declined":
-        return "destructive" as const;
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -83,8 +70,7 @@ export function SentInvitesList({
       <CardContent>
         {invites.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No user invites sent yet. Use the button above to invite users
-            directly.
+            No pending invites. Use the button above to invite users directly.
           </p>
         ) : (
           <div className="space-y-2">
@@ -105,19 +91,14 @@ export function SentInvitesList({
                   >
                     {invite.role}
                   </Badge>
-                  <Badge variant={statusVariant(invite.status)}>
-                    {invite.status}
-                  </Badge>
-                  {invite.status === "pending" && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => handleCancel(invite.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleCancel(invite.id)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}

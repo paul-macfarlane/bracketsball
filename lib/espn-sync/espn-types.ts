@@ -36,7 +36,7 @@ export interface ESPNCompetition {
   status: ESPNStatus;
 }
 
-export interface ESPNVenue {
+interface ESPNVenue {
   fullName?: string;
   address?: {
     city?: string;
@@ -44,7 +44,7 @@ export interface ESPNVenue {
   };
 }
 
-export interface ESPNCompetitor {
+interface ESPNCompetitor {
   id: string;
   team: ESPNTeam;
   score?: string;
@@ -55,7 +55,7 @@ export interface ESPNCompetitor {
   order?: number;
 }
 
-export interface ESPNTeam {
+interface ESPNTeam {
   id: string;
   location: string;
   name: string;
@@ -65,7 +65,7 @@ export interface ESPNTeam {
   logo?: string;
 }
 
-export interface ESPNNote {
+interface ESPNNote {
   type?: string;
   headline?: string;
 }

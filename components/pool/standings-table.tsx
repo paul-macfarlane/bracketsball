@@ -15,7 +15,7 @@ import {
 import { UserDisplay } from "@/components/user-display";
 import { TeamLogo } from "@/components/team-logo";
 
-export interface StandingsEntry {
+interface StandingsEntry {
   id: string;
   name: string;
   totalPoints: number;

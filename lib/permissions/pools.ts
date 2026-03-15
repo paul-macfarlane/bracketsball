@@ -2,7 +2,7 @@ type PoolMemberRole = "leader" | "member";
 
 // --- Pool Actions (server actions / mutations) ---
 
-export type PoolAction =
+type PoolAction =
   | "update-settings"
   | "delete-pool"
   | "create-invite"
@@ -32,7 +32,7 @@ export function canPerformPoolAction(
 
 // --- Pool Pages (read access / visibility) ---
 
-export type PoolPage = "detail" | "settings";
+type PoolPage = "detail" | "settings";
 // Future pages will be added here as stories are implemented
 
 const poolPagePermissions: Record<PoolPage, Set<PoolMemberRole>> = {

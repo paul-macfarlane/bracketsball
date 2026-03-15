@@ -450,14 +450,3 @@ export async function getPoolStandings(
 
   return ranked;
 }
-
-export async function deleteBracketEntriesForMember(
-  poolId: string,
-  userId: string,
-) {
-  await db
-    .delete(bracketEntry)
-    .where(
-      and(eq(bracketEntry.poolId, poolId), eq(bracketEntry.userId, userId)),
-    );
-}
