@@ -426,6 +426,22 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
   - Clicking it uses the stats-based logic (with the user's last-used preset/custom config and chaos level) to auto-pick the winner for that single game
   - If no prior config has been set, defaults to Balanced preset with Low chaos
 
+### 49. Splash Page Differentiation & Redesign (Non-MVP) ✅ — Epic: Branding
+
+**As a** visitor, **I want** the splash page to clearly communicate what makes Bracketsball different from ESPN, Yahoo, and CBS bracket apps **so that** I understand why I should use it over the competition.
+
+**Acceptance Criteria:**
+
+- Hero section communicates indie/friend-group positioning (not generic "bracket app" messaging)
+- Comparison section highlights key differentiators vs. big bracket apps (multiple brackets per pool, custom scoring, stats-based generation, no ads)
+- Stats-based bracket generation feature is prominently showcased with a visual preview of the weight/chaos controls
+- Feature cards highlight unique capabilities (multiple brackets, custom scoring, potential points tracking, built for groups)
+- Trust/indie section communicates that Bracketsball is fan-built, free, ad-free, and open source
+- How It Works section is retained and tightened
+- Final CTA with urgency messaging is retained
+- Accessibility: screen reader text on comparison icons, decorative SVG has aria-hidden
+- Page builds and passes lint with zero errors
+
 ### 25. Auto-Fill Bracket Picks (Non-MVP) — Epic: Auto-Fill Bracket
 
 **As a** pool member, **I want to** auto-fill my bracket with generated picks **so that** I can quickly create an entry without manually picking every game.
@@ -828,5 +844,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 29  | App Theme & Design System             | Branding                | No  | Done        |
 | 30  | Icon Pack (Favicon, App, OAuth)       | Branding                | No  | Done        |
 | 31  | Legal & Contact Pages                 | Branding                | No  | Done        |
+| 49  | Splash Page Differentiation           | Branding                | No  | Done        |
 
-**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 27 stories (24 done, 3 remaining)**
+**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 28 stories (25 done, 3 remaining)**
