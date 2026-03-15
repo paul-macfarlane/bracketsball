@@ -343,7 +343,7 @@ async function fetchAPRankings(season?: number): Promise<Map<string, number>> {
 /**
  * Fetch stats for a single team from ESPN.
  */
-export async function fetchTeamStats(
+async function fetchTeamStats(
   espnId: string,
   apRankings?: Map<string, number>,
   season?: number,

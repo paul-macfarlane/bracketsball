@@ -5,8 +5,17 @@ import { toast } from "sonner";
 
 import { deletePoolAction } from "./actions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Card,
   CardContent,
@@ -22,19 +31,16 @@ export function DeletePoolForm({
   poolId: string;
   poolName: string;
 }) {
-  const [confirmation, setConfirmation] = useState("");
   const [isPending, setIsPending] = useState(false);
-
-  const isConfirmed = confirmation === poolName;
+  const [open, setOpen] = useState(false);
 
   async function handleDelete() {
-    if (!isConfirmed) return;
-
     setIsPending(true);
     try {
       const result = await deletePoolAction(poolId);
       if (result?.error) {
         toast.error(result.error);
+        setOpen(false);
       }
     } catch {
       // redirect throws in server actions, which is expected
@@ -52,28 +58,37 @@ export function DeletePoolForm({
           cannot be undone.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="delete-confirmation">
-            Type the pool name{" "}
-            <span className="font-mono font-bold">{poolName}</span> to confirm
-          </Label>
-          <Input
-            id="delete-confirmation"
-            value={confirmation}
-            onChange={(e) => setConfirmation(e.target.value)}
-            placeholder={poolName}
-            autoComplete="off"
-          />
-        </div>
-        <Button
-          variant="destructive"
-          className="w-full"
-          disabled={!isConfirmed || isPending}
-          onClick={handleDelete}
-        >
-          {isPending ? "Deleting..." : "Delete Pool"}
-        </Button>
+      <CardContent>
+        <AlertDialog open={open} onOpenChange={setOpen}>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" className="w-full">
+              Delete Pool
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete &quot;{poolName}&quot; and all
+                associated data including bracket entries and member data. This
+                action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDelete();
+                }}
+                disabled={isPending}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isPending ? "Deleting..." : "Delete Pool"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );

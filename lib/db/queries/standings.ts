@@ -1,6 +1,6 @@
 import { eq, inArray } from "drizzle-orm";
 
-import { db } from "@/lib/db";
+import { db, type DbClient } from "@/lib/db";
 import {
   bracketEntry,
   bracketPick,
@@ -9,12 +9,15 @@ import {
 } from "@/lib/db/schema";
 import { calculateBracketScores, type PoolScoring } from "@/lib/scoring";
 
-export async function syncStandingsForTournament(tournamentId: string) {
+export async function syncStandingsForTournament(
+  tournamentId: string,
+  client: DbClient = db,
+) {
   // Get all pools (every pool uses the active tournament)
-  const pools = await db.select().from(pool);
+  const pools = await client.select().from(pool);
 
   // Get all games for this tournament
-  const games = await db
+  const games = await client
     .select({
       id: tournamentGame.id,
       round: tournamentGame.round,
@@ -27,7 +30,7 @@ export async function syncStandingsForTournament(tournamentId: string) {
     .where(eq(tournamentGame.tournamentId, tournamentId));
 
   // Get all bracket entries for this tournament
-  const entries = await db
+  const entries = await client
     .select()
     .from(bracketEntry)
     .where(eq(bracketEntry.tournamentId, tournamentId));
@@ -36,7 +39,7 @@ export async function syncStandingsForTournament(tournamentId: string) {
 
   // Get picks only for this tournament's entries (not all picks globally)
   const entryIds = entries.map((e) => e.id);
-  const allPicks = await db
+  const allPicks = await client
     .select({
       bracketEntryId: bracketPick.bracketEntryId,
       tournamentGameId: bracketPick.tournamentGameId,
@@ -75,23 +78,32 @@ export async function syncStandingsForTournament(tournamentId: string) {
 
   // Calculate and update scores for each entry
   let updatedCount = 0;
-  for (const entry of entries) {
-    const entryPicks = picksByEntry.get(entry.id) ?? [];
-    const poolScoring = poolScoringMap.get(entry.poolId);
-    if (!poolScoring) continue;
 
-    const { totalPoints, potentialPoints } = calculateBracketScores(
-      games,
-      entryPicks,
-      poolScoring,
-    );
+  const doWork = async (tx: DbClient) => {
+    for (const entry of entries) {
+      const entryPicks = picksByEntry.get(entry.id) ?? [];
+      const poolScoring = poolScoringMap.get(entry.poolId);
+      if (!poolScoring) continue;
 
-    await db
-      .update(bracketEntry)
-      .set({ totalPoints, potentialPoints })
-      .where(eq(bracketEntry.id, entry.id));
+      const { totalPoints, potentialPoints } = calculateBracketScores(
+        games,
+        entryPicks,
+        poolScoring,
+      );
 
-    updatedCount++;
+      await tx
+        .update(bracketEntry)
+        .set({ totalPoints, potentialPoints })
+        .where(eq(bracketEntry.id, entry.id));
+
+      updatedCount++;
+    }
+  };
+
+  if (client === db) {
+    await db.transaction(doWork);
+  } else {
+    await doWork(client);
   }
 
   return { updatedCount };

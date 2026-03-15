@@ -22,10 +22,7 @@ export const poolUserInviteStatusEnum = pgEnum("pool_user_invite_status", [
   "declined",
 ]);
 
-export const poolMemberRoleEnum = pgEnum("pool_member_role", [
-  "leader",
-  "member",
-]);
+const poolMemberRoleEnum = pgEnum("pool_member_role", ["leader", "member"]);
 
 export const pool = pgTable("pool", {
   id: text("id")

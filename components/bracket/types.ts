@@ -75,10 +75,3 @@ export const ROUND_LABELS: Record<string, string> = {
   final_four: "Final Four",
   championship: "Championship",
 };
-
-export const REGION_LABELS: Record<string, string> = {
-  south: "South",
-  east: "East",
-  west: "West",
-  midwest: "Midwest",
-};

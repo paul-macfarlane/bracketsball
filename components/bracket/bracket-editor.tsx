@@ -40,6 +40,7 @@ import {
   clearBracketAction,
 } from "@/app/(app)/pools/[id]/brackets/actions";
 import { CountdownTimer } from "@/components/countdown-timer";
+import { AlertTriangle } from "lucide-react";
 import type {
   AutoFillStrategy,
   StatsAutoFillConfig,
@@ -294,6 +295,19 @@ export function BracketEditor({
         </div>
       )}
 
+      {/* Draft warning banner */}
+      {!isSubmitted && !isLocked && (
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm font-medium text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>
+            Your bracket is not submitted yet.{" "}
+            {isComplete
+              ? 'Scroll down and click "Submit Bracket" to lock in your picks.'
+              : `Complete all ${totalGames} picks and enter a tiebreaker score, then submit below.`}
+          </span>
+        </div>
+      )}
+
       {/* Header — stacks vertically on mobile */}
       <StickySubHeader className="py-2 md:py-3">
         {poolName && (
@@ -316,8 +330,15 @@ export function BracketEditor({
               maxLength={100}
               className="min-w-0 flex-1"
             />
-            <Badge variant={isSubmitted ? "default" : "secondary"}>
-              {isSubmitted ? "Submitted" : "Draft"}
+            <Badge
+              variant={isSubmitted ? "default" : "outline"}
+              className={
+                isSubmitted
+                  ? ""
+                  : "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/50 dark:text-amber-300"
+              }
+            >
+              {isSubmitted ? "Submitted" : "Not Submitted"}
             </Badge>
           </div>
 
@@ -327,7 +348,7 @@ export function BracketEditor({
               {rankInfo && (
                 <>
                   <span className="font-semibold">
-                    {formatOrdinal(rankInfo.rank)}/{rankInfo.totalEntries}
+                    {formatOrdinal(rankInfo.rank)}
                   </span>
                   <span className="text-muted-foreground">|</span>
                 </>
@@ -341,12 +362,16 @@ export function BracketEditor({
                   <span className="text-muted-foreground">
                     {scores.potentialPoints} pot
                   </span>
-                  <span className="text-muted-foreground">|</span>
+                  {!isSubmitted && (
+                    <span className="text-muted-foreground">|</span>
+                  )}
                 </>
               )}
-              <span className="text-muted-foreground">
-                {pickedGames}/{totalGames} picks
-              </span>
+              {!isSubmitted && (
+                <span className="text-muted-foreground">
+                  {pickedGames}/{totalGames} picks
+                </span>
+              )}
             </div>
             <div className="ml-auto flex items-center gap-2">
               {!isDisabled && (
@@ -453,8 +478,8 @@ export function BracketEditor({
         roundPointsMap={roundPointsMap}
       />
 
-      {/* Tiebreaker + Submit */}
-      <div className="mt-6 rounded-lg border border-border bg-card p-4">
+      {/* Tiebreaker + Submit — sticky at the bottom */}
+      <div className="sticky bottom-0 z-30 mt-6 border-t border-border bg-card p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex-1">
             <label
@@ -484,8 +509,14 @@ export function BracketEditor({
             <Button
               onClick={handleSubmit}
               disabled={!isComplete || isSubmitting || isSubmitted}
+              size="lg"
+              className={!isSubmitted && isComplete ? "animate-pulse" : ""}
             >
-              {isSubmitting ? "Submitting..." : "Submit Bracket"}
+              {isSubmitting
+                ? "Submitting..."
+                : isSubmitted
+                  ? "Submitted"
+                  : "Submit Bracket"}
             </Button>
           )}
         </div>

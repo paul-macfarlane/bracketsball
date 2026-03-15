@@ -1,4 +1,4 @@
-import { eq, and, count, sql } from "drizzle-orm";
+import { eq, and, count, sql, gt, or, isNull } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { pool, poolInvite, poolMember, user } from "@/lib/db/schema";
@@ -64,7 +64,16 @@ export async function getPoolInvitesByPoolId(poolId: string) {
     })
     .from(poolInvite)
     .innerJoin(user, eq(poolInvite.createdBy, user.id))
-    .where(eq(poolInvite.poolId, poolId))
+    .where(
+      and(
+        eq(poolInvite.poolId, poolId),
+        gt(poolInvite.expiresAt, new Date()),
+        or(
+          isNull(poolInvite.maxUses),
+          sql`${poolInvite.useCount} < ${poolInvite.maxUses}`,
+        ),
+      ),
+    )
     .orderBy(poolInvite.createdAt);
 }
 

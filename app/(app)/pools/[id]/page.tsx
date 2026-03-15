@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { AlertTriangle, ChevronRight } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { getPoolById } from "@/lib/db/queries/pools";
@@ -183,22 +183,46 @@ export default async function PoolDetailPage({
                 <Link
                   key={entry.id}
                   href={`/pools/${id}/brackets/${entry.id}`}
-                  className="flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-muted"
+                  className={`flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-muted ${
+                    entry.status !== "submitted" && !tournamentStarted
+                      ? "border-amber-300 bg-amber-50/50 dark:border-amber-700 dark:bg-amber-950/30"
+                      : ""
+                  }`}
                 >
-                  <span className="font-medium">{entry.name}</span>
+                  <div className="flex items-center gap-2">
+                    {entry.status !== "submitted" && !tournamentStarted && (
+                      <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    )}
+                    <span className="font-medium">{entry.name}</span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Badge
                       variant={
-                        entry.status === "submitted" ? "default" : "secondary"
+                        entry.status === "submitted" ? "default" : "outline"
+                      }
+                      className={
+                        entry.status === "submitted"
+                          ? ""
+                          : "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/50 dark:text-amber-300"
                       }
                     >
-                      {entry.status === "submitted" ? "Submitted" : "Draft"}
+                      {entry.status === "submitted"
+                        ? "Submitted"
+                        : "Not Submitted"}
                     </Badge>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </Link>
               ))}
             </div>
+            {!tournamentStarted &&
+              bracketEntries.some((e) => e.status !== "submitted") && (
+                <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                  You have unsubmitted brackets. Open each bracket and click
+                  &quot;Submit Bracket&quot; to lock in your picks before the
+                  tournament starts.
+                </p>
+              )}
           </CardContent>
         )}
       </Card>

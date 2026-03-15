@@ -454,7 +454,7 @@ function R64WithFirstFour({
         </div>
       </div>
       {/* Game rows */}
-      <div className="flex flex-col" style={{ gap: "0.25rem" }}>
+      <div className="flex flex-col gap-1">
         {r64Games.map((r64Game) => {
           const ffGame = firstFourByR64Game.get(r64Game.id);
           const [r64Team1, r64Team2] = getTeamsForGame(r64Game.id);

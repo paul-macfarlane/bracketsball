@@ -455,7 +455,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - User can modify any auto-filled picks before submitting
 - Auto-fill is available during bracket creation and editing (before tournament lock)
 
-### 41. Unused Code Enforcement & Cleanup (Non-MVP) — Epic: Tech Debt
+### 41. Unused Code Enforcement & Cleanup (Non-MVP) ✅ — Epic: Tech Debt
 
 **As a** developer, **I want** a lint rule that catches unused exports and dead code, plus a one-time audit to remove existing unused code, **so that** the codebase stays lean and maintainable.
 
@@ -471,7 +471,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - **Ongoing standard:**
   - Add a standard to `docs/technical/standards.md` that exported functions/types must have at least one consumer — no speculative exports
 
-### 42. Codebase Standards Audit (Non-MVP) — Epic: Tech Debt
+### 42. Codebase Standards Audit (Non-MVP) ✅ — Epic: Tech Debt
 
 **As a** developer, **I want** an audit of the codebase against `docs/technical/standards.md` **so that** existing code conforms to our documented conventions and any gaps are fixed.
 
@@ -492,7 +492,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Fix all violations
 - Verify fixes pass `pnpm lint`, `pnpm build`, and don't break existing functionality
 
-### 21. Transaction Audit (Non-MVP) — Epic: Tech Debt
+### 21. Transaction Audit (Non-MVP) ✅ — Epic: Tech Debt
 
 **As a** developer, **I want to** audit all existing query functions and server actions for missing transactions **so that** data integrity is guaranteed across the app.
 
@@ -818,7 +818,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 32  | Update External Services Branding     | Branding                | Yes | Done        |
 | 26  | Fix Bracket Submit Double-Click       | Bug Fixes               | No  | Done        |
 | 25  | Auto-Fill Bracket Picks               | Auto-Fill Bracket       | No  | Done        |
-| 21  | Transaction Audit                     | Tech Debt               | No  | Not Started |
+| 21  | Transaction Audit                     | Tech Debt               | No  | Done        |
 | 16  | Manage Bracket Scoring Settings       | Pool Settings           | No  | Done        |
 | 33  | Team & Game Info in Bracket Builder   | Bracket UX Enhancements | No  | Done        |
 | 28  | SEO Plan & Implementation             | Branding                | No  | Done        |
@@ -829,8 +829,8 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 37  | Team Mascot / Nickname Display        | Bracket UX Enhancements | No  | Done        |
 | 38  | Admin Manual Team & Game Data Entry   | Bracket UX Enhancements | No  | Done        |
 | 40  | GitHub Repo Link in Footer            | Branding                | No  | Done        |
-| 41  | Unused Code Enforcement & Cleanup     | Tech Debt               | No  | Not Started |
-| 42  | Codebase Standards Audit              | Tech Debt               | No  | Not Started |
+| 41  | Unused Code Enforcement & Cleanup     | Tech Debt               | No  | Done        |
+| 42  | Codebase Standards Audit              | Tech Debt               | No  | Done        |
 | 43  | Improved Delete Confirmations         | UX                      | No  | Done        |
 | 44  | Stats-Based Bracket Generation        | Auto-Fill Bracket       | No  | Done        |
 | 45  | Dark/Light Mode Team Icons            | Bracket UX Enhancements | No  | Done        |
@@ -846,4 +846,4 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 31  | Legal & Contact Pages                 | Branding                | No  | Done        |
 | 49  | Splash Page Differentiation           | Branding                | No  | Done        |
 
-**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 28 stories (25 done, 3 remaining)**
+**MVP Total: 21 stories (20 done, 1 remaining)** | **Post-MVP: 28 stories (28 done, 0 remaining)**

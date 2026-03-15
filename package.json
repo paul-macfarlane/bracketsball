@@ -15,7 +15,8 @@
     "sync:test": "npx tsx scripts/test-espn-sync.ts",
     "generate:icons": "npx tsx scripts/generate-icons.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "knip": "knip"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -49,6 +50,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
+    "knip": "^5.86.0",
     "prettier": "3.8.1",
     "shadcn": "^3.8.5",
     "sharp": "^0.34.5",

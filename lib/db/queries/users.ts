@@ -3,11 +3,6 @@ import { eq, and, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { user, session, account, poolMember } from "@/lib/db/schema";
 
-export async function getUserById(id: string) {
-  const result = await db.select().from(user).where(eq(user.id, id)).limit(1);
-  return result[0] ?? null;
-}
-
 export async function isUsernameTaken(
   username: string,
   excludeUserId: string,

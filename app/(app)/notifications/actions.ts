@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
@@ -45,6 +46,8 @@ export async function respondToInviteAction(
   if (!result.success) {
     return { error: result.error };
   }
+
+  revalidatePath("/", "layout");
 
   return { success: true, poolId: result.poolId };
 }
