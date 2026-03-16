@@ -500,22 +500,40 @@ function findPositionalMatch(
   if (!espnGame.region) return undefined;
 
   // For R64, match by seed matchup → exact gameNumber
-  if (espnGame.round === "round_of_64" && espnGame.team1 && espnGame.team2) {
-    const highSeed = Math.min(espnGame.team1.seed, espnGame.team2.seed);
-    const lowSeed = Math.max(espnGame.team1.seed, espnGame.team2.seed);
+  if (espnGame.round === "round_of_64") {
+    if (espnGame.team1 && espnGame.team2) {
+      // Both teams known: use exact seed pair
+      const highSeed = Math.min(espnGame.team1.seed, espnGame.team2.seed);
+      const lowSeed = Math.max(espnGame.team1.seed, espnGame.team2.seed);
 
-    const gameNumber = R64_SEED_MATCHUPS.findIndex(
-      ([h, l]) => h === highSeed && l === lowSeed,
-    );
-
-    if (gameNumber >= 0) {
-      return dbGames.find(
-        (g) =>
-          g.round === "round_of_64" &&
-          g.region === espnGame.region &&
-          g.gameNumber === gameNumber + 1 &&
-          !g.espnEventId,
+      const gameNumber = R64_SEED_MATCHUPS.findIndex(
+        ([h, l]) => h === highSeed && l === lowSeed,
       );
+
+      if (gameNumber >= 0) {
+        return dbGames.find(
+          (g) =>
+            g.round === "round_of_64" &&
+            g.region === espnGame.region &&
+            g.gameNumber === gameNumber + 1 &&
+            !g.espnEventId,
+        );
+      }
+    } else {
+      // One team known (other is TBD from First Four): match by that team's seed
+      const knownTeam = espnGame.team1 ?? espnGame.team2;
+      if (knownTeam) {
+        const gameNumber = seedToR64GameNumber(knownTeam.seed);
+        if (gameNumber != null) {
+          return dbGames.find(
+            (g) =>
+              g.round === "round_of_64" &&
+              g.region === espnGame.region &&
+              g.gameNumber === gameNumber &&
+              !g.espnEventId,
+          );
+        }
+      }
     }
   }
 
@@ -540,6 +558,20 @@ function findPositionalMatch(
         const ancestors = getR64AncestorGameNumbers(candidate, gamesById);
         if (ancestors.has(team1R64) && ancestors.has(team2R64)) {
           return candidate;
+        }
+      }
+    }
+  } else {
+    // One team known (other is TBD): match by that team's seed ancestry
+    const knownTeam = espnGame.team1 ?? espnGame.team2;
+    if (knownTeam) {
+      const knownR64 = seedToR64GameNumber(knownTeam.seed);
+      if (knownR64 != null) {
+        for (const candidate of candidates) {
+          const ancestors = getR64AncestorGameNumbers(candidate, gamesById);
+          if (ancestors.has(knownR64)) {
+            return candidate;
+          }
         }
       }
     }

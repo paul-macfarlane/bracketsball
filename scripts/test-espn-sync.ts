@@ -98,10 +98,10 @@ const YEAR_CONFIGS: Record<number, YearConfig> = {
       { name: "Championship", start: "2026-04-06", end: "2026-04-06" },
     ],
     positions: {
-      topLeft: "south", // TODO: Update after Selection Sunday (March 15)
-      bottomLeft: "east", // TODO: Update after Selection Sunday (March 15)
-      topRight: "west", // TODO: Update after Selection Sunday (March 15)
-      bottomRight: "midwest", // TODO: Update after Selection Sunday (March 15)
+      topLeft: "east",
+      bottomLeft: "south",
+      topRight: "west",
+      bottomRight: "midwest",
     },
   },
 };

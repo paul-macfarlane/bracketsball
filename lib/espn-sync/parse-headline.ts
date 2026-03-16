@@ -57,7 +57,10 @@ export function parseHeadline(headline: string): HeadlineResult {
   // Strip the common prefix so "championship" in
   // "Men's Basketball Championship" doesn't false-match.
   // After stripping, we get e.g. "south region - 1st round" or "national championship"
-  const stripped = lower.replace(/^men's basketball championship\s*-\s*/, "");
+  const stripped = lower.replace(
+    /^(?:ncaa\s+)?men's basketball championship\s*-\s*/,
+    "",
+  );
 
   // Extract round — check longer phrases first to avoid partial matches
   const sortedKeys = Object.keys(ROUND_MAP).sort((a, b) => b.length - a.length);
