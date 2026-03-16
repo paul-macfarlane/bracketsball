@@ -16,11 +16,12 @@ All writes happen in a single database transaction.
 
 There are three ways to trigger a sync:
 
-| Trigger             | What it syncs                           | How to use                                                      |
-| ------------------- | --------------------------------------- | --------------------------------------------------------------- |
-| **Cron endpoint**   | Today's games for the active tournament | `GET /api/sync-espn` with `Authorization: Bearer <CRON_SECRET>` |
-| **Admin UI button** | Today's games for the viewed tournament | "Sync from ESPN" button on Admin > Tournament > Games           |
-| **Test script**     | Full date range for a historical year   | `pnpm sync:test 2024`                                           |
+| Trigger                | What it syncs                                | How to use                                                           |
+| ---------------------- | -------------------------------------------- | -------------------------------------------------------------------- |
+| **Cron endpoint**      | Today's games for the active tournament      | `GET /api/sync-espn` with `Authorization: Bearer <CRON_SECRET>`      |
+| **Full sync endpoint** | All games across the tournament's date range | `GET /api/sync-espn-full` with `Authorization: Bearer <CRON_SECRET>` |
+| **Admin UI button**    | Today's games for the viewed tournament      | "Sync from ESPN" button on Admin > Tournament > Games                |
+| **Test script**        | Full date range for a historical year        | `pnpm sync:test 2024`                                                |
 
 ## March Madness Operations Timeline
 
@@ -63,11 +64,23 @@ You don't need to manually create the tournament, seed teams, or generate the br
 
 A simpler approach: **every 15 minutes from noon to 1am ET during the tournament window (Mar 17 – Apr 6)** covers all scenarios without over-complicating the schedule. In crontab: `*/15 17-23,0-5 * 3-4 *` (filter active dates via cron-job.org's date settings).
 
-Set this up at [cron-job.org](https://cron-job.org):
+Set these up at [cron-job.org](https://cron-job.org):
+
+**Live game sync** (scores, status, winner advancement):
 
 - URL: `https://your-domain.com/api/sync-espn`
 - Method: GET
 - Header: `Authorization: Bearer <your-CRON_SECRET>`
+- Schedule: Per the cron table above
+
+**Full schedule sync** (game times, venues, team assignments across all dates):
+
+- URL: `https://your-domain.com/api/sync-espn-full`
+- Method: GET
+- Header: `Authorization: Bearer <your-CRON_SECRET>`
+- Schedule: Once daily at 2 AM ET (`0 7 * * *` UTC) during the tournament window (Mar 17 – Apr 6)
+
+The full sync is especially useful in the days between Selection Sunday and the First Four, when ESPN is still publishing game times and venue assignments. It derives the date range from the tournament's existing game start times, so no configuration is needed. It does not delete or recreate the tournament — safe to run with existing picks.
 
 ### What Each Sync Does
 

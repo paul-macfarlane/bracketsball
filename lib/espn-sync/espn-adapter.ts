@@ -61,6 +61,8 @@ function parseEvent(event: ESPNEvent): SyncGame | null {
 
   function toSyncTeam(comp: (typeof competitors)[0]): SyncTeam | null {
     if (!comp.team) return null;
+    // Filter out ESPN placeholder teams (e.g. TBD with id "-2" for First Four pending results)
+    if (parseInt(comp.team.id, 10) < 0) return null;
     const seed = comp.curatedRank?.current;
     if (!seed) return null;
 
