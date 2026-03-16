@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { BarChart3 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { syncTeamStatsAction } from "./actions";
+import { syncTeamStatsAction } from "../../actions";
 
 interface SyncTeamStatsButtonProps {
   tournamentId: string;

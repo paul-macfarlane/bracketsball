@@ -168,9 +168,9 @@ export const espnAdapter: TournamentDataSource = {
       const games = await espnAdapter.fetchGamesByDate(dateStr);
       allGames.push(...games);
 
-      // 500ms delay to be respectful to ESPN's API
+      // Small delay to avoid hammering ESPN's API
       if (current < end) {
-        await delay(500);
+        await delay(50);
       }
 
       current.setDate(current.getDate() + 1);

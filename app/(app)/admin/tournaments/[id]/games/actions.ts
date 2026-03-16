@@ -14,7 +14,6 @@ import {
 import { syncStandingsForTournament } from "@/lib/db/queries/standings";
 import { syncTournament } from "@/lib/espn-sync/sync";
 import { espnAdapter } from "@/lib/espn-sync/espn-adapter";
-import { syncTeamStats } from "@/lib/espn-sync/sync-team-stats";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({
@@ -219,25 +218,6 @@ export async function syncFromESPNAction(tournamentId: string) {
     gamesUpdated: result.gamesUpdated,
     gamesSkipped: result.gamesSkipped,
     teamsUpserted: result.teamsUpserted,
-    errors: result.errors,
-  };
-}
-
-export async function syncTeamStatsAction(tournamentId: string) {
-  await requireAdmin();
-
-  const tournament = await getTournamentById(tournamentId);
-  if (!tournament) {
-    return { error: "Tournament not found." };
-  }
-
-  const result = await syncTeamStats(tournamentId, undefined, tournament.year);
-
-  revalidatePath(`/admin/tournaments/${tournamentId}/games`);
-  return {
-    success: true,
-    teamsUpdated: result.teamsUpdated,
-    teamsSkipped: result.teamsSkipped,
     errors: result.errors,
   };
 }

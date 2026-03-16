@@ -22,6 +22,7 @@ import { AddTeamForm } from "./add-team-form";
 import { EditTeamButton } from "./edit-team-button";
 import { EditTeamStatsButton } from "./edit-team-stats-button";
 import { RemoveTeamButton } from "./remove-team-button";
+import { SyncTeamStatsButton } from "./sync-team-stats-button";
 
 export default async function TournamentTeamsPage({
   params,
@@ -59,10 +60,15 @@ export default async function TournamentTeamsPage({
         ]}
         className="mb-4"
       />
-      <div className="mb-6">
+      <div className="mb-6 space-y-3">
         <h1 className="text-2xl font-bold">
           {tournament.name} — Teams ({tournamentTeams.length}/68)
         </h1>
+        {tournamentTeams.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <SyncTeamStatsButton tournamentId={id} />
+          </div>
+        )}
       </div>
 
       {locked && (

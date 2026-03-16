@@ -804,6 +804,22 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 51. ESPN Sync & Dark Mode Bug Fixes (Non-MVP) ✅ — Epic: Bug Fixes
+
+**As a** admin/user, **I want** ESPN team stats sync to correctly populate opponent PPG, dark mode team logos to render without hydration errors, and syncs to run faster **so that** the app data is complete and the UI is consistent.
+
+**Acceptance Criteria:**
+
+- Opponent PPG (oppPpg) is populated when syncing team stats for the current season
+- The `fetchTeamInfo` endpoint is called when the requested season matches the current NCAA season, even when a season parameter is provided
+- The `oppPpg` field is also extracted from the statistics endpoint's defensive category as a fallback
+- Dark mode team logos render correctly without React hydration mismatch errors
+- The TeamLogo component defers theme-dependent src selection until after client hydration
+- The "Sync Team Stats" button and action are located in the tournament teams admin section (not games)
+- ESPN sync delays are reduced from 300-500ms to 50ms per request
+
+---
+
 ## Summary
 
 | #   | Story                                 | Epic                    | MVP | Status |
@@ -859,5 +875,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 31  | Legal & Contact Pages                 | Branding                | No  | Done   |
 | 49  | Splash Page Differentiation           | Branding                | No  | Done   |
 | 50  | Seamless Invite Flow for Unauthed     | Pool Members            | No  | Done   |
+| 51  | ESPN Sync & Dark Mode Bug Fixes       | Bug Fixes               | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 29 stories (29 done, 0 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 30 stories (30 done, 0 remaining)**
