@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
 interface TeamLogoProps {
@@ -17,10 +17,13 @@ export function TeamLogo({
   className,
 }: TeamLogoProps) {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
 
+  useEffect(() => setMounted(true), []);
+
   const src =
-    resolvedTheme === "dark" && darkLogoUrl && !useFallback
+    mounted && resolvedTheme === "dark" && darkLogoUrl && !useFallback
       ? darkLogoUrl
       : logoUrl;
 

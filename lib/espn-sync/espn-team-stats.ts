@@ -224,6 +224,7 @@ async function fetchTeamInfo(
 
 interface TeamStatisticsResult {
   ppg: number | null;
+  oppPpg: number | null;
   fgPct: number | null;
   threePtPct: number | null;
   ftPct: number | null;
@@ -240,6 +241,7 @@ interface TeamStatisticsResult {
 
 const EMPTY_STATISTICS: TeamStatisticsResult = {
   ppg: null,
+  oppPpg: null,
   fgPct: null,
   threePtPct: null,
   ftPct: null,
@@ -310,6 +312,7 @@ async function fetchTeamStatistics(
     stealsPerGame: findStatValue(categories, "defensive", "avgSteals"),
     blocksPerGame: findStatValue(categories, "defensive", "avgBlocks"),
     turnoversPerGame: findStatValue(categories, "offensive", "avgTurnovers"),
+    oppPpg: findStatValue(categories, "defensive", "avgPointsAgainst"),
     overallWins,
     overallLosses,
     conferenceName,
@@ -350,11 +353,15 @@ async function fetchTeamStats(
 ): Promise<TeamStats> {
   const statistics = await fetchTeamStatistics(espnId, season);
 
-  // Only call the team info endpoint for the current season. It doesn't
-  // support the ?season param (always returns current-season data), so for
-  // historical seasons we'd get wrong data. Better to have some fields null
-  // than display the wrong season's stats.
-  const info = season ? null : await fetchTeamInfo(espnId);
+  // The team info endpoint doesn't support ?season (always returns
+  // current-season data). Call it when no season is specified or when the
+  // requested season matches the current NCAA season (year of the spring
+  // semester, i.e. current year if Jan-Jun, next year if Jul-Dec).
+  const now = new Date();
+  const currentNcaaSeason =
+    now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
+  const isCurrentSeason = !season || season === currentNcaaSeason;
+  const info = isCurrentSeason ? await fetchTeamInfo(espnId) : null;
 
   return {
     espnId,
@@ -363,7 +370,7 @@ async function fetchTeamStats(
     conferenceWins: info?.conferenceWins ?? null,
     conferenceLosses: info?.conferenceLosses ?? null,
     conferenceName: statistics.conferenceName ?? info?.conferenceName ?? null,
-    oppPpg: info?.oppPpg ?? null,
+    oppPpg: statistics.oppPpg ?? info?.oppPpg ?? null,
     ppg: statistics.ppg,
     fgPct: statistics.fgPct,
     threePtPct: statistics.threePtPct,
@@ -378,8 +385,8 @@ async function fetchTeamStats(
 }
 
 /**
- * Fetch stats for all teams in a list. Includes 300ms delay between
- * teams to be respectful to ESPN's API.
+ * Fetch stats for all teams in a list. Includes 50ms delay between
+ * teams to avoid hammering ESPN's API.
  */
 export async function fetchAllTeamStats(
   espnIds: string[],
@@ -396,7 +403,7 @@ export async function fetchAllTeamStats(
 
     // Rate limit
     if (i < espnIds.length - 1) {
-      await delay(300);
+      await delay(50);
     }
   }
 

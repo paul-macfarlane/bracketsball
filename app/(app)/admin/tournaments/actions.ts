@@ -25,7 +25,9 @@ import {
   removeTeamFromTournament,
   getTournamentTeams,
   getTournamentGames,
+  getTournamentById,
 } from "@/lib/db/queries/tournaments";
+import { syncTeamStats } from "@/lib/espn-sync/sync-team-stats";
 
 // Standard NCAA bracket seeding matchups for R64
 const R64_SEED_MATCHUPS: [number, number][] = [
@@ -509,4 +511,23 @@ export async function updateTournamentTeamStatsAction(
   }
 
   revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+}
+
+export async function syncTeamStatsAction(tournamentId: string) {
+  await requireAdmin();
+
+  const tournament = await getTournamentById(tournamentId);
+  if (!tournament) {
+    return { error: "Tournament not found." };
+  }
+
+  const result = await syncTeamStats(tournamentId, undefined, tournament.year);
+
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  return {
+    success: true,
+    teamsUpdated: result.teamsUpdated,
+    teamsSkipped: result.teamsSkipped,
+    errors: result.errors,
+  };
 }
