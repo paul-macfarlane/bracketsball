@@ -6,6 +6,12 @@ import { MatchupCard } from "./matchup-card";
 import type { BracketGame, BracketTeam } from "./types";
 import { ROUND_LABELS } from "./types";
 
+export interface RoundPointsSummary {
+  earned: number;
+  remaining: number;
+  lost: number;
+}
+
 export interface BracketPositions {
   topLeft: string;
   bottomLeft: string;
@@ -167,6 +173,56 @@ export function BracketFullView({
     return { leftFinalFour: left, rightFinalFour: right };
   }, [finalFourGames, games, LEFT_REGIONS]);
 
+  // Compute per-round points summary: earned, remaining potential, lost
+  const roundSummaries = useMemo(() => {
+    const summaries = new Map<string, RoundPointsSummary>();
+    if (!roundPointsMap) return summaries;
+
+    // Group games by round
+    const gamesByRound = new Map<string, BracketGame[]>();
+    for (const game of games) {
+      const list = gamesByRound.get(game.round) ?? [];
+      list.push(game);
+      gamesByRound.set(game.round, list);
+    }
+
+    for (const [round, roundGames] of gamesByRound) {
+      const pts = roundPointsMap.get(round) ?? 0;
+      if (pts === 0) {
+        summaries.set(round, { earned: 0, remaining: 0, lost: 0 });
+        continue;
+      }
+
+      let earned = 0;
+      let remaining = 0;
+      let lost = 0;
+
+      for (const game of roundGames) {
+        const pickedTeamId = picks.get(game.id);
+        if (!pickedTeamId) continue;
+
+        if (game.status === "final" && game.winnerTeamId) {
+          if (pickedTeamId === game.winnerTeamId) {
+            earned += pts;
+          } else {
+            lost += pts;
+          }
+        } else {
+          // Game not decided yet
+          if (eliminatedTeamIds.has(pickedTeamId)) {
+            lost += pts;
+          } else {
+            remaining += pts;
+          }
+        }
+      }
+
+      summaries.set(round, { earned, remaining, lost });
+    }
+
+    return summaries;
+  }, [games, picks, roundPointsMap, eliminatedTeamIds]);
+
   // Check if any region on each side has First Four games, so we can reserve
   // placeholder space on regions that don't (keeping round columns aligned).
   const sideHasFirstFour = useMemo(() => {
@@ -238,6 +294,7 @@ export function BracketFullView({
               sideHasFirstFour={sideHasFirstFour.left}
               roundPointsMap={roundPointsMap}
               eliminatedTeamIds={eliminatedTeamIds}
+              roundSummaries={roundSummaries}
             />
           ))}
         </div>
@@ -245,9 +302,10 @@ export function BracketFullView({
         {/* Left Final Four: centered between South and East E8 */}
         {leftFinalFour && (
           <div className="flex flex-col items-center justify-center px-1">
-            <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
-              {ROUND_LABELS.final_four}
-            </div>
+            <RoundHeader
+              round="final_four"
+              summary={roundSummaries.get("final_four")}
+            />
             {renderMatchup(leftFinalFour)}
           </div>
         )}
@@ -255,9 +313,10 @@ export function BracketFullView({
         {/* Championship: centered between the two Final Four games */}
         {championshipGame && (
           <div className="flex flex-col items-center justify-center px-1">
-            <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
-              {ROUND_LABELS.championship}
-            </div>
+            <RoundHeader
+              round="championship"
+              summary={roundSummaries.get("championship")}
+            />
             {renderMatchup(championshipGame)}
           </div>
         )}
@@ -265,9 +324,10 @@ export function BracketFullView({
         {/* Right Final Four: centered between West and Midwest E8 */}
         {rightFinalFour && (
           <div className="flex flex-col items-center justify-center px-1">
-            <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
-              {ROUND_LABELS.final_four}
-            </div>
+            <RoundHeader
+              round="final_four"
+              summary={roundSummaries.get("final_four")}
+            />
             {renderMatchup(rightFinalFour)}
           </div>
         )}
@@ -290,10 +350,47 @@ export function BracketFullView({
               sideHasFirstFour={sideHasFirstFour.right}
               roundPointsMap={roundPointsMap}
               eliminatedTeamIds={eliminatedTeamIds}
+              roundSummaries={roundSummaries}
             />
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+function RoundHeader({
+  round,
+  summary,
+}: {
+  round: string;
+  summary?: RoundPointsSummary;
+}) {
+  const hasActivity =
+    summary &&
+    (summary.earned > 0 || summary.remaining > 0 || summary.lost > 0);
+  return (
+    <div className="mb-1 text-center">
+      <div className="text-[10px] font-medium text-muted-foreground">
+        {ROUND_LABELS[round] ?? round}
+      </div>
+      {hasActivity && (
+        <div className="flex items-center justify-center gap-1.5 text-[9px]">
+          {summary.earned > 0 && (
+            <span className="font-medium text-success">{summary.earned}</span>
+          )}
+          {summary.remaining > 0 && (
+            <span className="font-medium text-muted-foreground">
+              +{summary.remaining}
+            </span>
+          )}
+          {summary.lost > 0 && (
+            <span className="font-medium text-failure line-through">
+              {summary.lost}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -312,6 +409,7 @@ interface RegionBracketProps {
   sideHasFirstFour: boolean;
   roundPointsMap?: Map<string, number>;
   eliminatedTeamIds: Set<string>;
+  roundSummaries: Map<string, RoundPointsSummary>;
 }
 
 function RegionBracket({
@@ -328,6 +426,7 @@ function RegionBracket({
   sideHasFirstFour,
   roundPointsMap,
   eliminatedTeamIds,
+  roundSummaries,
 }: RegionBracketProps) {
   const orderedRounds = direction === "rtl" ? [...rounds].reverse() : rounds;
 
@@ -360,6 +459,7 @@ function RegionBracket({
                 showFirstFourColumn={showFirstFourColumn}
                 roundPointsMap={roundPointsMap}
                 eliminatedTeamIds={eliminatedTeamIds}
+                roundSummaries={roundSummaries}
               />
             );
           }
@@ -376,6 +476,7 @@ function RegionBracket({
               disabled={disabled}
               roundPointsMap={roundPointsMap}
               eliminatedTeamIds={eliminatedTeamIds}
+              roundSummary={roundSummaries.get(round)}
             />
           );
         })}
@@ -396,6 +497,7 @@ interface R64WithFirstFourProps {
   showFirstFourColumn: boolean;
   roundPointsMap?: Map<string, number>;
   eliminatedTeamIds: Set<string>;
+  roundSummaries: Map<string, RoundPointsSummary>;
 }
 
 /** Resolve picked team data, looking up by ID if not one of the displayed teams */
@@ -427,6 +529,7 @@ function R64WithFirstFour({
   showFirstFourColumn,
   roundPointsMap,
   eliminatedTeamIds,
+  roundSummaries,
 }: R64WithFirstFourProps) {
   const hasAnyFirstFour = r64Games.some((g) => firstFourByR64Game.has(g.id));
 
@@ -437,20 +540,32 @@ function R64WithFirstFour({
         {showFirstFourColumn && (
           <div
             className={cn(
-              "w-44 px-1 text-center text-[10px] font-medium text-muted-foreground",
+              "w-44 px-1",
               direction === "rtl" ? "order-2" : "order-1",
             )}
           >
-            {hasAnyFirstFour ? ROUND_LABELS.first_four : "\u00A0"}
+            {hasAnyFirstFour ? (
+              <RoundHeader
+                round="first_four"
+                summary={roundSummaries.get("first_four")}
+              />
+            ) : (
+              <div className="text-center text-[10px] font-medium text-muted-foreground">
+                &nbsp;
+              </div>
+            )}
           </div>
         )}
         <div
           className={cn(
-            "w-44 px-1 text-center text-[10px] font-medium text-muted-foreground",
+            "w-44 px-1",
             direction === "rtl" ? "order-1" : "order-2",
           )}
         >
-          {ROUND_LABELS.round_of_64}
+          <RoundHeader
+            round="round_of_64"
+            summary={roundSummaries.get("round_of_64")}
+          />
         </div>
       </div>
       {/* Game rows */}
@@ -557,6 +672,7 @@ interface RoundColumnProps {
   disabled: boolean;
   roundPointsMap?: Map<string, number>;
   eliminatedTeamIds: Set<string>;
+  roundSummary?: RoundPointsSummary;
 }
 
 function RoundColumn({
@@ -569,12 +685,11 @@ function RoundColumn({
   disabled,
   roundPointsMap,
   eliminatedTeamIds,
+  roundSummary,
 }: RoundColumnProps) {
   return (
     <div className="flex flex-1 flex-col px-1">
-      <div className="mb-1 text-center text-[10px] font-medium text-muted-foreground">
-        {ROUND_LABELS[round] ?? round}
-      </div>
+      <RoundHeader round={round} summary={roundSummary} />
       <div className="flex flex-1 flex-col justify-around">
         {games.map((game) => {
           const [team1, team2] = getTeamsForGame(game.id);

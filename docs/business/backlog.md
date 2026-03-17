@@ -857,6 +857,19 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Integration test seeds a test DB with pool, entries, picks, and games, calls `syncStandingsForTournament()`, and asserts persisted scores are correct
 - Integration test mutates a game to "final", re-syncs, and verifies scores update
 
+### 55. Per-Game & Round-Level Potential Points on Bracket (Non-MVP) ✅ — Epic: Bracket UX Enhancements
+
+**As a** pool member viewing my bracket during a tournament, **I want to** see the potential points at stake on each game and a summary of earned/remaining/lost points per round **so that** I can quickly understand where my upside lies and how my bracket is performing at a glance.
+
+**Acceptance Criteria:**
+
+- Each matchup card footer shows potential points for non-final games: muted `+X pts` when picked team is still alive, red strikethrough `+X pts` when picked team is eliminated or pick was incorrect
+- Correct picks continue to show green `+X pts` (unchanged)
+- Each round column header shows a compact summary: earned points (green), remaining potential (muted), and lost points (red strikethrough)
+- Round summaries only appear when there is tournament activity in that round
+- Pre-tournament bracket editing is unaffected
+- No changes to scoring calculation logic
+
 ---
 
 ## Summary
@@ -918,5 +931,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 52  | Unit Test Standings Sorting & Ranking | Testing                 | No  | Done   |
 | 53  | Full Tournament Scenario Tests        | Testing                 | No  | Done   |
 | 54  | Tiebreaker Edge Cases & Integration   | Testing                 | No  |        |
+| 55  | Per-Game & Round-Level Potential Pts  | Bracket UX Enhancements | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 33 stories (32 done, 1 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 34 stories (33 done, 1 remaining)**
