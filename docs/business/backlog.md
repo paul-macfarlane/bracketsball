@@ -820,6 +820,45 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 52. Unit Test Standings Sorting & Ranking Logic (Non-MVP) ✅ — Epic: Testing
+
+**As a** developer, **I want** the standings sort, rank assignment, and tiebreaker logic to be extracted into pure functions with comprehensive unit tests **so that** I have confidence the standings are correct before the tournament starts.
+
+**Acceptance Criteria:**
+
+- The sort + rank logic from `getPoolStandings()` is extracted into a standalone, testable pure function
+- Unit tests cover: ordering by points desc, potential desc, tiebreaker diff asc, name alphabetical
+- Unit tests cover tie handling: same rank for tied entries, correct rank skip after ties (1, 1, 3)
+- Unit tests cover tiebreaker edge cases: null tiebreaker, null championship total, exact prediction
+- Unit tests cover empty and single-entry standings
+
+---
+
+### 53. Full Tournament Scenario Scoring Tests (Non-MVP) ✅ — Epic: Testing
+
+**As a** developer, **I want** realistic multi-entry tournament scenario tests that exercise scoring across multiple rounds and bracket states **so that** I can verify scoring works correctly in production-like conditions.
+
+**Acceptance Criteria:**
+
+- Tests simulate realistic tournament states with 4-8 bracket entries and 20+ games
+- Scenarios cover: early tournament (R64 partial), mid tournament (S16 done), late tournament (F4), complete tournament
+- Scenarios cover upset-heavy brackets where most entries are busted
+- Tests verify both individual entry scores and relative standings ordering across entries
+
+---
+
+### 54. Tiebreaker Edge Cases & Integration Tests (Non-MVP) — Epic: Testing
+
+**As a** developer, **I want** dedicated tiebreaker edge case tests and optional integration tests for `syncStandingsForTournament` **so that** I have full confidence in the scoring pipeline end-to-end.
+
+**Acceptance Criteria:**
+
+- Tiebreaker tests cover: exact prediction (diff=0), symmetric over/under, null tiebreaker score, null championship total, tiebreaker only breaking ties when points and potential are equal
+- Integration test seeds a test DB with pool, entries, picks, and games, calls `syncStandingsForTournament()`, and asserts persisted scores are correct
+- Integration test mutates a game to "final", re-syncs, and verifies scores update
+
+---
+
 ## Summary
 
 | #   | Story                                 | Epic                    | MVP | Status |
@@ -876,5 +915,8 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 49  | Splash Page Differentiation           | Branding                | No  | Done   |
 | 50  | Seamless Invite Flow for Unauthed     | Pool Members            | No  | Done   |
 | 51  | ESPN Sync & Dark Mode Bug Fixes       | Bug Fixes               | No  | Done   |
+| 52  | Unit Test Standings Sorting & Ranking | Testing                 | No  | Done   |
+| 53  | Full Tournament Scenario Tests        | Testing                 | No  | Done   |
+| 54  | Tiebreaker Edge Cases & Integration   | Testing                 | No  |        |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 30 stories (30 done, 0 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 33 stories (32 done, 1 remaining)**

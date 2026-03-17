@@ -8,7 +8,11 @@ import {
   team,
   tournamentGame,
 } from "@/lib/db/schema";
-import { calculateBracketScores, type PoolScoring } from "@/lib/scoring";
+import {
+  calculateBracketScores,
+  sortAndRankStandings,
+  type PoolScoring,
+} from "@/lib/scoring";
 
 interface CreateBracketEntryData {
   poolId: string;
@@ -418,35 +422,5 @@ export async function getPoolStandings(
     };
   });
 
-  // Sort: points desc, potential desc, tiebreaker accuracy asc, name asc
-  entriesWithScores.sort((a, b) => {
-    if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
-    if (b.potentialPoints !== a.potentialPoints)
-      return b.potentialPoints - a.potentialPoints;
-    if (a.tiebreakerDiff !== null && b.tiebreakerDiff !== null) {
-      if (a.tiebreakerDiff !== b.tiebreakerDiff)
-        return a.tiebreakerDiff - b.tiebreakerDiff;
-    }
-    return a.name.localeCompare(b.name);
-  });
-
-  // Assign ranks with ties
-  const ranked: ((typeof entriesWithScores)[number] & { rank: number })[] = [];
-  for (let i = 0; i < entriesWithScores.length; i++) {
-    const entry = entriesWithScores[i];
-    let rank = i + 1;
-    if (i > 0) {
-      const prev = entriesWithScores[i - 1];
-      if (
-        entry.totalPoints === prev.totalPoints &&
-        entry.potentialPoints === prev.potentialPoints &&
-        entry.tiebreakerDiff === prev.tiebreakerDiff
-      ) {
-        rank = ranked[i - 1].rank;
-      }
-    }
-    ranked.push({ ...entry, rank });
-  }
-
-  return ranked;
+  return sortAndRankStandings(entriesWithScores);
 }

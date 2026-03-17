@@ -95,3 +95,44 @@ export function calculateBracketScores(
 
   return { totalPoints, potentialPoints };
 }
+
+export interface StandingsEntry {
+  name: string;
+  totalPoints: number;
+  potentialPoints: number;
+  tiebreakerDiff: number | null;
+}
+
+export function sortAndRankStandings<T extends StandingsEntry>(
+  entries: T[],
+): (T & { rank: number })[] {
+  const sorted = [...entries].sort((a, b) => {
+    if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+    if (b.potentialPoints !== a.potentialPoints)
+      return b.potentialPoints - a.potentialPoints;
+    if (a.tiebreakerDiff !== null && b.tiebreakerDiff !== null) {
+      if (a.tiebreakerDiff !== b.tiebreakerDiff)
+        return a.tiebreakerDiff - b.tiebreakerDiff;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  const ranked: (T & { rank: number })[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    const entry = sorted[i];
+    let rank = i + 1;
+    if (i > 0) {
+      const prev = sorted[i - 1];
+      if (
+        entry.totalPoints === prev.totalPoints &&
+        entry.potentialPoints === prev.potentialPoints &&
+        entry.tiebreakerDiff === prev.tiebreakerDiff
+      ) {
+        rank = ranked[i - 1].rank;
+      }
+    }
+    ranked.push({ ...entry, rank });
+  }
+
+  return ranked;
+}

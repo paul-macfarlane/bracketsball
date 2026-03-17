@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   calculateBracketScores,
   getPointsForRound,
+  sortAndRankStandings,
   type PoolScoring,
+  type StandingsEntry,
 } from "./scoring";
 
 const DEFAULT_SCORING: PoolScoring = {
@@ -550,5 +552,950 @@ describe("calculateBracketScores", () => {
       expect(result.totalPoints).toBe(192);
       expect(result.potentialPoints).toBe(192);
     });
+  });
+});
+
+// Helper for standings entries
+function makeEntry(
+  overrides: Partial<StandingsEntry> & { name: string },
+): StandingsEntry {
+  return {
+    totalPoints: 0,
+    potentialPoints: 0,
+    tiebreakerDiff: null,
+    ...overrides,
+  };
+}
+
+describe("sortAndRankStandings", () => {
+  describe("sorting", () => {
+    it("sorts by total points descending", () => {
+      const entries = [
+        makeEntry({ name: "Low", totalPoints: 5 }),
+        makeEntry({ name: "High", totalPoints: 20 }),
+        makeEntry({ name: "Mid", totalPoints: 10 }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => e.name)).toEqual(["High", "Mid", "Low"]);
+    });
+
+    it("breaks ties with potential points descending", () => {
+      const entries = [
+        makeEntry({ name: "LowPot", totalPoints: 10, potentialPoints: 20 }),
+        makeEntry({ name: "HighPot", totalPoints: 10, potentialPoints: 50 }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => e.name)).toEqual(["HighPot", "LowPot"]);
+    });
+
+    it("breaks ties with tiebreaker diff ascending (closer is better)", () => {
+      const entries = [
+        makeEntry({
+          name: "Far",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: 15,
+        }),
+        makeEntry({
+          name: "Close",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: 3,
+        }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => e.name)).toEqual(["Close", "Far"]);
+    });
+
+    it("breaks all remaining ties alphabetically by name", () => {
+      const entries = [
+        makeEntry({
+          name: "Zulu",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: 5,
+        }),
+        makeEntry({
+          name: "Alpha",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: 5,
+        }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => e.name)).toEqual(["Alpha", "Zulu"]);
+    });
+
+    it("handles null tiebreaker (championship not played) — falls through to name", () => {
+      const entries = [
+        makeEntry({
+          name: "Bravo",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: null,
+        }),
+        makeEntry({
+          name: "Alpha",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: null,
+        }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => e.name)).toEqual(["Alpha", "Bravo"]);
+    });
+
+    it("handles mixed null and non-null tiebreaker diffs", () => {
+      // When one has tiebreaker and the other doesn't, the comparison
+      // (null !== null) is false so it falls through to name sort
+      const entries = [
+        makeEntry({
+          name: "HasTB",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: 5,
+        }),
+        makeEntry({
+          name: "NoTB",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: null,
+        }),
+      ];
+      const result = sortAndRankStandings(entries);
+      // Falls through to alphabetical since tiebreaker comparison is skipped
+      expect(result.map((e) => e.name)).toEqual(["HasTB", "NoTB"]);
+    });
+  });
+
+  describe("ranking", () => {
+    it("assigns sequential ranks for different scores", () => {
+      const entries = [
+        makeEntry({ name: "A", totalPoints: 30 }),
+        makeEntry({ name: "B", totalPoints: 20 }),
+        makeEntry({ name: "C", totalPoints: 10 }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => e.rank)).toEqual([1, 2, 3]);
+    });
+
+    it("assigns same rank for tied entries", () => {
+      const entries = [
+        makeEntry({
+          name: "Alpha",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: 5,
+        }),
+        makeEntry({
+          name: "Bravo",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: 5,
+        }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => e.rank)).toEqual([1, 1]);
+    });
+
+    it("skips rank correctly after ties (1, 1, 3 not 1, 1, 2)", () => {
+      const entries = [
+        makeEntry({
+          name: "A",
+          totalPoints: 20,
+          potentialPoints: 20,
+          tiebreakerDiff: 5,
+        }),
+        makeEntry({
+          name: "B",
+          totalPoints: 20,
+          potentialPoints: 20,
+          tiebreakerDiff: 5,
+        }),
+        makeEntry({ name: "C", totalPoints: 10 }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => ({ name: e.name, rank: e.rank }))).toEqual([
+        { name: "A", rank: 1 },
+        { name: "B", rank: 1 },
+        { name: "C", rank: 3 },
+      ]);
+    });
+
+    it("handles three-way tie followed by different score", () => {
+      const entries = [
+        makeEntry({
+          name: "A",
+          totalPoints: 15,
+          potentialPoints: 15,
+          tiebreakerDiff: null,
+        }),
+        makeEntry({
+          name: "B",
+          totalPoints: 15,
+          potentialPoints: 15,
+          tiebreakerDiff: null,
+        }),
+        makeEntry({
+          name: "C",
+          totalPoints: 15,
+          potentialPoints: 15,
+          tiebreakerDiff: null,
+        }),
+        makeEntry({ name: "D", totalPoints: 5 }),
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result.map((e) => e.rank)).toEqual([1, 1, 1, 4]);
+    });
+
+    it("single entry gets rank 1", () => {
+      const entries = [makeEntry({ name: "Solo", totalPoints: 42 })];
+      const result = sortAndRankStandings(entries);
+      expect(result).toHaveLength(1);
+      expect(result[0].rank).toBe(1);
+    });
+
+    it("returns empty array for no entries", () => {
+      const result = sortAndRankStandings([]);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("preserves extra properties", () => {
+    it("passes through additional fields on entries", () => {
+      const entries = [
+        {
+          name: "A",
+          totalPoints: 10,
+          potentialPoints: 10,
+          tiebreakerDiff: null,
+          userId: "u1",
+        },
+        {
+          name: "B",
+          totalPoints: 5,
+          potentialPoints: 5,
+          tiebreakerDiff: null,
+          userId: "u2",
+        },
+      ];
+      const result = sortAndRankStandings(entries);
+      expect(result[0].userId).toBe("u1");
+      expect(result[1].userId).toBe("u2");
+    });
+  });
+});
+
+describe("full tournament scenarios", () => {
+  // Builds a mini-bracket: 4 teams, 2 R64 games, 1 R32 game (one region)
+  // Returns games and per-entry picks for testing multi-entry competition
+  function buildMiniRegion(
+    teams: [string, string, string, string],
+    results: {
+      r64g1?: { winner: 0 | 1; status?: string };
+      r64g2?: { winner: 0 | 1; status?: string };
+      r32?: { winner: 0 | 1; status?: string };
+    },
+  ) {
+    const [t1, t2, t3, t4] = teams;
+    const games: ReturnType<typeof makeGame>[] = [];
+
+    const r64g1Status = results.r64g1?.status ?? "scheduled";
+    const r64g1Winner =
+      r64g1Status === "final" ? (results.r64g1?.winner === 0 ? t1 : t2) : null;
+
+    const r64g2Status = results.r64g2?.status ?? "scheduled";
+    const r64g2Winner =
+      r64g2Status === "final" ? (results.r64g2?.winner === 0 ? t3 : t4) : null;
+
+    games.push(
+      makeGame({
+        id: `r64-${t1}-${t2}`,
+        round: "round_of_64",
+        status: r64g1Status,
+        winnerTeamId: r64g1Winner,
+        team1Id: t1,
+        team2Id: t2,
+      }),
+    );
+    games.push(
+      makeGame({
+        id: `r64-${t3}-${t4}`,
+        round: "round_of_64",
+        status: r64g2Status,
+        winnerTeamId: r64g2Winner,
+        team1Id: t3,
+        team2Id: t4,
+      }),
+    );
+
+    const r32Status = results.r32?.status ?? "scheduled";
+    const r32Team1 = r64g1Winner;
+    const r32Team2 = r64g2Winner;
+    const r32Winner =
+      r32Status === "final"
+        ? results.r32?.winner === 0
+          ? r32Team1
+          : r32Team2
+        : null;
+
+    games.push(
+      makeGame({
+        id: `r32-${t1}${t2}-${t3}${t4}`,
+        round: "round_of_32",
+        status: r32Status,
+        winnerTeamId: r32Winner,
+        team1Id: r32Team1,
+        team2Id: r32Team2,
+      }),
+    );
+
+    return games;
+  }
+
+  // Full 8-team single-elimination bracket for one half of a region
+  // R64 (4 games) → R32 (2 games) → S16 (1 game)
+  function buildHalfRegion(
+    teamIds: string[],
+    gameResults: {
+      round: string;
+      gameIndex: number;
+      winner: 0 | 1;
+      status: string;
+    }[],
+  ) {
+    // 8 teams → 4 R64 games → 2 R32 games → 1 S16 game
+    const games: ReturnType<typeof makeGame>[] = [];
+    const resultMap = new Map(
+      gameResults.map((r) => [`${r.round}-${r.gameIndex}`, r]),
+    );
+
+    // R64: 4 games
+    const r64Winners: (string | null)[] = [];
+    for (let i = 0; i < 4; i++) {
+      const t1 = teamIds[i * 2];
+      const t2 = teamIds[i * 2 + 1];
+      const res = resultMap.get(`round_of_64-${i}`);
+      const status = res?.status ?? "scheduled";
+      const winner = status === "final" ? (res?.winner === 0 ? t1 : t2) : null;
+      r64Winners.push(winner);
+      games.push(
+        makeGame({
+          id: `r64-${i}`,
+          round: "round_of_64",
+          status,
+          winnerTeamId: winner,
+          team1Id: t1,
+          team2Id: t2,
+        }),
+      );
+    }
+
+    // R32: 2 games
+    const r32Winners: (string | null)[] = [];
+    for (let i = 0; i < 2; i++) {
+      const t1 = r64Winners[i * 2];
+      const t2 = r64Winners[i * 2 + 1];
+      const res = resultMap.get(`round_of_32-${i}`);
+      const status = res?.status ?? "scheduled";
+      const winner = status === "final" ? (res?.winner === 0 ? t1 : t2) : null;
+      r32Winners.push(winner);
+      games.push(
+        makeGame({
+          id: `r32-${i}`,
+          round: "round_of_32",
+          status,
+          winnerTeamId: winner,
+          team1Id: t1,
+          team2Id: t2,
+        }),
+      );
+    }
+
+    // S16: 1 game
+    const res = resultMap.get("sweet_16-0");
+    const s16Status = res?.status ?? "scheduled";
+    const s16Winner =
+      s16Status === "final"
+        ? res?.winner === 0
+          ? r32Winners[0]
+          : r32Winners[1]
+        : null;
+    games.push(
+      makeGame({
+        id: "s16-0",
+        round: "sweet_16",
+        status: s16Status,
+        winnerTeamId: s16Winner,
+        team1Id: r32Winners[0],
+        team2Id: r32Winners[1],
+      }),
+    );
+
+    return { games, teamIds };
+  }
+
+  it("early tournament: R64 half done, everyone has high potential", () => {
+    // 8 teams, only first 2 of 4 R64 games are final
+    const teams = ["t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"];
+    const { games } = buildHalfRegion(teams, [
+      { round: "round_of_64", gameIndex: 0, winner: 0, status: "final" }, // t1 wins
+      { round: "round_of_64", gameIndex: 1, winner: 1, status: "final" }, // t4 wins
+    ]);
+
+    // Entry A: picked t1, t4 (both correct), picks t1 going deep
+    const picksA = [
+      { tournamentGameId: "r64-0", pickedTeamId: "t1" },
+      { tournamentGameId: "r64-1", pickedTeamId: "t4" },
+      { tournamentGameId: "r64-2", pickedTeamId: "t5" }, // pending
+      { tournamentGameId: "r64-3", pickedTeamId: "t7" }, // pending
+      { tournamentGameId: "r32-0", pickedTeamId: "t1" }, // pending, alive
+      { tournamentGameId: "r32-1", pickedTeamId: "t5" }, // pending, alive
+      { tournamentGameId: "s16-0", pickedTeamId: "t1" }, // pending, alive
+    ];
+
+    // Entry B: picked t2, t3 (both wrong), t2 eliminated
+    const picksB = [
+      { tournamentGameId: "r64-0", pickedTeamId: "t2" },
+      { tournamentGameId: "r64-1", pickedTeamId: "t3" },
+      { tournamentGameId: "r64-2", pickedTeamId: "t6" }, // pending
+      { tournamentGameId: "r64-3", pickedTeamId: "t8" }, // pending
+      { tournamentGameId: "r32-0", pickedTeamId: "t2" }, // eliminated
+      { tournamentGameId: "r32-1", pickedTeamId: "t6" }, // pending, alive
+      { tournamentGameId: "s16-0", pickedTeamId: "t2" }, // eliminated
+    ];
+
+    const scoreA = calculateBracketScores(games, picksA, DEFAULT_SCORING);
+    const scoreB = calculateBracketScores(games, picksB, DEFAULT_SCORING);
+
+    // A: 1 + 1 correct = 2 points, potential: 2 + 1 + 1 + 2 + 2 + 4 = 12
+    expect(scoreA.totalPoints).toBe(2);
+    expect(scoreA.potentialPoints).toBe(12);
+
+    // B: 0 correct, potential: 0 + 0 + 1 + 1 + 0 + 2 + 0 = 4
+    expect(scoreB.totalPoints).toBe(0);
+    expect(scoreB.potentialPoints).toBe(4);
+
+    const standings = sortAndRankStandings([
+      { ...scoreA, name: "Entry A", tiebreakerDiff: null },
+      { ...scoreB, name: "Entry B", tiebreakerDiff: null },
+    ]);
+
+    expect(standings[0].name).toBe("Entry A");
+    expect(standings[0].rank).toBe(1);
+    expect(standings[1].name).toBe("Entry B");
+    expect(standings[1].rank).toBe(2);
+  });
+
+  it("mid tournament: S16 complete, some entries busted", () => {
+    // All R64, R32, and S16 are final
+    const teams = ["t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"];
+    const { games } = buildHalfRegion(teams, [
+      { round: "round_of_64", gameIndex: 0, winner: 0, status: "final" }, // t1
+      { round: "round_of_64", gameIndex: 1, winner: 0, status: "final" }, // t3
+      { round: "round_of_64", gameIndex: 2, winner: 1, status: "final" }, // t6 (upset)
+      { round: "round_of_64", gameIndex: 3, winner: 1, status: "final" }, // t8 (upset)
+      { round: "round_of_32", gameIndex: 0, winner: 0, status: "final" }, // t1
+      { round: "round_of_32", gameIndex: 1, winner: 1, status: "final" }, // t8 (upset)
+      { round: "sweet_16", gameIndex: 0, winner: 0, status: "final" }, // t1
+    ]);
+
+    // Entry "Chalk": picked all favorites (t1, t3, t5, t7, t1, t5, t1)
+    const picksChalk = [
+      { tournamentGameId: "r64-0", pickedTeamId: "t1" }, // correct
+      { tournamentGameId: "r64-1", pickedTeamId: "t3" }, // correct
+      { tournamentGameId: "r64-2", pickedTeamId: "t5" }, // wrong
+      { tournamentGameId: "r64-3", pickedTeamId: "t7" }, // wrong
+      { tournamentGameId: "r32-0", pickedTeamId: "t1" }, // correct
+      { tournamentGameId: "r32-1", pickedTeamId: "t5" }, // wrong (t5 eliminated)
+      { tournamentGameId: "s16-0", pickedTeamId: "t1" }, // correct
+    ];
+
+    // Entry "Upsets": picked underdogs (t2, t4, t6, t8, t2, t8, t8)
+    const picksUpsets = [
+      { tournamentGameId: "r64-0", pickedTeamId: "t2" }, // wrong
+      { tournamentGameId: "r64-1", pickedTeamId: "t4" }, // wrong
+      { tournamentGameId: "r64-2", pickedTeamId: "t6" }, // correct
+      { tournamentGameId: "r64-3", pickedTeamId: "t8" }, // correct
+      { tournamentGameId: "r32-0", pickedTeamId: "t2" }, // wrong (eliminated)
+      { tournamentGameId: "r32-1", pickedTeamId: "t8" }, // correct
+      { tournamentGameId: "s16-0", pickedTeamId: "t8" }, // wrong
+    ];
+
+    const chalkScore = calculateBracketScores(
+      games,
+      picksChalk,
+      DEFAULT_SCORING,
+    );
+    const upsetsScore = calculateBracketScores(
+      games,
+      picksUpsets,
+      DEFAULT_SCORING,
+    );
+
+    // Chalk: R64: 1+1+0+0=2, R32: 2+0=2, S16: 4 → total 8, all final → potential = total
+    expect(chalkScore.totalPoints).toBe(8);
+    expect(chalkScore.potentialPoints).toBe(8);
+
+    // Upsets: R64: 0+0+1+1=2, R32: 0+2=2, S16: 0 → total 4
+    expect(upsetsScore.totalPoints).toBe(4);
+    expect(upsetsScore.potentialPoints).toBe(4);
+
+    const standings = sortAndRankStandings([
+      { ...chalkScore, name: "Chalk", tiebreakerDiff: null },
+      { ...upsetsScore, name: "Upsets", tiebreakerDiff: null },
+    ]);
+
+    expect(standings[0].name).toBe("Chalk");
+    expect(standings[1].name).toBe("Upsets");
+  });
+
+  it("complete tournament: tiebreaker decides winner", () => {
+    // Simple 4-team bracket: 2 R64 + 1 championship, all final
+    const games = [
+      makeGame({
+        id: "r64-1",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "duke",
+        team1Id: "duke",
+        team2Id: "unc",
+      }),
+      makeGame({
+        id: "r64-2",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "kansas",
+        team1Id: "kansas",
+        team2Id: "kentucky",
+      }),
+      makeGame({
+        id: "champ",
+        round: "championship",
+        status: "final",
+        winnerTeamId: "duke",
+        team1Id: "duke",
+        team2Id: "kansas",
+      }),
+    ];
+
+    // Both entries pick all games correctly (same points)
+    const picksA = [
+      { tournamentGameId: "r64-1", pickedTeamId: "duke" },
+      { tournamentGameId: "r64-2", pickedTeamId: "kansas" },
+      { tournamentGameId: "champ", pickedTeamId: "duke" },
+    ];
+    const picksB = [...picksA]; // Same picks
+
+    const scoreA = calculateBracketScores(games, picksA, DEFAULT_SCORING);
+    const scoreB = calculateBracketScores(games, picksB, DEFAULT_SCORING);
+
+    // Both: 1 + 1 + 32 = 34
+    expect(scoreA.totalPoints).toBe(34);
+    expect(scoreB.totalPoints).toBe(34);
+
+    // Entry A predicted championship total 145, Entry B predicted 160
+    // Actual total was 150 (duke 80, kansas 70)
+    const standings = sortAndRankStandings([
+      { ...scoreA, name: "Entry A", tiebreakerDiff: Math.abs(145 - 150) }, // diff 5
+      { ...scoreB, name: "Entry B", tiebreakerDiff: Math.abs(160 - 150) }, // diff 10
+    ]);
+
+    expect(standings[0].name).toBe("Entry A");
+    expect(standings[0].rank).toBe(1);
+    expect(standings[1].name).toBe("Entry B");
+    expect(standings[1].rank).toBe(2);
+  });
+
+  it("upset-heavy tournament: chalk brackets busted, underdog picker leads", () => {
+    // 4 R64 games, all upsets (team2 wins)
+    const games = [
+      makeGame({
+        id: "g1",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "t2",
+        team1Id: "t1",
+        team2Id: "t2",
+      }),
+      makeGame({
+        id: "g2",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "t4",
+        team1Id: "t3",
+        team2Id: "t4",
+      }),
+      makeGame({
+        id: "g3",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "t6",
+        team1Id: "t5",
+        team2Id: "t6",
+      }),
+      makeGame({
+        id: "g4",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "t8",
+        team1Id: "t7",
+        team2Id: "t8",
+      }),
+      // R32 games pending
+      makeGame({
+        id: "g5",
+        round: "round_of_32",
+        status: "scheduled",
+        team1Id: "t2",
+        team2Id: "t4",
+      }),
+      makeGame({
+        id: "g6",
+        round: "round_of_32",
+        status: "scheduled",
+        team1Id: "t6",
+        team2Id: "t8",
+      }),
+    ];
+
+    // Chalk picker: picked all favorites (all wrong)
+    const picksChalk = [
+      { tournamentGameId: "g1", pickedTeamId: "t1" },
+      { tournamentGameId: "g2", pickedTeamId: "t3" },
+      { tournamentGameId: "g3", pickedTeamId: "t5" },
+      { tournamentGameId: "g4", pickedTeamId: "t7" },
+      { tournamentGameId: "g5", pickedTeamId: "t1" }, // eliminated
+      { tournamentGameId: "g6", pickedTeamId: "t5" }, // eliminated
+    ];
+
+    // Underdog picker: picked all underdogs (all correct)
+    const picksUnderdog = [
+      { tournamentGameId: "g1", pickedTeamId: "t2" },
+      { tournamentGameId: "g2", pickedTeamId: "t4" },
+      { tournamentGameId: "g3", pickedTeamId: "t6" },
+      { tournamentGameId: "g4", pickedTeamId: "t8" },
+      { tournamentGameId: "g5", pickedTeamId: "t2" }, // alive
+      { tournamentGameId: "g6", pickedTeamId: "t6" }, // alive
+    ];
+
+    // Mixed picker: 2 correct, 2 wrong
+    const picksMixed = [
+      { tournamentGameId: "g1", pickedTeamId: "t2" }, // correct
+      { tournamentGameId: "g2", pickedTeamId: "t3" }, // wrong
+      { tournamentGameId: "g3", pickedTeamId: "t6" }, // correct
+      { tournamentGameId: "g4", pickedTeamId: "t7" }, // wrong
+      { tournamentGameId: "g5", pickedTeamId: "t2" }, // alive
+      { tournamentGameId: "g6", pickedTeamId: "t6" }, // alive
+    ];
+
+    const chalkScore = calculateBracketScores(
+      games,
+      picksChalk,
+      DEFAULT_SCORING,
+    );
+    const underdogScore = calculateBracketScores(
+      games,
+      picksUnderdog,
+      DEFAULT_SCORING,
+    );
+    const mixedScore = calculateBracketScores(
+      games,
+      picksMixed,
+      DEFAULT_SCORING,
+    );
+
+    // Chalk: 0 points, 0 potential (all favorites eliminated)
+    expect(chalkScore.totalPoints).toBe(0);
+    expect(chalkScore.potentialPoints).toBe(0);
+
+    // Underdog: 4 points (4×1), potential: 4 + 2 + 2 = 8
+    expect(underdogScore.totalPoints).toBe(4);
+    expect(underdogScore.potentialPoints).toBe(8);
+
+    // Mixed: 2 points (2×1), potential: 2 + 2 + 2 = 6
+    expect(mixedScore.totalPoints).toBe(2);
+    expect(mixedScore.potentialPoints).toBe(6);
+
+    const standings = sortAndRankStandings([
+      { ...chalkScore, name: "Chalk", tiebreakerDiff: null },
+      { ...underdogScore, name: "Underdog", tiebreakerDiff: null },
+      { ...mixedScore, name: "Mixed", tiebreakerDiff: null },
+    ]);
+
+    expect(standings.map((s) => s.name)).toEqual([
+      "Underdog",
+      "Mixed",
+      "Chalk",
+    ]);
+    expect(standings.map((s) => s.rank)).toEqual([1, 2, 3]);
+  });
+
+  it("late tournament: F4, close race with tiebreaker not yet available", () => {
+    // Simulate a condensed late-tournament state:
+    // 4 R64 final, 2 R32 final, 1 S16 final, 1 E8 final, F4 + championship pending
+    const games = [
+      // R64 — all final
+      makeGame({
+        id: "r64-1",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "duke",
+        team1Id: "duke",
+        team2Id: "unc",
+      }),
+      makeGame({
+        id: "r64-2",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "kansas",
+        team1Id: "kansas",
+        team2Id: "baylor",
+      }),
+      makeGame({
+        id: "r64-3",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "uconn",
+        team1Id: "uconn",
+        team2Id: "purdue",
+      }),
+      makeGame({
+        id: "r64-4",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "houston",
+        team1Id: "houston",
+        team2Id: "auburn",
+      }),
+      // R32 — all final
+      makeGame({
+        id: "r32-1",
+        round: "round_of_32",
+        status: "final",
+        winnerTeamId: "duke",
+        team1Id: "duke",
+        team2Id: "kansas",
+      }),
+      makeGame({
+        id: "r32-2",
+        round: "round_of_32",
+        status: "final",
+        winnerTeamId: "uconn",
+        team1Id: "uconn",
+        team2Id: "houston",
+      }),
+      // S16 — final
+      makeGame({
+        id: "s16-1",
+        round: "sweet_16",
+        status: "final",
+        winnerTeamId: "duke",
+        team1Id: "duke",
+        team2Id: "uconn",
+      }),
+      // E8 — pending
+      makeGame({
+        id: "e8-1",
+        round: "elite_8",
+        status: "scheduled",
+        team1Id: "duke",
+        team2Id: null,
+      }),
+      // F4 — pending
+      makeGame({
+        id: "f4-1",
+        round: "final_four",
+        status: "scheduled",
+        team1Id: null,
+        team2Id: null,
+      }),
+      // Championship — pending
+      makeGame({
+        id: "champ",
+        round: "championship",
+        status: "scheduled",
+        team1Id: null,
+        team2Id: null,
+      }),
+    ];
+
+    // Entry 1: Picked duke all the way (duke still alive)
+    const picks1 = [
+      { tournamentGameId: "r64-1", pickedTeamId: "duke" },
+      { tournamentGameId: "r64-2", pickedTeamId: "kansas" },
+      { tournamentGameId: "r64-3", pickedTeamId: "uconn" },
+      { tournamentGameId: "r64-4", pickedTeamId: "houston" },
+      { tournamentGameId: "r32-1", pickedTeamId: "duke" },
+      { tournamentGameId: "r32-2", pickedTeamId: "uconn" },
+      { tournamentGameId: "s16-1", pickedTeamId: "duke" },
+      { tournamentGameId: "e8-1", pickedTeamId: "duke" },
+      { tournamentGameId: "f4-1", pickedTeamId: "duke" },
+      { tournamentGameId: "champ", pickedTeamId: "duke" },
+    ];
+
+    // Entry 2: Picked similar but had uconn winning S16
+    const picks2 = [
+      { tournamentGameId: "r64-1", pickedTeamId: "duke" },
+      { tournamentGameId: "r64-2", pickedTeamId: "kansas" },
+      { tournamentGameId: "r64-3", pickedTeamId: "uconn" },
+      { tournamentGameId: "r64-4", pickedTeamId: "houston" },
+      { tournamentGameId: "r32-1", pickedTeamId: "duke" },
+      { tournamentGameId: "r32-2", pickedTeamId: "uconn" },
+      { tournamentGameId: "s16-1", pickedTeamId: "uconn" }, // wrong
+      { tournamentGameId: "e8-1", pickedTeamId: "uconn" }, // eliminated
+      { tournamentGameId: "f4-1", pickedTeamId: "uconn" }, // eliminated
+      { tournamentGameId: "champ", pickedTeamId: "uconn" }, // eliminated
+    ];
+
+    const score1 = calculateBracketScores(games, picks1, DEFAULT_SCORING);
+    const score2 = calculateBracketScores(games, picks2, DEFAULT_SCORING);
+
+    // Entry 1: R64: 4×1=4, R32: 2×2=4, S16: 4 = 12 earned
+    // Potential: 12 + 8(E8) + 16(F4) + 32(champ) = 68
+    expect(score1.totalPoints).toBe(12);
+    expect(score1.potentialPoints).toBe(68);
+
+    // Entry 2: R64: 4×1=4, R32: 2×2=4, S16: 0 = 8 earned
+    // uconn eliminated, so E8/F4/champ picks are dead
+    // Potential: 8 + 0 + 0 + 0 = 8
+    expect(score2.totalPoints).toBe(8);
+    expect(score2.potentialPoints).toBe(8);
+
+    const standings = sortAndRankStandings([
+      { ...score1, name: "Duke Fan", tiebreakerDiff: null },
+      { ...score2, name: "UConn Fan", tiebreakerDiff: null },
+    ]);
+
+    expect(standings[0].name).toBe("Duke Fan");
+    expect(standings[1].name).toBe("UConn Fan");
+  });
+
+  it("multi-entry pool: 5 entries with varied strategies produce correct standings", () => {
+    // 4 R64 games (all final) + 2 R32 games (1 final, 1 pending)
+    const games = [
+      makeGame({
+        id: "g1",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "A",
+        team1Id: "A",
+        team2Id: "B",
+      }),
+      makeGame({
+        id: "g2",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "C",
+        team1Id: "C",
+        team2Id: "D",
+      }),
+      makeGame({
+        id: "g3",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "F",
+        team1Id: "E",
+        team2Id: "F",
+      }),
+      makeGame({
+        id: "g4",
+        round: "round_of_64",
+        status: "final",
+        winnerTeamId: "G",
+        team1Id: "G",
+        team2Id: "H",
+      }),
+      makeGame({
+        id: "g5",
+        round: "round_of_32",
+        status: "final",
+        winnerTeamId: "A",
+        team1Id: "A",
+        team2Id: "C",
+      }),
+      makeGame({
+        id: "g6",
+        round: "round_of_32",
+        status: "scheduled",
+        team1Id: "F",
+        team2Id: "G",
+      }),
+    ];
+
+    const allPicks = {
+      // Perfect so far: 4 R64 correct + R32 correct = 4 + 2 = 6
+      Perfect: [
+        { tournamentGameId: "g1", pickedTeamId: "A" },
+        { tournamentGameId: "g2", pickedTeamId: "C" },
+        { tournamentGameId: "g3", pickedTeamId: "F" },
+        { tournamentGameId: "g4", pickedTeamId: "G" },
+        { tournamentGameId: "g5", pickedTeamId: "A" },
+        { tournamentGameId: "g6", pickedTeamId: "F" }, // alive
+      ],
+      // 3 R64 correct + R32 correct = 3 + 2 = 5
+      AlmostPerfect: [
+        { tournamentGameId: "g1", pickedTeamId: "A" },
+        { tournamentGameId: "g2", pickedTeamId: "D" }, // wrong
+        { tournamentGameId: "g3", pickedTeamId: "F" },
+        { tournamentGameId: "g4", pickedTeamId: "G" },
+        { tournamentGameId: "g5", pickedTeamId: "A" },
+        { tournamentGameId: "g6", pickedTeamId: "G" }, // alive
+      ],
+      // Same as AlmostPerfect but different R32 pending pick
+      TiedWithAlmost: [
+        { tournamentGameId: "g1", pickedTeamId: "A" },
+        { tournamentGameId: "g2", pickedTeamId: "D" }, // wrong
+        { tournamentGameId: "g3", pickedTeamId: "F" },
+        { tournamentGameId: "g4", pickedTeamId: "G" },
+        { tournamentGameId: "g5", pickedTeamId: "A" },
+        { tournamentGameId: "g6", pickedTeamId: "F" }, // alive
+      ],
+      // 2 R64 correct, R32 wrong = 2 + 0 = 2
+      Mediocre: [
+        { tournamentGameId: "g1", pickedTeamId: "A" },
+        { tournamentGameId: "g2", pickedTeamId: "D" }, // wrong
+        { tournamentGameId: "g3", pickedTeamId: "E" }, // wrong
+        { tournamentGameId: "g4", pickedTeamId: "G" },
+        { tournamentGameId: "g5", pickedTeamId: "D" }, // eliminated
+        { tournamentGameId: "g6", pickedTeamId: "E" }, // eliminated
+      ],
+      // 0 correct
+      Busted: [
+        { tournamentGameId: "g1", pickedTeamId: "B" },
+        { tournamentGameId: "g2", pickedTeamId: "D" },
+        { tournamentGameId: "g3", pickedTeamId: "E" },
+        { tournamentGameId: "g4", pickedTeamId: "H" },
+        { tournamentGameId: "g5", pickedTeamId: "B" }, // eliminated
+        { tournamentGameId: "g6", pickedTeamId: "E" }, // eliminated
+      ],
+    };
+
+    const scores = Object.entries(allPicks).map(([name, picks]) => ({
+      name,
+      ...calculateBracketScores(games, picks, DEFAULT_SCORING),
+      tiebreakerDiff: null,
+    }));
+
+    const standings = sortAndRankStandings(scores);
+
+    // Perfect: 6pts, potential 6+2=8
+    // AlmostPerfect: 5pts, potential 5+2=7
+    // TiedWithAlmost: 5pts, potential 5+2=7
+    // Mediocre: 2pts, potential 2
+    // Busted: 0pts, potential 0
+    expect(standings.map((s) => s.name)).toEqual([
+      "Perfect",
+      "AlmostPerfect",
+      "TiedWithAlmost",
+      "Mediocre",
+      "Busted",
+    ]);
+
+    // AlmostPerfect and TiedWithAlmost are tied on points and potential
+    expect(standings[1].rank).toBe(2);
+    expect(standings[2].rank).toBe(2); // same rank (tied)
+    expect(standings[3].rank).toBe(4); // skips to 4
+    expect(standings[4].rank).toBe(5);
   });
 });
