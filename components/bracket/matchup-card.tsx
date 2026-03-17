@@ -344,6 +344,18 @@ export function MatchupCard({
               <span className="font-medium text-success">
                 +{earnedPoints} pts
               </span>
+            ) : pickStatus === "eliminated" && roundPoints > 0 ? (
+              <span className="font-medium text-failure line-through">
+                +{roundPoints} pts
+              </span>
+            ) : pickStatus === "pending" && roundPoints > 0 ? (
+              <span className="font-medium text-muted-foreground">
+                +{roundPoints} pts
+              </span>
+            ) : pickStatus === "incorrect" && roundPoints > 0 ? (
+              <span className="font-medium text-failure line-through">
+                +{roundPoints} pts
+              </span>
             ) : (
               <span className="invisible">-</span>
             )}
