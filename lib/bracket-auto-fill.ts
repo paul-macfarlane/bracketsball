@@ -26,6 +26,10 @@ export interface StatWeights {
   stealsPerGame: number;
   blocksPerGame: number;
   turnoversPerGame: number;
+  bpiOffense: number;
+  bpiDefense: number;
+  strengthOfSchedule: number;
+  strengthOfRecord: number;
 }
 
 export interface StatsAutoFillConfig {
@@ -36,44 +40,121 @@ export interface StatsAutoFillConfig {
 export const STAT_CATEGORIES: {
   key: keyof StatWeights;
   label: string;
+  fullLabel: string;
   inverted: boolean;
+  /** Shown in the auto-fill dialog to clarify what "better" means for inverted stats */
+  invertedHint?: string;
   group: string;
 }[] = [
-  { key: "winPct", label: "Win %", inverted: false, group: "Overall" },
-  { key: "ppg", label: "PPG", inverted: false, group: "Offense" },
-  { key: "oppPpg", label: "Opp PPG", inverted: true, group: "Offense" },
   {
-    key: "assistsPerGame",
-    label: "APG",
+    key: "winPct",
+    label: "Win %",
+    fullLabel: "Win Percentage",
+    inverted: false,
+    group: "Overall",
+  },
+  {
+    key: "ppg",
+    label: "PPG",
+    fullLabel: "Points Per Game",
     inverted: false,
     group: "Offense",
   },
-  { key: "fgPct", label: "FG%", inverted: false, group: "Shooting" },
-  { key: "threePtPct", label: "3PT%", inverted: false, group: "Shooting" },
-  { key: "ftPct", label: "FT%", inverted: false, group: "Shooting" },
+  {
+    key: "oppPpg",
+    label: "Opp PPG",
+    fullLabel: "Opponent Points Per Game",
+    inverted: true,
+    invertedHint: "fewer = better",
+    group: "Offense",
+  },
+  {
+    key: "assistsPerGame",
+    label: "APG",
+    fullLabel: "Assists Per Game",
+    inverted: false,
+    group: "Offense",
+  },
+  {
+    key: "fgPct",
+    label: "FG%",
+    fullLabel: "Field Goal Percentage",
+    inverted: false,
+    group: "Shooting",
+  },
+  {
+    key: "threePtPct",
+    label: "3PT%",
+    fullLabel: "3-Point Percentage",
+    inverted: false,
+    group: "Shooting",
+  },
+  {
+    key: "ftPct",
+    label: "FT%",
+    fullLabel: "Free Throw Percentage",
+    inverted: false,
+    group: "Shooting",
+  },
   {
     key: "reboundsPerGame",
     label: "RPG",
+    fullLabel: "Rebounds Per Game",
     inverted: false,
     group: "Hustle",
   },
   {
     key: "stealsPerGame",
     label: "SPG",
+    fullLabel: "Steals Per Game",
     inverted: false,
     group: "Defense",
   },
   {
     key: "blocksPerGame",
     label: "BPG",
+    fullLabel: "Blocks Per Game",
     inverted: false,
     group: "Defense",
   },
   {
     key: "turnoversPerGame",
     label: "TOPG",
+    fullLabel: "Turnovers Per Game",
     inverted: true,
+    invertedHint: "fewer = better",
     group: "Defense",
+  },
+  {
+    key: "bpiOffense",
+    label: "BPI Offense",
+    fullLabel: "BPI Offense",
+    inverted: false,
+    group: "BPI",
+  },
+  {
+    key: "bpiDefense",
+    label: "BPI Defense",
+    fullLabel: "BPI Defense",
+    inverted: true,
+    invertedHint: "lower = better",
+    group: "BPI",
+  },
+  {
+    key: "strengthOfSchedule",
+    label: "SOS",
+    fullLabel: "Strength of Schedule",
+    inverted: true,
+    invertedHint: "tougher = better",
+    group: "Strength",
+  },
+  {
+    key: "strengthOfRecord",
+    label: "SOR",
+    fullLabel: "Strength of Record",
+    inverted: true,
+    invertedHint: "tougher = better",
+    group: "Strength",
   },
 ];
 
@@ -101,6 +182,10 @@ export const PRESETS: Record<
       stealsPerGame: 1,
       blocksPerGame: 1,
       turnoversPerGame: 3,
+      bpiOffense: 8,
+      bpiDefense: 2,
+      strengthOfSchedule: 2,
+      strengthOfRecord: 2,
     },
   },
   defense_heavy: {
@@ -117,6 +202,10 @@ export const PRESETS: Record<
       stealsPerGame: 8,
       blocksPerGame: 7,
       turnoversPerGame: 8,
+      bpiOffense: 2,
+      bpiDefense: 8,
+      strengthOfSchedule: 3,
+      strengthOfRecord: 3,
     },
   },
   balanced: {
@@ -133,6 +222,10 @@ export const PRESETS: Record<
       stealsPerGame: 5,
       blocksPerGame: 5,
       turnoversPerGame: 5,
+      bpiOffense: 5,
+      bpiDefense: 5,
+      strengthOfSchedule: 5,
+      strengthOfRecord: 5,
     },
   },
   rebounding_hustle: {
@@ -149,6 +242,10 @@ export const PRESETS: Record<
       stealsPerGame: 8,
       blocksPerGame: 7,
       turnoversPerGame: 5,
+      bpiOffense: 3,
+      bpiDefense: 3,
+      strengthOfSchedule: 3,
+      strengthOfRecord: 3,
     },
   },
 };

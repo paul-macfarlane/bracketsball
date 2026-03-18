@@ -65,6 +65,10 @@ const WEIGHT_KEYS: (keyof StatWeights)[] = [
   "stealsPerGame",
   "blocksPerGame",
   "turnoversPerGame",
+  "bpiOffense",
+  "bpiDefense",
+  "strengthOfSchedule",
+  "strengthOfRecord",
 ];
 
 const DEFAULT_CONFIG: SavedConfig = {
@@ -230,10 +234,10 @@ export function StatsAutoFillDialog({
                 <div key={cat.key} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
                     <span>
-                      {cat.label}
-                      {cat.inverted && (
+                      {cat.fullLabel}
+                      {cat.inverted && cat.invertedHint && (
                         <span className="ml-1 text-xs text-muted-foreground">
-                          (lower is better)
+                          ({cat.invertedHint})
                         </span>
                       )}
                     </span>

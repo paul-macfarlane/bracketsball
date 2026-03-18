@@ -36,6 +36,15 @@ export interface TeamStats {
   turnoversPerGame: number | null;
   apRanking: number | null;
   strengthOfSchedule: number | null;
+  strengthOfScheduleRank: number | null;
+  strengthOfRecord: number | null;
+  strengthOfRecordRank: number | null;
+  bpi: number | null;
+  bpiOffense: number | null;
+  bpiDefense: number | null;
+  bpiRank: number | null;
+  bpiOffenseRank: number | null;
+  bpiDefenseRank: number | null;
 }
 
 export interface BracketTeam {

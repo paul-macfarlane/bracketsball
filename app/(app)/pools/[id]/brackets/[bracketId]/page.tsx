@@ -100,6 +100,15 @@ export default async function BracketPage({
       turnoversPerGame: tt.turnoversPerGame,
       apRanking: tt.apRanking,
       strengthOfSchedule: tt.strengthOfSchedule,
+      strengthOfScheduleRank: tt.strengthOfScheduleRank,
+      strengthOfRecord: tt.strengthOfRecord,
+      strengthOfRecordRank: tt.strengthOfRecordRank,
+      bpi: tt.bpi,
+      bpiOffense: tt.bpiOffense,
+      bpiDefense: tt.bpiDefense,
+      bpiRank: tt.bpiRank,
+      bpiOffenseRank: tt.bpiOffenseRank,
+      bpiDefenseRank: tt.bpiDefenseRank,
     },
   }));
 

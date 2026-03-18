@@ -89,6 +89,15 @@ export const updateTournamentTeamStatsSchema = z.object({
   turnoversPerGame: z.number().min(0).nullable().optional(),
   apRanking: z.number().int().min(1).max(25).nullable().optional(),
   strengthOfSchedule: z.number().nullable().optional(),
+  strengthOfScheduleRank: z.number().int().min(1).nullable().optional(),
+  strengthOfRecord: z.number().nullable().optional(),
+  strengthOfRecordRank: z.number().int().min(1).nullable().optional(),
+  bpi: z.number().nullable().optional(),
+  bpiOffense: z.number().nullable().optional(),
+  bpiDefense: z.number().nullable().optional(),
+  bpiRank: z.number().int().min(1).nullable().optional(),
+  bpiOffenseRank: z.number().int().min(1).nullable().optional(),
+  bpiDefenseRank: z.number().int().min(1).nullable().optional(),
 });
 
 export type UpdateTournamentTeamStatsFormValues = z.infer<
