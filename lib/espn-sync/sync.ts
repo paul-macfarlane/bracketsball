@@ -56,8 +56,17 @@ export async function syncTournamentDateRange(
   endDate: string,
   options?: { scheduleOnly?: boolean },
 ): Promise<SyncResult> {
+  const fetchStart = performance.now();
   const espnGames = await adapter.fetchGamesForDateRange(startDate, endDate);
-  return syncGamesToDB(tournamentId, espnGames, options);
+  const espnFetchMs = Math.round(performance.now() - fetchStart);
+
+  const result = await syncGamesToDB(tournamentId, espnGames, options);
+
+  if (result.timing) {
+    result.timing.espnFetchMs = espnFetchMs;
+  }
+
+  return result;
 }
 
 /**

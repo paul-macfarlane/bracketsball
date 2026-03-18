@@ -19,6 +19,8 @@ function mapStatus(espnStatusName: string): GameStatus {
     case "STATUS_FINAL":
       return "final";
     case "STATUS_IN_PROGRESS":
+    case "STATUS_HALFTIME":
+    case "STATUS_END_PERIOD":
       return "in_progress";
     default:
       return "scheduled";

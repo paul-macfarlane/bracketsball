@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { syncTournament, getActiveTournamentId } from "@/lib/espn-sync/sync";
+import {
+  syncTournamentDateRange,
+  getActiveTournamentId,
+} from "@/lib/espn-sync/sync";
 import { espnAdapter } from "@/lib/espn-sync/espn-adapter";
 
 export const maxDuration = 30;
@@ -25,8 +28,21 @@ export async function GET(request: Request) {
     );
   }
 
-  const today = new Date().toISOString().split("T")[0];
-  const result = await syncTournament(tournamentId, espnAdapter, today);
+  // Sync both UTC today and yesterday to handle the ET/UTC timezone boundary.
+  // Games played in the evening ET (e.g. 9 PM EDT) fall on the next UTC date,
+  // so querying only the UTC date misses in-progress or recently-finished games.
+  const now = new Date();
+  const todayUTC = now.toISOString().split("T")[0];
+  const yesterdayUTC = new Date(now.getTime() - 86_400_000)
+    .toISOString()
+    .split("T")[0];
+
+  const result = await syncTournamentDateRange(
+    tournamentId,
+    espnAdapter,
+    yesterdayUTC,
+    todayUTC,
+  );
 
   const totalDurationMs = Math.round(performance.now() - startTime);
   console.log(
@@ -39,7 +55,7 @@ export async function GET(request: Request) {
   );
 
   return NextResponse.json({
-    date: today,
+    dates: [yesterdayUTC, todayUTC],
     tournamentId,
     totalDurationMs,
     ...result,
