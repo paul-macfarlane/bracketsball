@@ -51,18 +51,20 @@ You don't need to manually create the tournament, seed teams, or generate the br
 
 **Cron schedule recommendations (2026 tournament):**
 
-| Phase        | Dates             | Suggested cron (UTC)                         | crontab expression         |
-| ------------ | ----------------- | -------------------------------------------- | -------------------------- |
-| First Four   | Tue-Wed Mar 17-18 | Every 15 min, 6pm-1am ET (11pm-6am UTC)      | `*/15 23,0-5 17-18 3 *`    |
-| Round of 64  | Thu-Fri Mar 19-20 | Every 10 min, 12pm-1am ET (5pm-6am UTC next) | `*/10 17-23,0-5 19-20 3 *` |
-| Round of 32  | Sat-Sun Mar 21-22 | Every 10 min, 12pm-1am ET (5pm-6am UTC next) | `*/10 17-23,0-5 21-22 3 *` |
-| Sweet 16     | Thu-Fri Mar 26-27 | Every 10 min, 7pm-1am ET (12am-6am UTC next) | `*/10 0-5 27-28 3 *`       |
-| Elite 8      | Sat-Sun Mar 28-29 | Every 10 min, 2pm-1am ET (7pm-6am UTC next)  | `*/10 19-23,0-5 28-29 3 *` |
-| Final Four   | Sat Apr 4         | Every 5 min, 6pm-1am ET (11pm-6am UTC next)  | `*/5 23,0-5 4-5 4 *`       |
-| Championship | Mon Apr 6         | Every 5 min, 8pm-1am ET (1am-6am UTC next)   | `*/5 1-6 7 4 *`            |
-| Off days     | Any non-game day  | Once daily or skip                           | `0 12 * * *`               |
+All crontab expressions below are in **America/New_York (ET)**. Configure your cron-job.org jobs with this timezone.
 
-A simpler approach: **every 15 minutes from noon to 1am ET during the tournament window (Mar 17 – Apr 6)** covers all scenarios without over-complicating the schedule. In crontab: `*/15 17-23,0-5 * 3-4 *` (filter active dates via cron-job.org's date settings).
+| Phase        | Dates             | Suggested cron (ET)       | crontab expression (ET)    |
+| ------------ | ----------------- | ------------------------- | -------------------------- |
+| First Four   | Tue-Wed Mar 17-18 | Every 15 min, 6pm-1am ET  | `*/15 18-23,0-1 17-18 3 *` |
+| Round of 64  | Thu-Fri Mar 19-20 | Every 10 min, 12pm-1am ET | `*/10 12-23,0-1 19-20 3 *` |
+| Round of 32  | Sat-Sun Mar 21-22 | Every 10 min, 12pm-1am ET | `*/10 12-23,0-1 21-22 3 *` |
+| Sweet 16     | Thu-Fri Mar 26-27 | Every 10 min, 7pm-1am ET  | `*/10 19-23,0-1 26-27 3 *` |
+| Elite 8      | Sat-Sun Mar 28-29 | Every 10 min, 2pm-1am ET  | `*/10 14-23,0-1 28-29 3 *` |
+| Final Four   | Sat Apr 4         | Every 5 min, 6pm-1am ET   | `*/5 18-23,0-1 4 4 *`      |
+| Championship | Mon Apr 6         | Every 5 min, 8pm-1am ET   | `*/5 20-23,0-1 6 4 *`      |
+| Off days     | Any non-game day  | Once daily or skip        | `0 8 * * *`                |
+
+A simpler approach: **every 15 minutes from noon to 1am ET during the tournament window (Mar 17 – Apr 6)** covers all scenarios without over-complicating the schedule. In crontab: `*/15 12-23,0-1 * 3-4 *` (filter active dates via cron-job.org's date settings).
 
 Set these up at [cron-job.org](https://cron-job.org):
 
@@ -78,7 +80,7 @@ Set these up at [cron-job.org](https://cron-job.org):
 - URL: `https://your-domain.com/api/sync-espn-full`
 - Method: GET
 - Header: `Authorization: Bearer <your-CRON_SECRET>`
-- Schedule: Once daily at 2 AM ET (`0 7 * * *` UTC) during the tournament window (Mar 17 – Apr 6)
+- Schedule: Once daily at 2 AM ET (`0 2 * * *` ET) during the tournament window (Mar 17 – Apr 6)
 
 The full sync is especially useful in the days between Selection Sunday and the First Four, when ESPN is still publishing game times and venue assignments. It derives the date range from the tournament's existing game start times, so no configuration is needed. It does not delete or recreate the tournament — safe to run with existing picks.
 
