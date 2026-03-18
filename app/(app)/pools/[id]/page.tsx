@@ -183,8 +183,12 @@ export default async function PoolDetailPage({
     winnerTeamId: g.winnerTeamId,
   }));
 
-  // Compute elimination status for user's brackets from standings
+  // Compute elimination status and standings info for user's brackets
   const myBracketElimination = new Map<string, boolean>();
+  const myBracketStandings = new Map<
+    string,
+    { rank: number; totalPoints: number; potentialPoints: number }
+  >();
   if (tournamentStarted && standings.length > 0) {
     const eliminationMap = getEliminationStatus(standings, 1);
     standings.forEach((s, i) => {
@@ -192,9 +196,25 @@ export default async function PoolDetailPage({
       // Only set for user's brackets
       if (bracketEntries.some((e) => e.id === s.id)) {
         myBracketElimination.set(s.id, isEliminated);
+        myBracketStandings.set(s.id, {
+          rank: s.rank,
+          totalPoints: s.totalPoints,
+          potentialPoints: s.potentialPoints,
+        });
       }
     });
   }
+
+  // Post-tournament: filter to submitted only and sort by placement
+  const displayedBracketEntries = tournamentStarted
+    ? bracketEntries
+        .filter((e) => e.status === "submitted")
+        .sort((a, b) => {
+          const aRank = myBracketStandings.get(a.id)?.rank ?? Infinity;
+          const bRank = myBracketStandings.get(b.id)?.rank ?? Infinity;
+          return aRank - bRank;
+        })
+    : bracketEntries;
 
   const bracketOptions = submittedEntries.map((e) => ({
     id: e.id,
@@ -281,10 +301,10 @@ export default async function PoolDetailPage({
             </CardDescription>
           )}
         </CardHeader>
-        {bracketEntries.length > 0 && (
+        {displayedBracketEntries.length > 0 && (
           <CardContent>
             <div className="space-y-2">
-              {bracketEntries.map((entry) => (
+              {displayedBracketEntries.map((entry) => (
                 <BracketEntryRow
                   key={entry.id}
                   entry={entry}
@@ -293,6 +313,8 @@ export default async function PoolDetailPage({
                   canDuplicate={canCreateBracket}
                   championPick={championPicks.get(entry.id) ?? null}
                   isEliminated={myBracketElimination.get(entry.id) ?? null}
+                  standingsInfo={myBracketStandings.get(entry.id) ?? null}
+                  totalBrackets={standings.length}
                 />
               ))}
             </div>

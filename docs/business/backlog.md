@@ -879,7 +879,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
-### 58. Elimination Tracker (Non-MVP) —  ✅ Epic: Tournament Experience
+### 58. Elimination Tracker (Non-MVP) — ✅ Epic: Tournament Experience
 
 **As a** pool member, **I want to** see which brackets are mathematically eliminated from winning the pool **so that** I can focus my attention on brackets that are still in contention.
 
@@ -1082,6 +1082,23 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - Round summaries only appear when there is tournament activity in that round
 - Pre-tournament bracket editing is unaffected
 - No changes to scoring calculation logic
+
+---
+
+### 69. Enrich My Brackets Section Post-Tournament Start (Non-MVP) ✅ — Epic: Tournament Experience
+
+**As a** pool member, **I want to** see my placement, points, and potential points in the "My Brackets" section once the tournament starts **so that** I can quickly check how my brackets are performing without scanning the full standings table.
+
+**Acceptance Criteria:**
+
+- Once the tournament has started, each bracket row in "My Brackets" shows:
+  - Placement in the pool standings (e.g., "3rd of 12")
+  - Points earned so far
+  - Potential points remaining
+- Brackets are sorted by placement (best first) once the tournament starts; pre-tournament order is unchanged
+- The "Submitted" badge is hidden once the tournament starts (all visible brackets are submitted by then)
+- Draft/unsubmitted brackets are hidden once the tournament starts (they were never locked in)
+- Pre-tournament behavior is unchanged (draft management, duplicate/delete actions, submitted badge)
 
 ---
 
