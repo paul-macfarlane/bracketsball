@@ -109,6 +109,15 @@ export async function getTournamentTeams(tournamentId: string) {
       turnoversPerGame: tournamentTeam.turnoversPerGame,
       apRanking: tournamentTeam.apRanking,
       strengthOfSchedule: tournamentTeam.strengthOfSchedule,
+      strengthOfScheduleRank: tournamentTeam.strengthOfScheduleRank,
+      strengthOfRecord: tournamentTeam.strengthOfRecord,
+      strengthOfRecordRank: tournamentTeam.strengthOfRecordRank,
+      bpi: tournamentTeam.bpi,
+      bpiOffense: tournamentTeam.bpiOffense,
+      bpiDefense: tournamentTeam.bpiDefense,
+      bpiRank: tournamentTeam.bpiRank,
+      bpiOffenseRank: tournamentTeam.bpiOffenseRank,
+      bpiDefenseRank: tournamentTeam.bpiDefenseRank,
     })
     .from(tournamentTeam)
     .innerJoin(team, eq(tournamentTeam.teamId, team.id))
@@ -165,6 +174,15 @@ export async function updateTournamentTeamStats(
     turnoversPerGame?: number | null;
     apRanking?: number | null;
     strengthOfSchedule?: number | null;
+    strengthOfScheduleRank?: number | null;
+    strengthOfRecord?: number | null;
+    strengthOfRecordRank?: number | null;
+    bpi?: number | null;
+    bpiOffense?: number | null;
+    bpiDefense?: number | null;
+    bpiRank?: number | null;
+    bpiOffenseRank?: number | null;
+    bpiDefenseRank?: number | null;
   },
 ) {
   const [result] = await db

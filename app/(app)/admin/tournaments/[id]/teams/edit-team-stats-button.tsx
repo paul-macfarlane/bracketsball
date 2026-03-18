@@ -44,6 +44,15 @@ interface EditTeamStatsButtonProps {
     turnoversPerGame: number | null;
     apRanking: number | null;
     strengthOfSchedule: number | null;
+    strengthOfScheduleRank: number | null;
+    strengthOfRecord: number | null;
+    strengthOfRecordRank: number | null;
+    bpi: number | null;
+    bpiOffense: number | null;
+    bpiDefense: number | null;
+    bpiRank: number | null;
+    bpiOffenseRank: number | null;
+    bpiDefenseRank: number | null;
   };
 }
 
@@ -86,6 +95,15 @@ export function EditTeamStatsButton({
       turnoversPerGame: currentStats.turnoversPerGame,
       apRanking: currentStats.apRanking,
       strengthOfSchedule: currentStats.strengthOfSchedule,
+      strengthOfScheduleRank: currentStats.strengthOfScheduleRank,
+      strengthOfRecord: currentStats.strengthOfRecord,
+      strengthOfRecordRank: currentStats.strengthOfRecordRank,
+      bpi: currentStats.bpi,
+      bpiOffense: currentStats.bpiOffense,
+      bpiDefense: currentStats.bpiDefense,
+      bpiRank: currentStats.bpiRank,
+      bpiOffenseRank: currentStats.bpiOffenseRank,
+      bpiDefenseRank: currentStats.bpiDefenseRank,
     },
   });
 
@@ -332,7 +350,7 @@ export function EditTeamStatsButton({
           </div>
 
           <div>
-            <h3 className="mb-2 text-sm font-semibold">Rankings</h3>
+            <h3 className="mb-2 text-sm font-semibold">Rankings & Strength</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="apRanking">AP Ranking</Label>
@@ -354,6 +372,121 @@ export function EditTeamStatsButton({
                   step="any"
                   defaultValue={currentStats.strengthOfSchedule ?? ""}
                   {...register("strengthOfSchedule", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="strengthOfScheduleRank">SOS Rank</Label>
+                <Input
+                  id="strengthOfScheduleRank"
+                  type="number"
+                  min={1}
+                  step={1}
+                  defaultValue={currentStats.strengthOfScheduleRank ?? ""}
+                  {...register("strengthOfScheduleRank", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="strengthOfRecord">SOR</Label>
+                <Input
+                  id="strengthOfRecord"
+                  type="number"
+                  step="any"
+                  defaultValue={currentStats.strengthOfRecord ?? ""}
+                  {...register("strengthOfRecord", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="strengthOfRecordRank">SOR Rank</Label>
+                <Input
+                  id="strengthOfRecordRank"
+                  type="number"
+                  min={1}
+                  step={1}
+                  defaultValue={currentStats.strengthOfRecordRank ?? ""}
+                  {...register("strengthOfRecordRank", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-sm font-semibold">BPI</h3>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label htmlFor="bpi">BPI</Label>
+                <Input
+                  id="bpi"
+                  type="number"
+                  step="any"
+                  defaultValue={currentStats.bpi ?? ""}
+                  {...register("bpi", { setValueAs: numericSetValueAs })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bpiOffense">BPI Off</Label>
+                <Input
+                  id="bpiOffense"
+                  type="number"
+                  step="any"
+                  defaultValue={currentStats.bpiOffense ?? ""}
+                  {...register("bpiOffense", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bpiDefense">BPI Def</Label>
+                <Input
+                  id="bpiDefense"
+                  type="number"
+                  step="any"
+                  defaultValue={currentStats.bpiDefense ?? ""}
+                  {...register("bpiDefense", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bpiRank">BPI Rank</Label>
+                <Input
+                  id="bpiRank"
+                  type="number"
+                  min={1}
+                  step={1}
+                  defaultValue={currentStats.bpiRank ?? ""}
+                  {...register("bpiRank", { setValueAs: numericSetValueAs })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bpiOffenseRank">BPI Off Rank</Label>
+                <Input
+                  id="bpiOffenseRank"
+                  type="number"
+                  min={1}
+                  step={1}
+                  defaultValue={currentStats.bpiOffenseRank ?? ""}
+                  {...register("bpiOffenseRank", {
+                    setValueAs: numericSetValueAs,
+                  })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bpiDefenseRank">BPI Def Rank</Label>
+                <Input
+                  id="bpiDefenseRank"
+                  type="number"
+                  min={1}
+                  step={1}
+                  defaultValue={currentStats.bpiDefenseRank ?? ""}
+                  {...register("bpiDefenseRank", {
                     setValueAs: numericSetValueAs,
                   })}
                 />

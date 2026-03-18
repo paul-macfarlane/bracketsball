@@ -334,17 +334,154 @@ export function TeamComparison({
             />
 
             {(s1?.strengthOfSchedule != null ||
-              s2?.strengthOfSchedule != null) && (
+              s2?.strengthOfSchedule != null ||
+              s1?.strengthOfRecord != null ||
+              s2?.strengthOfRecord != null) && (
               <>
                 <div className="my-1 border-t" />
+                {(s1?.strengthOfSchedule != null ||
+                  s2?.strengthOfSchedule != null) && (
+                  <StatRow
+                    label="SOS"
+                    value1={formatNum(s1?.strengthOfSchedule, 4)}
+                    value2={formatNum(s2?.strengthOfSchedule, 4)}
+                    raw1={s1?.strengthOfSchedule}
+                    raw2={s2?.strengthOfSchedule}
+                    better="lower"
+                  />
+                )}
+                {(s1?.strengthOfScheduleRank != null ||
+                  s2?.strengthOfScheduleRank != null) && (
+                  <StatRow
+                    label="SOS Rank"
+                    value1={
+                      s1?.strengthOfScheduleRank != null
+                        ? `#${s1.strengthOfScheduleRank}`
+                        : null
+                    }
+                    value2={
+                      s2?.strengthOfScheduleRank != null
+                        ? `#${s2.strengthOfScheduleRank}`
+                        : null
+                    }
+                    raw1={s1?.strengthOfScheduleRank}
+                    raw2={s2?.strengthOfScheduleRank}
+                    better="lower"
+                  />
+                )}
+                {(s1?.strengthOfRecord != null ||
+                  s2?.strengthOfRecord != null) && (
+                  <StatRow
+                    label="SOR"
+                    value1={formatNum(s1?.strengthOfRecord, 4)}
+                    value2={formatNum(s2?.strengthOfRecord, 4)}
+                    raw1={s1?.strengthOfRecord}
+                    raw2={s2?.strengthOfRecord}
+                    better="lower"
+                  />
+                )}
+                {(s1?.strengthOfRecordRank != null ||
+                  s2?.strengthOfRecordRank != null) && (
+                  <StatRow
+                    label="SOR Rank"
+                    value1={
+                      s1?.strengthOfRecordRank != null
+                        ? `#${s1.strengthOfRecordRank}`
+                        : null
+                    }
+                    value2={
+                      s2?.strengthOfRecordRank != null
+                        ? `#${s2.strengthOfRecordRank}`
+                        : null
+                    }
+                    raw1={s1?.strengthOfRecordRank}
+                    raw2={s2?.strengthOfRecordRank}
+                    better="lower"
+                  />
+                )}
+              </>
+            )}
+
+            {(s1?.bpi != null ||
+              s2?.bpi != null ||
+              s1?.bpiOffense != null ||
+              s2?.bpiOffense != null ||
+              s1?.bpiDefense != null ||
+              s2?.bpiDefense != null) && (
+              <>
+                <div className="my-2 border-b pb-1 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  BPI
+                </div>
                 <StatRow
-                  label="SOS"
-                  value1={formatNum(s1?.strengthOfSchedule, 2)}
-                  value2={formatNum(s2?.strengthOfSchedule, 2)}
-                  raw1={s1?.strengthOfSchedule}
-                  raw2={s2?.strengthOfSchedule}
+                  label="BPI"
+                  value1={formatNum(s1?.bpi)}
+                  value2={formatNum(s2?.bpi)}
+                  raw1={s1?.bpi}
+                  raw2={s2?.bpi}
                   better="higher"
                 />
+                {(s1?.bpiRank != null || s2?.bpiRank != null) && (
+                  <StatRow
+                    label="BPI Rank"
+                    value1={s1?.bpiRank != null ? `#${s1.bpiRank}` : null}
+                    value2={s2?.bpiRank != null ? `#${s2.bpiRank}` : null}
+                    raw1={s1?.bpiRank}
+                    raw2={s2?.bpiRank}
+                    better="lower"
+                  />
+                )}
+                <StatRow
+                  label="BPI Offense"
+                  value1={formatNum(s1?.bpiOffense)}
+                  value2={formatNum(s2?.bpiOffense)}
+                  raw1={s1?.bpiOffense}
+                  raw2={s2?.bpiOffense}
+                  better="higher"
+                />
+                {(s1?.bpiOffenseRank != null || s2?.bpiOffenseRank != null) && (
+                  <StatRow
+                    label="BPI Off Rank"
+                    value1={
+                      s1?.bpiOffenseRank != null
+                        ? `#${s1.bpiOffenseRank}`
+                        : null
+                    }
+                    value2={
+                      s2?.bpiOffenseRank != null
+                        ? `#${s2.bpiOffenseRank}`
+                        : null
+                    }
+                    raw1={s1?.bpiOffenseRank}
+                    raw2={s2?.bpiOffenseRank}
+                    better="lower"
+                  />
+                )}
+                <StatRow
+                  label="BPI Defense"
+                  value1={formatNum(s1?.bpiDefense)}
+                  value2={formatNum(s2?.bpiDefense)}
+                  raw1={s1?.bpiDefense}
+                  raw2={s2?.bpiDefense}
+                  better="lower"
+                />
+                {(s1?.bpiDefenseRank != null || s2?.bpiDefenseRank != null) && (
+                  <StatRow
+                    label="BPI Def Rank"
+                    value1={
+                      s1?.bpiDefenseRank != null
+                        ? `#${s1.bpiDefenseRank}`
+                        : null
+                    }
+                    value2={
+                      s2?.bpiDefenseRank != null
+                        ? `#${s2.bpiDefenseRank}`
+                        : null
+                    }
+                    raw1={s1?.bpiDefenseRank}
+                    raw2={s2?.bpiDefenseRank}
+                    better="lower"
+                  />
+                )}
               </>
             )}
           </div>

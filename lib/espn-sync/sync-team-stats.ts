@@ -47,6 +47,22 @@ function buildStatsUpdate(stats: TeamStats): TournamentTeamUpdate {
   if (stats.turnoversPerGame != null)
     update.turnoversPerGame = stats.turnoversPerGame;
   if (stats.apRanking != null) update.apRanking = stats.apRanking;
+  if (stats.bpi != null) update.bpi = stats.bpi;
+  if (stats.bpiOffense != null) update.bpiOffense = stats.bpiOffense;
+  if (stats.bpiDefense != null) update.bpiDefense = stats.bpiDefense;
+  if (stats.bpiRank != null) update.bpiRank = stats.bpiRank;
+  if (stats.bpiOffenseRank != null)
+    update.bpiOffenseRank = stats.bpiOffenseRank;
+  if (stats.bpiDefenseRank != null)
+    update.bpiDefenseRank = stats.bpiDefenseRank;
+  if (stats.strengthOfSchedule != null)
+    update.strengthOfSchedule = stats.strengthOfSchedule;
+  if (stats.strengthOfScheduleRank != null)
+    update.strengthOfScheduleRank = stats.strengthOfScheduleRank;
+  if (stats.strengthOfRecord != null)
+    update.strengthOfRecord = stats.strengthOfRecord;
+  if (stats.strengthOfRecordRank != null)
+    update.strengthOfRecordRank = stats.strengthOfRecordRank;
 
   return update;
 }

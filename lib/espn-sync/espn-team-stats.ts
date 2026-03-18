@@ -10,6 +10,9 @@ const ESPN_TEAMS_URL =
 const ESPN_RANKINGS_URL =
   "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/rankings";
 
+const ESPN_POWERINDEX_URL =
+  "https://sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons";
+
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -32,6 +35,31 @@ export interface TeamStats {
   blocksPerGame: number | null;
   turnoversPerGame: number | null;
   apRanking: number | null;
+  bpi: number | null;
+  bpiOffense: number | null;
+  bpiDefense: number | null;
+  bpiRank: number | null;
+  bpiOffenseRank: number | null;
+  bpiDefenseRank: number | null;
+  strengthOfSchedule: number | null;
+  strengthOfScheduleRank: number | null;
+  strengthOfRecord: number | null;
+  strengthOfRecordRank: number | null;
+}
+
+interface ESPNPowerIndexStat {
+  name: string;
+  value: number;
+}
+
+interface ESPNPowerIndexResponse {
+  stats?: ESPNPowerIndexStat[];
+  bpi?: number;
+  bpioffense?: number;
+  bpidefense?: number;
+  bpirank?: number;
+  bpioffenserank?: number;
+  bpidefenserank?: number;
 }
 
 // ESPN team API response types (subset we care about)
@@ -343,6 +371,79 @@ async function fetchAPRankings(season?: number): Promise<Map<string, number>> {
   return rankings;
 }
 
+interface PowerIndexResult {
+  bpi: number | null;
+  bpiOffense: number | null;
+  bpiDefense: number | null;
+  bpiRank: number | null;
+  bpiOffenseRank: number | null;
+  bpiDefenseRank: number | null;
+  strengthOfSchedule: number | null;
+  strengthOfScheduleRank: number | null;
+  strengthOfRecord: number | null;
+  strengthOfRecordRank: number | null;
+}
+
+const EMPTY_POWER_INDEX: PowerIndexResult = {
+  bpi: null,
+  bpiOffense: null,
+  bpiDefense: null,
+  bpiRank: null,
+  bpiOffenseRank: null,
+  bpiDefenseRank: null,
+  strengthOfSchedule: null,
+  strengthOfScheduleRank: null,
+  strengthOfRecord: null,
+  strengthOfRecordRank: null,
+};
+
+function findPowerIndexStat(
+  stats: ESPNPowerIndexStat[] | undefined,
+  name: string,
+): number | null {
+  if (!stats) return null;
+  const stat = stats.find((s) => s.name === name);
+  return stat?.value ?? null;
+}
+
+async function fetchTeamPowerIndex(
+  espnId: string,
+  season?: number,
+): Promise<PowerIndexResult> {
+  const year = season ?? new Date().getFullYear();
+  const url = `${ESPN_POWERINDEX_URL}/${year}/powerindex/${espnId}`;
+  try {
+    const response = await fetch(url, {
+      headers: { "User-Agent": "Bracketsball/1.0" },
+    });
+    if (!response.ok) {
+      console.warn(
+        `[espn-stats] Failed to fetch power index for ${espnId}: ${response.status}`,
+      );
+      return EMPTY_POWER_INDEX;
+    }
+    const data: ESPNPowerIndexResponse = await response.json();
+    const stats = data.stats;
+    return {
+      bpi: data.bpi ?? findPowerIndexStat(stats, "bpi"),
+      bpiOffense: data.bpioffense ?? findPowerIndexStat(stats, "bpioffense"),
+      bpiDefense: data.bpidefense ?? findPowerIndexStat(stats, "bpidefense"),
+      bpiRank: data.bpirank ?? findPowerIndexStat(stats, "bpirank"),
+      bpiOffenseRank:
+        data.bpioffenserank ?? findPowerIndexStat(stats, "bpioffenserank"),
+      bpiDefenseRank:
+        data.bpidefenserank ?? findPowerIndexStat(stats, "bpidefenserank"),
+      strengthOfSchedule: findPowerIndexStat(stats, "sospast"),
+      strengthOfScheduleRank: findPowerIndexStat(stats, "sospastrank"),
+      strengthOfRecord: findPowerIndexStat(stats, "sor"),
+      strengthOfRecordRank: findPowerIndexStat(stats, "sorrank"),
+    };
+  } catch (err) {
+    console.warn(`[espn-stats] Error fetching power index for ${espnId}:`, err);
+    return EMPTY_POWER_INDEX;
+  }
+}
+
 /**
  * Fetch stats for a single team from ESPN.
  */
@@ -351,7 +452,10 @@ async function fetchTeamStats(
   apRankings?: Map<string, number>,
   season?: number,
 ): Promise<TeamStats> {
-  const statistics = await fetchTeamStatistics(espnId, season);
+  const [statistics, powerIndex] = await Promise.all([
+    fetchTeamStatistics(espnId, season),
+    fetchTeamPowerIndex(espnId, season),
+  ]);
 
   // The team info endpoint doesn't support ?season (always returns
   // current-season data). Call it when no season is specified or when the
@@ -381,6 +485,16 @@ async function fetchTeamStats(
     blocksPerGame: statistics.blocksPerGame,
     turnoversPerGame: statistics.turnoversPerGame,
     apRanking: apRankings?.get(espnId) ?? null,
+    bpi: powerIndex.bpi,
+    bpiOffense: powerIndex.bpiOffense,
+    bpiDefense: powerIndex.bpiDefense,
+    bpiRank: powerIndex.bpiRank,
+    bpiOffenseRank: powerIndex.bpiOffenseRank,
+    bpiDefenseRank: powerIndex.bpiDefenseRank,
+    strengthOfSchedule: powerIndex.strengthOfSchedule,
+    strengthOfScheduleRank: powerIndex.strengthOfScheduleRank,
+    strengthOfRecord: powerIndex.strengthOfRecord,
+    strengthOfRecordRank: powerIndex.strengthOfRecordRank,
   };
 }
 

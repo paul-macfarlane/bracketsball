@@ -50,6 +50,10 @@ const statWeightsSchema = z.object({
   stealsPerGame: z.number().int().min(0).max(10),
   blocksPerGame: z.number().int().min(0).max(10),
   turnoversPerGame: z.number().int().min(0).max(10),
+  bpiOffense: z.number().int().min(0).max(10),
+  bpiDefense: z.number().int().min(0).max(10),
+  strengthOfSchedule: z.number().int().min(0).max(10),
+  strengthOfRecord: z.number().int().min(0).max(10),
 });
 
 const statsConfigSchema = z.object({
