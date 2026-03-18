@@ -879,7 +879,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
-### 58. Elimination Tracker (Non-MVP) — Epic: Tournament Experience
+### 58. Elimination Tracker (Non-MVP) —  ✅ Epic: Tournament Experience
 
 **As a** pool member, **I want to** see which brackets are mathematically eliminated from winning the pool **so that** I can focus my attention on brackets that are still in contention.
 
@@ -1145,9 +1145,9 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 53  | Full Tournament Scenario Tests        | Testing                 | No  | Done   |
 | 54  | Tiebreaker Edge Cases & Integration   | Testing                 | No  |        |
 | 55  | Per-Game & Round-Level Potential Pts  | Bracket UX Enhancements | No  | Done   |
-| 56  | "What I Need" Rooting Guide           | Tournament Experience   | No  |        |
+| 56  | "What I Need" Rooting Guide           | Tournament Experience   | No  | Done   |
 | 57  | Bracket Copy / Duplicate              | Bracket Creation        | No  | Done   |
-| 58  | Elimination Tracker                   | Tournament Experience   | No  |        |
+| 58  | Elimination Tracker                   | Tournament Experience   | No  | Done   |
 | 59  | Pool Activity Feed                    | Pool Social             | No  |        |
 | 60  | Pool Notifications                    | Pool Social             | No  |        |
 | 61  | Pool History / Past Seasons           | Multi-Season Support    | No  |        |
