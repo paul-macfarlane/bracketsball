@@ -39,6 +39,7 @@ export const submitBracketSchema = z.object({
 });
 
 const statWeightsSchema = z.object({
+  winPct: z.number().int().min(0).max(10),
   ppg: z.number().int().min(0).max(10),
   oppPpg: z.number().int().min(0).max(10),
   fgPct: z.number().int().min(0).max(10),
@@ -53,7 +54,7 @@ const statWeightsSchema = z.object({
 
 const statsConfigSchema = z.object({
   weights: statWeightsSchema,
-  chaosLevel: z.enum(["low", "medium", "high"]),
+  chaosLevel: z.enum(["none", "low", "medium", "high"]),
 });
 
 export const autoFillBracketSchema = z

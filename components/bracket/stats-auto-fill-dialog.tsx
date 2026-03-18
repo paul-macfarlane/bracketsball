@@ -52,8 +52,9 @@ const VALID_PRESETS = new Set<string>([
   "rebounding_hustle",
   "custom",
 ]);
-const VALID_CHAOS_LEVELS = new Set<string>(["low", "medium", "high"]);
+const VALID_CHAOS_LEVELS = new Set<string>(["none", "low", "medium", "high"]);
 const WEIGHT_KEYS: (keyof StatWeights)[] = [
+  "winPct",
   "ppg",
   "oppPpg",
   "fgPct",
@@ -69,7 +70,7 @@ const WEIGHT_KEYS: (keyof StatWeights)[] = [
 const DEFAULT_CONFIG: SavedConfig = {
   preset: "balanced",
   weights: { ...PRESETS.balanced.weights },
-  chaosLevel: "low",
+  chaosLevel: "none",
 };
 
 function isValidSavedConfig(data: unknown): data is SavedConfig {
@@ -209,6 +210,7 @@ export function StatsAutoFillDialog({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="none">None (pure stats)</SelectItem>
               <SelectItem value="low">Low (5% upsets)</SelectItem>
               <SelectItem value="medium">Medium (20% upsets)</SelectItem>
               <SelectItem value="high">High (40% upsets)</SelectItem>
