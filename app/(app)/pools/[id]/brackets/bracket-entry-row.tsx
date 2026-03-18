@@ -33,6 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { TeamLogo } from "@/components/team-logo";
+import { formatOrdinal } from "@/lib/utils";
 import {
   deleteBracketEntryAction,
   duplicateBracketEntryAction,
@@ -54,6 +55,12 @@ interface BracketEntryRowProps {
     teamDarkLogoUrl: string | null;
   } | null;
   isEliminated?: boolean | null;
+  standingsInfo?: {
+    rank: number;
+    totalPoints: number;
+    potentialPoints: number;
+  } | null;
+  totalBrackets?: number;
 }
 
 export function BracketEntryRow({
@@ -63,6 +70,8 @@ export function BracketEntryRow({
   canDuplicate,
   championPick,
   isEliminated,
+  standingsInfo,
+  totalBrackets,
 }: BracketEntryRowProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -131,16 +140,32 @@ export function BracketEntryRow({
         )}
       </Link>
       <div className="flex shrink-0 items-center gap-2">
-        <Badge
-          variant={entry.status === "submitted" ? "default" : "outline"}
-          className={
-            entry.status === "submitted"
-              ? ""
-              : "border-warning bg-warning/10 text-warning-foreground"
-          }
-        >
-          {entry.status === "submitted" ? "Submitted" : "Not Submitted"}
-        </Badge>
+        {tournamentStarted && standingsInfo && (
+          <div className="flex items-center gap-3 text-sm">
+            <span className="font-medium text-muted-foreground">
+              {formatOrdinal(standingsInfo.rank)} of {totalBrackets}
+            </span>
+            <span>
+              <span className="font-semibold">{standingsInfo.totalPoints}</span>
+              <span className="text-muted-foreground"> pts</span>
+            </span>
+            <span className="text-muted-foreground">
+              {standingsInfo.potentialPoints} potential
+            </span>
+          </div>
+        )}
+        {!tournamentStarted && (
+          <Badge
+            variant={entry.status === "submitted" ? "default" : "outline"}
+            className={
+              entry.status === "submitted"
+                ? ""
+                : "border-warning bg-warning/10 text-warning-foreground"
+            }
+          >
+            {entry.status === "submitted" ? "Submitted" : "Not Submitted"}
+          </Badge>
+        )}
         {!tournamentStarted && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
