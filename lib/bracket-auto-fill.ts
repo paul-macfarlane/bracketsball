@@ -12,9 +12,10 @@ export type AutoFillStrategy =
   | "random"
   | "stats_custom";
 
-export type ChaosLevel = "low" | "medium" | "high";
+export type ChaosLevel = "none" | "low" | "medium" | "high";
 
 export interface StatWeights {
+  winPct: number;
   ppg: number;
   oppPpg: number;
   fgPct: number;
@@ -38,20 +39,21 @@ export const STAT_CATEGORIES: {
   inverted: boolean;
   group: string;
 }[] = [
-  { key: "ppg", label: "PPG", inverted: false, group: "Scoring" },
-  { key: "oppPpg", label: "Opp PPG", inverted: true, group: "Scoring" },
+  { key: "winPct", label: "Win %", inverted: false, group: "Overall" },
+  { key: "ppg", label: "PPG", inverted: false, group: "Offense" },
+  { key: "oppPpg", label: "Opp PPG", inverted: true, group: "Offense" },
+  {
+    key: "assistsPerGame",
+    label: "APG",
+    inverted: false,
+    group: "Offense",
+  },
   { key: "fgPct", label: "FG%", inverted: false, group: "Shooting" },
   { key: "threePtPct", label: "3PT%", inverted: false, group: "Shooting" },
   { key: "ftPct", label: "FT%", inverted: false, group: "Shooting" },
   {
     key: "reboundsPerGame",
     label: "RPG",
-    inverted: false,
-    group: "Hustle",
-  },
-  {
-    key: "assistsPerGame",
-    label: "APG",
     inverted: false,
     group: "Hustle",
   },
@@ -88,6 +90,7 @@ export const PRESETS: Record<
   offense_heavy: {
     label: "Offense-Heavy",
     weights: {
+      winPct: 3,
       ppg: 9,
       oppPpg: 2,
       fgPct: 8,
@@ -103,6 +106,7 @@ export const PRESETS: Record<
   defense_heavy: {
     label: "Defense-Heavy",
     weights: {
+      winPct: 3,
       ppg: 2,
       oppPpg: 9,
       fgPct: 2,
@@ -118,6 +122,7 @@ export const PRESETS: Record<
   balanced: {
     label: "Balanced",
     weights: {
+      winPct: 5,
       ppg: 5,
       oppPpg: 5,
       fgPct: 5,
@@ -133,6 +138,7 @@ export const PRESETS: Record<
   rebounding_hustle: {
     label: "Rebounding & Hustle",
     weights: {
+      winPct: 3,
       ppg: 3,
       oppPpg: 3,
       fgPct: 2,
@@ -148,6 +154,7 @@ export const PRESETS: Record<
 };
 
 const CHAOS_UPSET_PROBABILITY: Record<ChaosLevel, number> = {
+  none: 0,
   low: 0.05,
   medium: 0.2,
   high: 0.4,
@@ -211,10 +218,53 @@ export function autoFillBracket(
     newPicks.push({ tournamentGameId: game.id, pickedTeamId: winner.id });
   }
 
-  // Generate a random tiebreaker in a realistic championship total range (100-180)
-  const tiebreakerScore = Math.floor(Math.random() * 81) + 100;
+  // Generate tiebreaker: use championship finalists' PPG if available, else random
+  const tiebreakerScore = generateTiebreaker(
+    sortedGames,
+    pickMap,
+    teamMap,
+    strategy,
+  );
 
   return { picks: newPicks, tiebreakerScore };
+}
+
+/**
+ * Generates a tiebreaker score. For stats-aware strategies, sums the PPG of
+ * the two championship finalists. Falls back to a random value in a realistic range.
+ */
+function generateTiebreaker(
+  sortedGames: BracketGame[],
+  pickMap: Map<string, string>,
+  teamMap: Map<string, BracketTeam>,
+  strategy: AutoFillStrategy,
+): number {
+  if (strategy === "stats_custom") {
+    const champGame = sortedGames.find((g) => g.round === "championship");
+    if (champGame) {
+      const team1 = resolveTeam(
+        champGame,
+        "team1",
+        pickMap,
+        sortedGames,
+        teamMap,
+      );
+      const team2 = resolveTeam(
+        champGame,
+        "team2",
+        pickMap,
+        sortedGames,
+        teamMap,
+      );
+      const ppg1 = team1?.stats?.ppg;
+      const ppg2 = team2?.stats?.ppg;
+      if (ppg1 != null && ppg2 != null) {
+        return Math.round(ppg1 + ppg2);
+      }
+    }
+  }
+  // Random fallback in a realistic championship total range (100-180)
+  return Math.floor(Math.random() * 81) + 100;
 }
 
 function resolveTeam(
@@ -247,31 +297,112 @@ function pickWinner(
 ): BracketTeam {
   if (strategy === "chalk") {
     // Lower seed number = higher seed = favored
-    // If equal seeds, pick team1 (arbitrary)
-    return team1.seed <= team2.seed ? team1 : team2;
+    // If equal seeds, coin flip
+    if (team1.seed === team2.seed) return Math.random() < 0.5 ? team1 : team2;
+    return team1.seed < team2.seed ? team1 : team2;
   }
 
   if (strategy === "random") {
     return Math.random() < 0.5 ? team1 : team2;
   }
 
-  // Weighted random: P(team1 wins) = team2.seed / (team1.seed + team2.seed)
-  const team1Weight = team2.seed;
-  const team2Weight = team1.seed;
-  const totalWeight = team1Weight + team2Weight;
-  const roll = Math.random() * totalWeight;
+  // Weighted random using historical NCAA upset rates by seed differential.
+  // Higher seed's win probability is looked up from historical data.
+  const higherSeed = team1.seed <= team2.seed ? team1 : team2;
+  const lowerSeed = higherSeed === team1 ? team2 : team1;
+  const prob = historicalHigherSeedWinRate(higherSeed.seed, lowerSeed.seed);
+  return Math.random() < prob ? higherSeed : lowerSeed;
+}
 
-  return roll < team1Weight ? team1 : team2;
+/**
+ * Returns approximate win probability for the higher-seeded team based on
+ * historical NCAA tournament matchup data. Falls back to a seed-ratio
+ * formula for matchups not in the lookup table.
+ */
+function historicalHigherSeedWinRate(
+  higherSeed: number,
+  lowerSeed: number,
+): number {
+  // Historical win rates for the higher seed in common first-round matchups
+  // Source: aggregated NCAA tournament data 1985-2024
+  const HISTORICAL_RATES: Record<string, number> = {
+    "1v16": 0.99,
+    "2v15": 0.94,
+    "3v14": 0.85,
+    "4v13": 0.79,
+    "5v12": 0.65,
+    "6v11": 0.63,
+    "7v10": 0.61,
+    "8v9": 0.51,
+  };
+  const key = `${higherSeed}v${lowerSeed}`;
+  if (key in HISTORICAL_RATES) {
+    return HISTORICAL_RATES[key];
+  }
+  // Fallback for later-round cross-seed matchups: seed-ratio formula
+  return lowerSeed / (higherSeed + lowerSeed);
+}
+
+/**
+ * Derives the win percentage from a team's win/loss record.
+ * Returns null if the data is unavailable or the team has played no games.
+ */
+function deriveWinPct(stats: TeamStats | undefined): number | null {
+  if (!stats || stats.overallWins == null || stats.overallLosses == null)
+    return null;
+  const total = stats.overallWins + stats.overallLosses;
+  if (total === 0) return null;
+  return stats.overallWins / total;
+}
+
+/**
+ * Gets the stat value for a category, handling the derived winPct stat
+ * that isn't a direct field on TeamStats.
+ */
+function getStatValue(
+  stats: TeamStats | undefined,
+  key: keyof StatWeights,
+): number | null {
+  if (key === "winPct") return deriveWinPct(stats);
+  return stats?.[key] ?? null;
+}
+
+/**
+ * Computes stat ranges (min/max) across two teams for min-max normalization.
+ * This ensures all stats are on a 0-1 scale before weights are applied,
+ * preventing stats with larger magnitudes (e.g., PPG ~80) from dominating
+ * over smaller-scale stats (e.g., SPG ~1.5).
+ */
+function computeStatRanges(
+  stats1: TeamStats | undefined,
+  stats2: TeamStats | undefined,
+): Map<keyof StatWeights, { min: number; max: number }> {
+  const ranges = new Map<keyof StatWeights, { min: number; max: number }>();
+  for (const cat of STAT_CATEGORIES) {
+    const v1 = getStatValue(stats1, cat.key);
+    const v2 = getStatValue(stats2, cat.key);
+    const values = [v1, v2].filter((v): v is number => v != null);
+    if (values.length > 0) {
+      ranges.set(cat.key, {
+        min: Math.min(...values),
+        max: Math.max(...values),
+      });
+    }
+  }
+  return ranges;
 }
 
 /**
  * Computes a composite score for a team based on weighted stat categories.
- * For inverted stats (Opp PPG, TOPG), lower raw values produce higher scores.
- * Missing stats for a category are skipped (weight excluded from total).
+ * Stats are min-max normalized to 0-1 using the provided ranges so that all
+ * categories contribute proportionally to their weights regardless of scale.
+ * For inverted stats (Opp PPG, TOPG), the normalization is flipped so that
+ * lower raw values produce higher normalized scores.
  */
 function computeTeamScore(
   stats: TeamStats | undefined,
   weights: StatWeights,
+  statRanges: Map<keyof StatWeights, { min: number; max: number }>,
 ): number | null {
   if (!stats) return null;
 
@@ -282,11 +413,23 @@ function computeTeamScore(
     const weight = weights[cat.key];
     if (weight === 0) continue;
 
-    const value = stats[cat.key];
+    const value = getStatValue(stats, cat.key);
     if (value == null) continue;
 
-    // Normalize: for inverted stats, negate so that lower raw = higher score
-    const normalized = cat.inverted ? -value : value;
+    const range = statRanges.get(cat.key);
+    if (!range) continue;
+
+    let normalized: number;
+    if (range.max === range.min) {
+      // Both teams have the same value — no differentiation
+      normalized = 0.5;
+    } else {
+      // Normalize to 0-1; for inverted stats, flip so lower raw = higher score
+      normalized = cat.inverted
+        ? (range.max - value) / (range.max - range.min)
+        : (value - range.min) / (range.max - range.min);
+    }
+
     totalScore += normalized * weight;
     totalWeight += weight;
   }
@@ -298,14 +441,20 @@ function computeTeamScore(
 /**
  * Picks a winner based on stats-weighted composite scores with chaos factor.
  * Falls back to seed-based logic when stats are unavailable.
+ *
+ * Chaos is score-aware: the upset probability scales with how close the matchup
+ * is. A near-tie gets close to the full chaos probability, while a dominant
+ * favorite gets a much smaller upset chance. At chaos "none", the favored team
+ * always wins.
  */
 function pickWinnerByStats(
   team1: BracketTeam,
   team2: BracketTeam,
   config: StatsAutoFillConfig,
 ): BracketTeam {
-  const score1 = computeTeamScore(team1.stats, config.weights);
-  const score2 = computeTeamScore(team2.stats, config.weights);
+  const statRanges = computeStatRanges(team1.stats, team2.stats);
+  const score1 = computeTeamScore(team1.stats, config.weights, statRanges);
+  const score2 = computeTeamScore(team2.stats, config.weights, statRanges);
 
   // Fall back to seed-based if no stats for either team
   if (score1 === null && score2 === null) {
@@ -329,10 +478,19 @@ function pickWinnerByStats(
 
   const statsUnderdog = statsFavored === team1 ? team2 : team1;
 
-  // Apply chaos: chance the underdog wins anyway
-  const upsetChance = CHAOS_UPSET_PROBABILITY[config.chaosLevel];
-  if (Math.random() < upsetChance) {
-    return statsUnderdog;
+  // Apply score-aware chaos: scale upset probability by closeness of matchup.
+  // closeness is 0 when scores are maximally different (0 vs 1 on normalized
+  // scale) and 1 when scores are identical. This means tight matchups get the
+  // full configured upset chance, while blowouts get very little.
+  const baseChaos = CHAOS_UPSET_PROBABILITY[config.chaosLevel];
+  if (baseChaos > 0 && score1 !== null && score2 !== null) {
+    const scoreDiff = Math.abs(score1 - score2);
+    // Max possible diff on normalized 0-1 scores is 1.0
+    const closeness = 1 - scoreDiff;
+    const upsetChance = baseChaos * closeness;
+    if (Math.random() < upsetChance) {
+      return statsUnderdog;
+    }
   }
 
   return statsFavored;
