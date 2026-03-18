@@ -74,3 +74,7 @@ export const autoFillBracketSchema = z
 export const clearBracketSchema = z.object({
   bracketEntryId: z.string().min(1),
 });
+
+export const duplicateBracketSchema = z.object({
+  bracketEntryId: z.string().min(1),
+});

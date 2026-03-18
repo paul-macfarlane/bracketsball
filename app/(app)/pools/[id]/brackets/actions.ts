@@ -12,6 +12,7 @@ import {
   createBracketEntry,
   getBracketEntryById,
   getBracketEntryCountForUser,
+  getBracketEntriesByPoolAndUser,
   getPicksForEntry,
   savePick as savePickQuery,
   savePicksBatch,
@@ -41,6 +42,7 @@ import {
   submitBracketSchema,
   autoFillBracketSchema,
   clearBracketSchema,
+  duplicateBracketSchema,
 } from "@/lib/validators/bracket-entry";
 import { hasTournamentStarted } from "@/lib/db/queries/pools";
 
@@ -505,6 +507,125 @@ export async function clearBracketAction(bracketEntryId: string) {
 
   revalidatePath(`/pools/${entry.poolId}/brackets/${entry.id}`);
   return { success: true };
+}
+
+export async function duplicateBracketEntryAction(
+  poolId: string,
+  sourceBracketEntryId: string,
+) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return { error: "Not authenticated" };
+  }
+
+  const parsed = duplicateBracketSchema.safeParse({
+    bracketEntryId: sourceBracketEntryId,
+  });
+  if (!parsed.success) {
+    return { error: "Invalid input" };
+  }
+
+  const poolData = await getPoolById(poolId, session.user.id);
+  if (!poolData) {
+    return { error: "Pool not found" };
+  }
+
+  const tournament = await getActiveTournament();
+  if (!tournament) {
+    return { error: "No active tournament" };
+  }
+
+  const started = await hasTournamentStarted();
+  if (started) {
+    return { error: "Tournament has already started" };
+  }
+
+  const entryCount = await getBracketEntryCountForUser(
+    poolId,
+    session.user.id,
+    tournament.id,
+  );
+  if (entryCount >= poolData.pool.maxBracketsPerUser) {
+    return {
+      error: `You have reached the maximum of ${poolData.pool.maxBracketsPerUser} brackets for this pool`,
+    };
+  }
+
+  const sourceEntry = await getBracketEntryById(parsed.data.bracketEntryId);
+  if (
+    !sourceEntry ||
+    sourceEntry.poolId !== poolId ||
+    sourceEntry.userId !== session.user.id
+  ) {
+    return { error: "Bracket entry not found" };
+  }
+
+  // Generate unique name with (Copy), (Copy 2), etc.
+  const existingEntries = await getBracketEntriesByPoolAndUser(
+    poolId,
+    session.user.id,
+    tournament.id,
+  );
+  const existingNames = new Set(existingEntries.map((e) => e.name));
+
+  // Generate unique name, truncating the base name to leave room for the suffix
+  const suffix = " (Copy)";
+  const maxBaseLength = 100 - suffix.length;
+  const baseName =
+    sourceEntry.name.length > maxBaseLength
+      ? sourceEntry.name.slice(0, maxBaseLength)
+      : sourceEntry.name;
+
+  let newName = `${baseName} (Copy)`;
+  if (existingNames.has(newName)) {
+    let counter = 2;
+    while (existingNames.has(`${baseName} (Copy ${counter})`)) {
+      counter++;
+    }
+    newName = `${baseName} (Copy ${counter})`;
+  }
+
+  // Final safety truncation (e.g., if counter digits push past 100)
+  if (newName.length > 100) {
+    newName = newName.slice(0, 100);
+  }
+
+  const sourcePicks = await getPicksForEntry(parsed.data.bracketEntryId);
+
+  const newEntry = await db.transaction(async (tx) => {
+    const entry = await createBracketEntry(
+      {
+        poolId,
+        userId: session.user.id,
+        tournamentId: tournament.id,
+        name: newName,
+      },
+      tx,
+    );
+
+    if (sourcePicks.length > 0) {
+      await savePicksBatch(
+        entry.id,
+        sourcePicks.map((p) => ({
+          tournamentGameId: p.tournamentGameId,
+          pickedTeamId: p.pickedTeamId,
+        })),
+        tx,
+      );
+    }
+
+    if (sourceEntry.tiebreakerScore !== null) {
+      await updateTiebreakerQuery(entry.id, sourceEntry.tiebreakerScore, tx);
+    }
+
+    return entry;
+  });
+
+  revalidatePath(`/pools/${poolId}`);
+  return { success: true, newEntryId: newEntry.id, poolId };
 }
 
 // Helper: find all games downstream of a given game (games that receive the winner)

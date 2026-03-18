@@ -21,8 +21,11 @@ interface CreateBracketEntryData {
   name: string;
 }
 
-export async function createBracketEntry(data: CreateBracketEntryData) {
-  const [entry] = await db.insert(bracketEntry).values(data).returning();
+export async function createBracketEntry(
+  data: CreateBracketEntryData,
+  client: DbClient = db,
+) {
+  const [entry] = await client.insert(bracketEntry).values(data).returning();
   return entry;
 }
 
@@ -259,6 +262,49 @@ export async function clearAllPicks(
   await client
     .delete(bracketPick)
     .where(eq(bracketPick.bracketEntryId, bracketEntryId));
+}
+
+export async function getChampionPicksForEntries(entryIds: string[]) {
+  if (entryIds.length === 0) return new Map<string, ChampionPickInfo>();
+
+  const rows = await db
+    .select({
+      bracketEntryId: bracketPick.bracketEntryId,
+      teamShortName: team.shortName,
+      teamMascot: team.mascot,
+      teamLogoUrl: team.logoUrl,
+      teamDarkLogoUrl: team.darkLogoUrl,
+    })
+    .from(bracketPick)
+    .innerJoin(
+      tournamentGame,
+      eq(bracketPick.tournamentGameId, tournamentGame.id),
+    )
+    .innerJoin(team, eq(bracketPick.pickedTeamId, team.id))
+    .where(
+      and(
+        inArray(bracketPick.bracketEntryId, entryIds),
+        eq(tournamentGame.round, "championship"),
+      ),
+    );
+
+  const map = new Map<string, ChampionPickInfo>();
+  for (const row of rows) {
+    map.set(row.bracketEntryId, {
+      teamShortName: row.teamShortName,
+      teamMascot: row.teamMascot,
+      teamLogoUrl: row.teamLogoUrl,
+      teamDarkLogoUrl: row.teamDarkLogoUrl,
+    });
+  }
+  return map;
+}
+
+interface ChampionPickInfo {
+  teamShortName: string;
+  teamMascot: string | null;
+  teamLogoUrl: string | null;
+  teamDarkLogoUrl: string | null;
 }
 
 export async function getPoolStandings(

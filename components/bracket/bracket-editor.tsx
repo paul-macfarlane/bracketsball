@@ -24,6 +24,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BracketFullView } from "./bracket-full-view";
@@ -36,11 +37,12 @@ import {
   submitBracketAction,
   unsubmitBracketAction,
   deleteBracketEntryAction,
+  duplicateBracketEntryAction,
   autoFillBracketAction,
   clearBracketAction,
 } from "@/app/(app)/pools/[id]/brackets/actions";
 import { CountdownTimer } from "@/components/countdown-timer";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Copy, MoreHorizontal, Trash2 } from "lucide-react";
 import type {
   AutoFillStrategy,
   StatsAutoFillConfig,
@@ -69,6 +71,7 @@ interface BracketEditorProps {
   poolScoring?: PoolScoring;
   poolName?: string;
   rankInfo?: { rank: number; totalEntries: number } | null;
+  canDuplicate?: boolean;
 }
 
 export function BracketEditor({
@@ -86,6 +89,7 @@ export function BracketEditor({
   poolScoring,
   poolName,
   rankInfo,
+  canDuplicate,
 }: BracketEditorProps) {
   const router = useRouter();
   const [name, setName] = useState(bracketName);
@@ -96,6 +100,7 @@ export function BracketEditor({
   const [isSubmitting, startSubmitTransition] = useTransition();
   const [status, setStatus] = useState(bracketStatus);
   const [showStatsDialog, setShowStatsDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const {
     picks,
@@ -281,6 +286,18 @@ export function BracketEditor({
     });
   }
 
+  function handleDuplicate() {
+    startTransition(async () => {
+      const result = await duplicateBracketEntryAction(poolId, bracketEntryId);
+      if (result.error) {
+        toast.error(result.error);
+      } else if (result.newEntryId) {
+        toast.success("Bracket duplicated");
+        router.push(`/pools/${poolId}/brackets/${result.newEntryId}`);
+      }
+    });
+  }
+
   return (
     <div>
       {/* Lock status: countdown or locked banner */}
@@ -297,7 +314,7 @@ export function BracketEditor({
 
       {/* Draft warning banner */}
       {!isSubmitted && !isLocked && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm font-medium text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-warning bg-warning/10 p-3 text-sm font-medium text-warning-foreground">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <span>
             Your bracket is not submitted yet.{" "}
@@ -335,7 +352,7 @@ export function BracketEditor({
               className={
                 isSubmitted
                   ? ""
-                  : "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/50 dark:text-amber-300"
+                  : "border-warning bg-warning/10 text-warning-foreground"
               }
             >
               {isSubmitted ? "Submitted" : "Not Submitted"}
@@ -434,32 +451,60 @@ export function BracketEditor({
                 </Button>
               )}
               {!isLocked && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      disabled={isPending}
-                    >
-                      Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete bracket?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently delete &quot;{name}&quot; and all
-                        its picks. This cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDelete}>
+                <>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        disabled={isPending}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">More actions</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={handleDuplicate}
+                        disabled={!canDuplicate || isPending}
+                      >
+                        <Copy className="mr-2 h-4 w-4" />
+                        Duplicate
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={() => setShowDeleteDialog(true)}
+                        disabled={isPending}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
                         Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <AlertDialog
+                    open={showDeleteDialog}
+                    onOpenChange={setShowDeleteDialog}
+                  >
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete bracket?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete &quot;{name}&quot; and
+                          all its picks. This cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
               )}
             </div>
           </div>
