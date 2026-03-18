@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { getPoolById } from "@/lib/db/queries/pools";
 import {
   getBracketEntryById,
+  getBracketEntryCountForUser,
   getPicksForEntry,
   getPoolStandings,
 } from "@/lib/db/queries/bracket-entries";
@@ -130,6 +131,19 @@ export default async function BracketPage({
     scoringChampionship: poolData.pool.scoringChampionship,
   };
 
+  // Compute canDuplicate for the editor
+  const bracketCount = isOwner
+    ? await getBracketEntryCountForUser(
+        poolId,
+        session.user.id,
+        entry.tournamentId,
+      )
+    : 0;
+  const canDuplicate =
+    isOwner &&
+    !tournamentStarted &&
+    bracketCount < poolData.pool.maxBracketsPerUser;
+
   // Get rank info for this bracket (only for submitted entries)
   let rankInfo: { rank: number; totalEntries: number } | null = null;
   if (entry.status === "submitted") {
@@ -162,6 +176,7 @@ export default async function BracketPage({
           poolScoring={poolScoring}
           poolName={poolData.pool.name}
           rankInfo={rankInfo}
+          canDuplicate={canDuplicate}
         />
       ) : (
         <BracketViewer

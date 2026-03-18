@@ -847,6 +847,219 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 56. "What I Need" Rooting Guide (Non-MVP) ✅ — Epic: Tournament Experience
+
+**As a** pool member watching the tournament, **I want to** see a personalized summary of which teams I need to win or lose **so that** I can quickly understand who to root for without mentally tracing through my bracket.
+
+**Acceptance Criteria:**
+
+- A "What I Need" tab or section is accessible from the pool detail page or individual bracket view
+- For each upcoming/in-progress game, the view shows whether the user's bracket needs Team A or Team B to win, and why (e.g., "You picked Duke to the Elite 8 — they must win this game for you to earn 4 pts")
+- Games are grouped by round and sorted by impact (highest potential points at stake first)
+- Games where the user's picked team is already eliminated are shown as "lost" / no longer relevant
+- If the user has multiple brackets in the pool, they can toggle between them
+- Works on both desktop and mobile
+- Only visible once the tournament has started (no value pre-tournament)
+
+---
+
+### 57. Bracket Copy / Duplicate (Non-MVP) ✅ — Epic: Bracket Creation
+
+**As a** pool member, **I want to** duplicate one of my existing bracket entries **so that** I can create a variation without re-picking every game from scratch.
+
+**Acceptance Criteria:**
+
+- A "Duplicate" action is available on the user's bracket list (pool detail page) for each of their bracket entries
+- Duplicating creates a new bracket entry pre-filled with all picks and tiebreaker from the source bracket
+- The new bracket is named "{Original Name} (Copy)" by default, and the user can rename it
+- The duplicate is created in draft/unsaved state — the user must review and submit it
+- Duplication is only available before tournament lock (same as bracket creation)
+- Duplication respects the pool's max brackets per user limit — if the user is already at the max, the action is disabled with an explanation
+- The duplicated bracket is independent — editing it does not affect the original
+
+---
+
+### 58. Elimination Tracker (Non-MVP) — Epic: Tournament Experience
+
+**As a** pool member, **I want to** see which brackets are mathematically eliminated from winning the pool **so that** I can focus my attention on brackets that are still in contention.
+
+**Acceptance Criteria:**
+
+- A bracket entry is "mathematically eliminated" when its current points + remaining potential points is less than the current leader's points
+- Eliminated brackets are visually marked on the standings page (e.g., a subtle "Eliminated" badge, greyed-out styling, or strikethrough)
+- Eliminated brackets are also marked on the user's own bracket list on the pool detail page
+- The bracket detail view shows an elimination banner when applicable (e.g., "Mathematically eliminated — leader has X pts, your max possible is Y pts")
+- Brackets that are still alive show a "Still alive" or "In contention" indicator
+- Elimination status updates automatically as games are completed and standings sync
+- Pre-tournament: no elimination indicators are shown
+- Edge case: if all brackets are tied, none are eliminated
+
+---
+
+### 59. Pool Activity Feed (Non-MVP) — Epic: Pool Social
+
+**As a** pool member, **I want to** see an activity feed and post comments within my pool **so that** I can trash talk, react to upsets, and stay engaged with my friends during the tournament.
+
+**Acceptance Criteria:**
+
+- A "Feed" or "Chat" tab is available on the pool detail page
+- Pool members can post text messages (max ~500 characters)
+- Messages display the author's profile picture, username, and timestamp
+- Feed loads most recent messages first with pagination or infinite scroll
+- Members can delete their own messages
+- Pool leaders can delete any message (moderation)
+- Feed is available before, during, and after the tournament
+- No real-time requirement — messages appear on page load/refresh
+- Works on both desktop and mobile
+
+---
+
+### 60. Pool Notifications (Non-MVP) — Epic: Pool Social
+
+**As a** pool member, **I want to** receive notifications for key pool events **so that** I stay engaged without having to constantly check the app.
+
+**Acceptance Criteria:**
+
+- Users can opt in/out of notifications from their profile settings
+- Notification triggers include:
+  - A new member joined the pool
+  - Tournament is about to lock (24 hours before R64 start)
+  - A new round has started
+  - User's standings position changed significantly (moved up or down 3+ spots)
+  - A bracket entry was eliminated (if elimination tracker is implemented)
+- Notifications are delivered via email (v1 — push notifications can come later)
+- Each notification type can be individually toggled on/off
+- Notifications include a direct link to the relevant pool/bracket page
+
+---
+
+### 61. Pool History / Past Seasons (Non-MVP) — Epic: Multi-Season Support
+
+**As a** pool member, **I want to** view past tournament results within my pool **so that** I can see historical winners and relive previous seasons.
+
+**Acceptance Criteria:**
+
+- A "Past Seasons" tab or section is available on the pool detail page when the pool has bracket entries from previous tournaments
+- Past seasons show the final standings for each completed tournament
+- Users can click into past bracket entries to view picks and results (read-only)
+- Past season winners are highlighted
+- Current season remains the default view
+- If no past seasons exist, the tab/section is hidden
+
+---
+
+### 62. Pool Awards / Badges (Non-MVP) — Epic: Pool Social
+
+**As a** pool member, **I want to** see fun awards and badges after the tournament ends **so that** our pool has memorable highlights beyond just the final standings.
+
+**Acceptance Criteria:**
+
+- After the tournament is complete, an "Awards" section appears on the pool detail page
+- Awards are automatically calculated based on bracket data. Examples:
+  - **Champion**: highest-scoring bracket
+  - **Cinderella Believer**: picked the most upsets (lower seed over higher seed)
+  - **Chalk King**: picked the most favorites (higher seed)
+  - **Best Upset Pick**: correctly predicted the biggest upset (largest seed differential)
+  - **Crystal Ball**: closest tiebreaker prediction
+  - **Last Place**: lowest-scoring bracket (good-natured)
+- Each award shows the bracket name, owner, and relevant stat
+- Awards are only shown after the championship game is final
+- Works with any number of brackets (minimum thresholds for awards to make sense, e.g., at least 3 brackets in the pool)
+
+---
+
+### 63. Standings Movement Tracker (Non-MVP) — Epic: Tournament Experience
+
+**As a** pool member, **I want to** see how standings positions have changed over time **so that** I can track momentum and see who is surging or falling.
+
+**Acceptance Criteria:**
+
+- The standings page shows a position change indicator next to each bracket entry (e.g., green up arrow with "+3", red down arrow with "-2", or dash for no change)
+- Position changes are calculated relative to the standings at the end of the previous round
+- A "Movement" column or inline indicator is added to the standings table
+- Newly submitted brackets (first appearance) show "NEW" instead of a movement indicator
+- Pre-tournament: no movement indicators are shown (no previous round to compare to)
+
+---
+
+### 64. Side-by-Side Bracket Comparison (Non-MVP) — Epic: Bracket UX Enhancements
+
+**As a** pool member, **I want to** compare two brackets side by side **so that** I can see where my picks diverge from a rival's and who is winning the head-to-head.
+
+**Acceptance Criteria:**
+
+- A "Compare" action is available from the standings page — user selects two brackets to compare
+- The comparison view shows both brackets' picks for each game, highlighting where they differ
+- Games where one bracket was correct and the other was wrong are visually distinguished
+- A summary header shows each bracket's total points, potential points, and head-to-head record (games where they differ and one was correct)
+- Users can compare any two brackets in the pool (their own or others')
+- Works on desktop; mobile can use a stacked or swipeable layout
+- Accessible from individual bracket view as well ("Compare with...")
+
+---
+
+### 65. Round Recap Digest (Non-MVP) — Epic: Tournament Experience
+
+**As a** pool member, **I want to** see a recap summary after each round completes **so that** I can quickly understand how the round affected the pool standings.
+
+**Acceptance Criteria:**
+
+- After all games in a round are marked final, a round recap is generated for the pool
+- Recap includes:
+  - Number of upsets in the round
+  - Which brackets gained the most points in the round
+  - Standings changes (who moved up/down the most)
+  - Number of brackets eliminated (if elimination tracker is implemented)
+  - Notable picks: correct upset picks that few brackets had
+- Recaps are accessible from the pool detail page (e.g., a "Recaps" section or inline on the feed)
+- Recaps are generated automatically — no admin action required
+- Each round's recap persists and can be viewed later
+
+---
+
+### 66. Pick Confidence Indicator (Non-MVP) — Epic: Bracket Creation
+
+**As a** pool member filling out my bracket, **I want to** see how "chalky" or "chaotic" my overall bracket is **so that** I can calibrate whether I'm being bold enough or playing it too safe.
+
+**Acceptance Criteria:**
+
+- While creating or editing a bracket, a summary indicator shows the percentage of picks that match the higher seed (chalk percentage)
+- The indicator updates in real-time as picks are made
+- A descriptive label accompanies the percentage (e.g., "Very Chalky", "Balanced", "Upset Heavy", "Pure Chaos")
+- Displayed in the bracket editor sticky header area alongside existing stats
+- Does not block or influence picks — purely informational
+- Only considers games that have been picked (not empty slots)
+
+---
+
+### 67. Aggregate Pick Percentages (Non-MVP) — Epic: Pool Social
+
+**As a** pool member, **I want to** see what percentage of brackets in my pool picked each team **so that** I can see how my picks compare to the group consensus.
+
+**Acceptance Criteria:**
+
+- After tournament lock, each game on the bracket view shows the percentage of pool brackets that picked each team (e.g., "Duke 73% / UNC 27%")
+- Percentages are calculated from all submitted brackets in the pool
+- Before tournament lock, pick percentages are hidden to prevent influencing picks
+- Percentages are shown as a subtle overlay or tooltip — not cluttering the main bracket view
+- Available on both the bracket viewer and the bracket editor (read-only post-lock)
+
+---
+
+### 68. Upset Notifications (Non-MVP) — Epic: Tournament Experience
+
+**As a** pool member, **I want to** be notified when a major upset happens that impacts my pool **so that** I stay engaged and can react in real time.
+
+**Acceptance Criteria:**
+
+- When a game marked as final is an upset (lower seed beats higher seed by 4+ seed lines), a notification is generated for the pool
+- Notification includes: the upset result, how many brackets in the pool had the losing team advancing, and which brackets (if any) correctly predicted the upset
+- Delivered via the same notification channel as pool notifications (#60) — email v1
+- Users who have pool notifications enabled receive upset notifications by default (can be toggled separately)
+- Only significant upsets trigger notifications (configurable threshold, default: 4+ seed differential)
+
+---
+
 ### 54. Tiebreaker Edge Cases & Integration Tests (Non-MVP) — Epic: Testing
 
 **As a** developer, **I want** dedicated tiebreaker edge case tests and optional integration tests for `syncStandingsForTournament` **so that** I have full confidence in the scoring pipeline end-to-end.
@@ -932,5 +1145,18 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 53  | Full Tournament Scenario Tests        | Testing                 | No  | Done   |
 | 54  | Tiebreaker Edge Cases & Integration   | Testing                 | No  |        |
 | 55  | Per-Game & Round-Level Potential Pts  | Bracket UX Enhancements | No  | Done   |
+| 56  | "What I Need" Rooting Guide           | Tournament Experience   | No  |        |
+| 57  | Bracket Copy / Duplicate              | Bracket Creation        | No  | Done   |
+| 58  | Elimination Tracker                   | Tournament Experience   | No  |        |
+| 59  | Pool Activity Feed                    | Pool Social             | No  |        |
+| 60  | Pool Notifications                    | Pool Social             | No  |        |
+| 61  | Pool History / Past Seasons           | Multi-Season Support    | No  |        |
+| 62  | Pool Awards / Badges                  | Pool Social             | No  |        |
+| 63  | Standings Movement Tracker            | Tournament Experience   | No  |        |
+| 64  | Side-by-Side Bracket Comparison       | Bracket UX Enhancements | No  |        |
+| 65  | Round Recap Digest                    | Tournament Experience   | No  |        |
+| 66  | Pick Confidence Indicator             | Bracket Creation        | No  |        |
+| 67  | Aggregate Pick Percentages            | Pool Social             | No  |        |
+| 68  | Upset Notifications                   | Tournament Experience   | No  |        |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 34 stories (33 done, 1 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 47 stories (34 done, 13 remaining)**

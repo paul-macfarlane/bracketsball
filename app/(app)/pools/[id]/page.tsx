@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { AlertTriangle, ChevronRight } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { getPoolById } from "@/lib/db/queries/pools";
@@ -11,9 +10,15 @@ import { getSentInvitesForPool } from "@/lib/db/queries/pool-user-invites";
 import {
   getBracketEntriesByPoolAndUser,
   getBracketEntryCountForUser,
+  getChampionPicksForEntries,
+  getPicksForEntry,
   getPoolStandings,
 } from "@/lib/db/queries/bracket-entries";
-import { getActiveTournament } from "@/lib/db/queries/tournaments";
+import {
+  getActiveTournament,
+  getTournamentGames,
+  getTournamentTeams,
+} from "@/lib/db/queries/tournaments";
 import {
   hasTournamentStarted,
   getBracketLockTime,
@@ -30,13 +35,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InviteList } from "./invites/invite-list";
 import { MemberList } from "./members/member-list";
 import { SentInvitesList } from "./members/sent-invites-list";
 import { CreateBracketDialog } from "./brackets/create-bracket-dialog";
+import { BracketEntryRow } from "./brackets/bracket-entry-row";
 import { StandingsTable } from "@/components/pool/standings-table";
+import { WhatINeedCard } from "@/components/pool/what-i-need-card";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { StickySubHeader } from "@/components/sticky-sub-header";
 import type { PoolScoring } from "@/lib/scoring";
@@ -97,6 +103,11 @@ export default async function PoolDetailPage({
     !tournamentStarted &&
     bracketCount < poolData.pool.maxBracketsPerUser;
 
+  const championPicks =
+    bracketEntries.length > 0
+      ? await getChampionPicksForEntries(bracketEntries.map((e) => e.id))
+      : new Map();
+
   const poolScoring: PoolScoring = {
     scoringFirstFour: poolData.pool.scoringFirstFour,
     scoringRound64: poolData.pool.scoringRound64,
@@ -110,6 +121,72 @@ export default async function PoolDetailPage({
   const standings = activeTournament
     ? await getPoolStandings(id, activeTournament.id, poolScoring)
     : [];
+
+  // What I Need data: games, teams, and picks for submitted brackets
+  const submittedEntries = bracketEntries.filter(
+    (e) => e.status === "submitted",
+  );
+  const [tournamentGames, tournamentTeamsData, ...submittedPicks] =
+    activeTournament && tournamentStarted && submittedEntries.length > 0
+      ? await Promise.all([
+          getTournamentGames(activeTournament.id),
+          getTournamentTeams(activeTournament.id),
+          ...submittedEntries.map((e) => getPicksForEntry(e.id)),
+        ])
+      : [[], [], ...submittedEntries.map(() => [])];
+
+  // Build team map for client component (serializable as plain object)
+  const teamMapForClient: Record<
+    string,
+    {
+      name: string;
+      shortName: string;
+      abbreviation: string;
+      logoUrl: string | null;
+      darkLogoUrl: string | null;
+      seed: number;
+    }
+  > = {};
+  for (const t of tournamentTeamsData) {
+    teamMapForClient[t.teamId] = {
+      name: t.teamName,
+      shortName: t.teamShortName,
+      abbreviation: t.teamAbbreviation,
+      logoUrl: t.teamLogoUrl,
+      darkLogoUrl: t.teamDarkLogoUrl,
+      seed: t.seed,
+    };
+  }
+
+  // Build picks keyed by bracket entry ID
+  const picksByBracket: Record<
+    string,
+    { tournamentGameId: string; pickedTeamId: string }[]
+  > = {};
+  submittedEntries.forEach((entry, i) => {
+    picksByBracket[entry.id] = (submittedPicks[i] ?? []).map((p) => ({
+      tournamentGameId: p.tournamentGameId,
+      pickedTeamId: p.pickedTeamId,
+    }));
+  });
+
+  // Serialize games for client (convert Date to string)
+  const gamesForClient = tournamentGames.map((g) => ({
+    id: g.id,
+    round: g.round,
+    status: g.status,
+    startTime: g.startTime ? g.startTime.toISOString() : null,
+    team1Id: g.team1Id,
+    team2Id: g.team2Id,
+    team1Score: g.team1Score,
+    team2Score: g.team2Score,
+    winnerTeamId: g.winnerTeamId,
+  }));
+
+  const bracketOptions = submittedEntries.map((e) => ({
+    id: e.id,
+    name: e.name,
+  }));
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -155,6 +232,17 @@ export default async function PoolDetailPage({
         </Card>
       )}
 
+      {/* What I Need */}
+      {activeTournament && tournamentStarted && submittedEntries.length > 0 && (
+        <WhatINeedCard
+          brackets={bracketOptions}
+          picksByBracket={picksByBracket}
+          games={gamesForClient}
+          poolScoring={poolScoring}
+          teamMap={teamMapForClient}
+        />
+      )}
+
       {/* My Brackets */}
       <Card>
         <CardHeader>
@@ -180,44 +268,19 @@ export default async function PoolDetailPage({
           <CardContent>
             <div className="space-y-2">
               {bracketEntries.map((entry) => (
-                <Link
+                <BracketEntryRow
                   key={entry.id}
-                  href={`/pools/${id}/brackets/${entry.id}`}
-                  className={`flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-muted ${
-                    entry.status !== "submitted" && !tournamentStarted
-                      ? "border-amber-300 bg-amber-50/50 dark:border-amber-700 dark:bg-amber-950/30"
-                      : ""
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {entry.status !== "submitted" && !tournamentStarted && (
-                      <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                    )}
-                    <span className="font-medium">{entry.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={
-                        entry.status === "submitted" ? "default" : "outline"
-                      }
-                      className={
-                        entry.status === "submitted"
-                          ? ""
-                          : "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/50 dark:text-amber-300"
-                      }
-                    >
-                      {entry.status === "submitted"
-                        ? "Submitted"
-                        : "Not Submitted"}
-                    </Badge>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </Link>
+                  entry={entry}
+                  poolId={id}
+                  tournamentStarted={tournamentStarted}
+                  canDuplicate={canCreateBracket}
+                  championPick={championPicks.get(entry.id) ?? null}
+                />
               ))}
             </div>
             {!tournamentStarted &&
               bracketEntries.some((e) => e.status !== "submitted") && (
-                <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                <p className="mt-3 text-sm text-warning-foreground">
                   You have unsubmitted brackets. Open each bracket and click
                   &quot;Submit Bracket&quot; to lock in your picks before the
                   tournament starts.
