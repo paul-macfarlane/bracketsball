@@ -52,6 +52,10 @@ import {
   calculateBracketScores,
   type PoolScoring,
 } from "@/lib/scoring";
+import {
+  EliminationBanner,
+  type EliminationInfo,
+} from "@/components/pool/elimination-banner";
 import { StatsAutoFillDialog } from "./stats-auto-fill-dialog";
 
 import { formatOrdinal } from "@/lib/utils";
@@ -72,6 +76,7 @@ interface BracketEditorProps {
   poolName?: string;
   rankInfo?: { rank: number; totalEntries: number } | null;
   canDuplicate?: boolean;
+  eliminationInfo?: EliminationInfo | null;
 }
 
 export function BracketEditor({
@@ -90,6 +95,7 @@ export function BracketEditor({
   poolName,
   rankInfo,
   canDuplicate,
+  eliminationInfo,
 }: BracketEditorProps) {
   const router = useRouter();
   const [name, setName] = useState(bracketName);
@@ -323,6 +329,14 @@ export function BracketEditor({
               : `Complete all ${totalGames} picks and enter a tiebreaker score, then submit below.`}
           </span>
         </div>
+      )}
+
+      {/* Elimination banner */}
+      {eliminationInfo && (
+        <EliminationBanner
+          eliminationInfo={eliminationInfo}
+          currentPoints={scores?.totalPoints ?? 0}
+        />
       )}
 
       {/* Header — stacks vertically on mobile */}

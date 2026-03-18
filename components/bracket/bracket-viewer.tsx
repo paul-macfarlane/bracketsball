@@ -9,6 +9,10 @@ import { BracketFullView } from "./bracket-full-view";
 import type { BracketPositions } from "./bracket-full-view";
 import type { BracketGame, BracketTeam, BracketPick } from "./types";
 import { getPointsForRound, type PoolScoring } from "@/lib/scoring";
+import {
+  EliminationBanner,
+  type EliminationInfo,
+} from "@/components/pool/elimination-banner";
 import { formatOrdinal } from "@/lib/utils";
 
 interface BracketViewerProps {
@@ -24,6 +28,7 @@ interface BracketViewerProps {
   poolId?: string;
   poolName?: string;
   rankInfo?: { rank: number; totalEntries: number } | null;
+  eliminationInfo?: EliminationInfo | null;
 }
 
 export function BracketViewer({
@@ -39,6 +44,7 @@ export function BracketViewer({
   poolId,
   poolName,
   rankInfo,
+  eliminationInfo,
 }: BracketViewerProps) {
   const picks = useMemo(
     () => new Map(picksList.map((p) => [p.tournamentGameId, p.pickedTeamId])),
@@ -146,6 +152,14 @@ export function BracketViewer({
           </div>
         </div>
       </StickySubHeader>
+
+      {/* Elimination banner */}
+      {eliminationInfo && (
+        <EliminationBanner
+          eliminationInfo={eliminationInfo}
+          currentPoints={totalPoints}
+        />
+      )}
 
       {/* Bracket view — disabled (read-only) */}
       <BracketFullView
