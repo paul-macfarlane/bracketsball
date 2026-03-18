@@ -21,7 +21,7 @@ import {
 import { BracketEditor } from "@/components/bracket/bracket-editor";
 import { BracketViewer } from "@/components/bracket/bracket-viewer";
 import type { BracketTeam } from "@/components/bracket/types";
-import type { PoolScoring } from "@/lib/scoring";
+import { getEliminationStatus, type PoolScoring } from "@/lib/scoring";
 
 export default async function BracketPage({
   params,
@@ -144,8 +144,13 @@ export default async function BracketPage({
     !tournamentStarted &&
     bracketCount < poolData.pool.maxBracketsPerUser;
 
-  // Get rank info for this bracket (only for submitted entries)
+  // Get rank info and elimination status for this bracket (only for submitted entries)
   let rankInfo: { rank: number; totalEntries: number } | null = null;
+  let eliminationInfo: {
+    isEliminated: boolean;
+    leaderPoints: number;
+    potentialPoints: number;
+  } | null = null;
   if (entry.status === "submitted") {
     const standings = await getPoolStandings(
       poolId,
@@ -155,6 +160,19 @@ export default async function BracketPage({
     const standing = standings.find((s) => s.id === bracketId);
     if (standing) {
       rankInfo = { rank: standing.rank, totalEntries: standings.length };
+    }
+
+    if (tournamentStarted && standings.length > 0) {
+      const eliminationMap = getEliminationStatus(standings, 1);
+      const idx = standings.findIndex((s) => s.id === bracketId);
+      if (idx !== -1) {
+        const leaderPoints = Math.max(...standings.map((s) => s.totalPoints));
+        eliminationInfo = {
+          isEliminated: eliminationMap.get(idx) ?? false,
+          leaderPoints,
+          potentialPoints: standings[idx].potentialPoints,
+        };
+      }
     }
   }
 
@@ -177,6 +195,7 @@ export default async function BracketPage({
           poolName={poolData.pool.name}
           rankInfo={rankInfo}
           canDuplicate={canDuplicate}
+          eliminationInfo={eliminationInfo}
         />
       ) : (
         <BracketViewer
@@ -192,6 +211,7 @@ export default async function BracketPage({
           poolId={poolId}
           poolName={poolData.pool.name}
           rankInfo={rankInfo}
+          eliminationInfo={eliminationInfo}
         />
       )}
     </div>

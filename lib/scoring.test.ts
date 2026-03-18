@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   calculateBracketScores,
+  getEliminationStatus,
   getPointsForRound,
   sortAndRankStandings,
   type PoolScoring,
@@ -1497,5 +1498,107 @@ describe("full tournament scenarios", () => {
     expect(standings[2].rank).toBe(2); // same rank (tied)
     expect(standings[3].rank).toBe(4); // skips to 4
     expect(standings[4].rank).toBe(5);
+  });
+});
+
+describe("getEliminationStatus", () => {
+  it("returns empty map for no entries", () => {
+    const result = getEliminationStatus([]);
+    expect(result.size).toBe(0);
+  });
+
+  it("single entry is never eliminated", () => {
+    const result = getEliminationStatus([
+      { totalPoints: 10, potentialPoints: 20 },
+    ]);
+    expect(result.get(0)).toBe(false);
+  });
+
+  it("leader is never eliminated", () => {
+    const entries = [
+      { totalPoints: 30, potentialPoints: 50 },
+      { totalPoints: 10, potentialPoints: 40 },
+    ];
+    const result = getEliminationStatus(entries);
+    expect(result.get(0)).toBe(false);
+  });
+
+  it("eliminates entry whose potentialPoints < leader totalPoints", () => {
+    const entries = [
+      { totalPoints: 30, potentialPoints: 50 },
+      { totalPoints: 10, potentialPoints: 25 },
+    ];
+    const result = getEliminationStatus(entries);
+    expect(result.get(0)).toBe(false);
+    expect(result.get(1)).toBe(true);
+  });
+
+  it("does NOT eliminate when potentialPoints === leader totalPoints", () => {
+    const entries = [
+      { totalPoints: 30, potentialPoints: 50 },
+      { totalPoints: 10, potentialPoints: 30 },
+    ];
+    const result = getEliminationStatus(entries);
+    expect(result.get(1)).toBe(false);
+  });
+
+  it("top 2 contention: not eliminated if fewer than 2 entries beat it", () => {
+    const entries = [
+      { totalPoints: 40, potentialPoints: 50 },
+      { totalPoints: 30, potentialPoints: 45 },
+      { totalPoints: 10, potentialPoints: 35 },
+    ];
+    const result = getEliminationStatus(entries, 2);
+    // Entry 2: only entry 0 has totalPoints (40) > potentialPoints (35) — 1 < 2, not eliminated
+    expect(result.get(2)).toBe(false);
+  });
+
+  it("top 2 contention: eliminated when 2+ entries beat it", () => {
+    const entries = [
+      { totalPoints: 40, potentialPoints: 50 },
+      { totalPoints: 35, potentialPoints: 45 },
+      { totalPoints: 10, potentialPoints: 30 },
+    ];
+    const result = getEliminationStatus(entries, 2);
+    // Entry 2: entries 0 (40) and 1 (35) both > 30 — 2 >= 2, eliminated
+    expect(result.get(2)).toBe(true);
+  });
+
+  it("top 3 contention", () => {
+    const entries = [
+      { totalPoints: 50, potentialPoints: 60 },
+      { totalPoints: 40, potentialPoints: 55 },
+      { totalPoints: 35, potentialPoints: 50 },
+      { totalPoints: 10, potentialPoints: 30 },
+    ];
+    const result = getEliminationStatus(entries, 3);
+    // Entry 3: 3 entries have totalPoints > 30 — eliminated
+    expect(result.get(3)).toBe(true);
+    // Entry 2: only 2 entries have totalPoints > 50 (none do) — not eliminated
+    expect(result.get(2)).toBe(false);
+  });
+
+  it("all entries tied: none eliminated", () => {
+    const entries = [
+      { totalPoints: 20, potentialPoints: 40 },
+      { totalPoints: 20, potentialPoints: 40 },
+      { totalPoints: 20, potentialPoints: 40 },
+    ];
+    const result = getEliminationStatus(entries);
+    expect(result.get(0)).toBe(false);
+    expect(result.get(1)).toBe(false);
+    expect(result.get(2)).toBe(false);
+  });
+
+  it("pre-tournament: all equal potential, none eliminated", () => {
+    const entries = [
+      { totalPoints: 0, potentialPoints: 63 },
+      { totalPoints: 0, potentialPoints: 63 },
+      { totalPoints: 0, potentialPoints: 63 },
+    ];
+    const result = getEliminationStatus(entries);
+    expect(result.get(0)).toBe(false);
+    expect(result.get(1)).toBe(false);
+    expect(result.get(2)).toBe(false);
   });
 });

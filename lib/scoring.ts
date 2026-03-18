@@ -136,3 +136,22 @@ export function sortAndRankStandings<T extends StandingsEntry>(
 
   return ranked;
 }
+
+/**
+ * Determines which entries are eliminated from finishing in the top N.
+ * An entry is eliminated when N or more other entries already have totalPoints
+ * strictly greater than this entry's potentialPoints.
+ */
+export function getEliminationStatus<
+  T extends { totalPoints: number; potentialPoints: number },
+>(entries: T[], topN: number = 1): Map<number, boolean> {
+  const result = new Map<number, boolean>();
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    const countBeatBy = entries.filter(
+      (e) => e.totalPoints > entry.potentialPoints,
+    ).length;
+    result.set(i, countBeatBy >= topN);
+  }
+  return result;
+}

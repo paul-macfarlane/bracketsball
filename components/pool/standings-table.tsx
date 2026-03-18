@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/table";
 import { UserDisplay } from "@/components/user-display";
 import { TeamLogo } from "@/components/team-logo";
+import { EliminationBadge } from "@/components/pool/elimination-badge";
+import { getEliminationStatus } from "@/lib/scoring";
 
 interface StandingsEntry {
   id: string;
@@ -38,10 +40,16 @@ type SortField = "rank" | "points" | "potential";
 interface StandingsTableProps {
   standings: StandingsEntry[];
   poolId: string;
+  tournamentStarted?: boolean;
 }
 
-export function StandingsTable({ standings, poolId }: StandingsTableProps) {
+export function StandingsTable({
+  standings,
+  poolId,
+  tournamentStarted = false,
+}: StandingsTableProps) {
   const [sortField, setSortField] = useState<SortField>("rank");
+  const [topN, setTopN] = useState<1 | 2 | 3>(1);
 
   const sorted = useMemo(() => {
     if (sortField === "rank") return standings;
@@ -50,6 +58,11 @@ export function StandingsTable({ standings, poolId }: StandingsTableProps) {
       return b.potentialPoints - a.potentialPoints;
     });
   }, [standings, sortField]);
+
+  const eliminationMap = useMemo(() => {
+    if (!tournamentStarted) return null;
+    return getEliminationStatus(sorted, topN);
+  }, [sorted, topN, tournamentStarted]);
 
   function handleSort(field: SortField) {
     setSortField((prev) => (prev === field ? "rank" : field));
@@ -65,6 +78,29 @@ export function StandingsTable({ standings, poolId }: StandingsTableProps) {
 
   return (
     <>
+      {/* Contention toggle */}
+      {tournamentStarted && (
+        <div className="mb-3 flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Contention:</span>
+          <div className="inline-flex rounded-md border border-border">
+            {([1, 2, 3] as const).map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setTopN(n)}
+                className={`px-2.5 py-1 text-xs font-medium transition-colors first:rounded-l-md last:rounded-r-md ${
+                  topN === n
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                }`}
+              >
+                {n === 1 ? "1st" : `Top ${n}`}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Desktop table */}
       <div className="hidden md:block">
         <Table>
@@ -94,72 +130,96 @@ export function StandingsTable({ standings, poolId }: StandingsTableProps) {
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </TableHead>
+              {tournamentStarted && (
+                <TableHead className="w-28 text-center">Status</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sorted.map((entry) => (
-              <TableRow key={entry.id}>
-                <TableCell className="font-medium text-muted-foreground">
-                  {entry.rank}
-                </TableCell>
-                <TableCell>
-                  <Link
-                    href={`/pools/${poolId}/brackets/${entry.id}`}
-                    className="font-medium hover:underline"
-                  >
-                    {entry.name}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <UserDisplay
-                    name={entry.userName}
-                    image={entry.userImage}
-                    username={entry.userUsername}
-                    size="sm"
-                  />
-                </TableCell>
-                <TableCell className="text-center">
-                  <ChampionDisplay championPick={entry.championPick} />
-                </TableCell>
-                <TableCell className="text-right font-semibold">
-                  {entry.totalPoints}
-                </TableCell>
-                <TableCell className="text-right text-muted-foreground">
-                  {entry.potentialPoints}
-                </TableCell>
-              </TableRow>
-            ))}
+            {sorted.map((entry, i) => {
+              const isEliminated = eliminationMap?.get(i) ?? false;
+              return (
+                <TableRow
+                  key={entry.id}
+                  className={isEliminated ? "opacity-60" : ""}
+                >
+                  <TableCell className="font-medium text-muted-foreground">
+                    {entry.rank}
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/pools/${poolId}/brackets/${entry.id}`}
+                      className="font-medium hover:underline"
+                    >
+                      {entry.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <UserDisplay
+                      name={entry.userName}
+                      image={entry.userImage}
+                      username={entry.userUsername}
+                      size="sm"
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <ChampionDisplay championPick={entry.championPick} />
+                  </TableCell>
+                  <TableCell className="text-right font-semibold">
+                    {entry.totalPoints}
+                  </TableCell>
+                  <TableCell className="text-right text-muted-foreground">
+                    {entry.potentialPoints}
+                  </TableCell>
+                  {tournamentStarted && (
+                    <TableCell className="text-center">
+                      <EliminationBadge isEliminated={isEliminated} />
+                    </TableCell>
+                  )}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
 
       {/* Mobile list */}
       <div className="space-y-1 md:hidden">
-        {sorted.map((entry) => (
-          <Link
-            key={entry.id}
-            href={`/pools/${poolId}/brackets/${entry.id}`}
-            className="flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors active:bg-muted"
-          >
-            <span className="w-6 shrink-0 text-center text-sm font-bold text-muted-foreground">
-              {entry.rank}
-            </span>
-            <ChampionDisplay championPick={entry.championPick} />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium">{entry.name}</div>
-              <div className="truncate text-xs text-muted-foreground">
-                {entry.userName}
+        {sorted.map((entry, i) => {
+          const isEliminated = eliminationMap?.get(i) ?? false;
+          return (
+            <Link
+              key={entry.id}
+              href={`/pools/${poolId}/brackets/${entry.id}`}
+              className={`flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors active:bg-muted ${
+                isEliminated ? "opacity-60" : ""
+              }`}
+            >
+              <span className="w-6 shrink-0 text-center text-sm font-bold text-muted-foreground">
+                {entry.rank}
+              </span>
+              <ChampionDisplay championPick={entry.championPick} />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium">{entry.name}</div>
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate text-xs text-muted-foreground">
+                    {entry.userName}
+                  </span>
+                  {tournamentStarted && (
+                    <EliminationBadge isEliminated={isEliminated} />
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="shrink-0 text-right">
-              <div className="text-sm font-semibold">{entry.totalPoints}</div>
-              <div className="text-xs text-muted-foreground">
-                {entry.potentialPoints}
+              <div className="shrink-0 text-right">
+                <div className="text-sm font-semibold">{entry.totalPoints}</div>
+                <div className="text-xs text-muted-foreground">
+                  {entry.potentialPoints}
+                </div>
               </div>
-            </div>
-            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-          </Link>
-        ))}
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </Link>
+          );
+        })}
       </div>
     </>
   );
@@ -171,7 +231,7 @@ function ChampionDisplay({
   championPick: StandingsEntry["championPick"];
 }) {
   if (!championPick) {
-    return <span className="text-xs text-muted-foreground">—</span>;
+    return <span className="text-xs text-muted-foreground">&mdash;</span>;
   }
   const displayName = championPick.teamMascot
     ? `${championPick.teamShortName} ${championPick.teamMascot}`

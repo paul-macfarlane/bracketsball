@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { EliminationBadge } from "@/components/pool/elimination-badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -52,6 +53,7 @@ interface BracketEntryRowProps {
     teamLogoUrl: string | null;
     teamDarkLogoUrl: string | null;
   } | null;
+  isEliminated?: boolean | null;
 }
 
 export function BracketEntryRow({
@@ -60,6 +62,7 @@ export function BracketEntryRow({
   tournamentStarted,
   canDuplicate,
   championPick,
+  isEliminated,
 }: BracketEntryRowProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -121,6 +124,11 @@ export function BracketEntryRow({
           </span>
         )}
         <span className="truncate font-medium">{entry.name}</span>
+        {isEliminated !== null && isEliminated !== undefined && (
+          <span className="shrink-0">
+            <EliminationBadge isEliminated={isEliminated} />
+          </span>
+        )}
       </Link>
       <div className="flex shrink-0 items-center gap-2">
         <Badge

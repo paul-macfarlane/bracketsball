@@ -45,7 +45,7 @@ import { StandingsTable } from "@/components/pool/standings-table";
 import { WhatINeedCard } from "@/components/pool/what-i-need-card";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { StickySubHeader } from "@/components/sticky-sub-header";
-import type { PoolScoring } from "@/lib/scoring";
+import { getEliminationStatus, type PoolScoring } from "@/lib/scoring";
 
 export default async function PoolDetailPage({
   params,
@@ -183,6 +183,19 @@ export default async function PoolDetailPage({
     winnerTeamId: g.winnerTeamId,
   }));
 
+  // Compute elimination status for user's brackets from standings
+  const myBracketElimination = new Map<string, boolean>();
+  if (tournamentStarted && standings.length > 0) {
+    const eliminationMap = getEliminationStatus(standings, 1);
+    standings.forEach((s, i) => {
+      const isEliminated = eliminationMap.get(i) ?? false;
+      // Only set for user's brackets
+      if (bracketEntries.some((e) => e.id === s.id)) {
+        myBracketElimination.set(s.id, isEliminated);
+      }
+    });
+  }
+
   const bracketOptions = submittedEntries.map((e) => ({
     id: e.id,
     name: e.name,
@@ -227,7 +240,11 @@ export default async function PoolDetailPage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <StandingsTable standings={standings} poolId={id} />
+            <StandingsTable
+              standings={standings}
+              poolId={id}
+              tournamentStarted={tournamentStarted}
+            />
           </CardContent>
         </Card>
       )}
@@ -275,6 +292,7 @@ export default async function PoolDetailPage({
                   tournamentStarted={tournamentStarted}
                   canDuplicate={canCreateBracket}
                   championPick={championPicks.get(entry.id) ?? null}
+                  isEliminated={myBracketElimination.get(entry.id) ?? null}
                 />
               ))}
             </div>
