@@ -1112,6 +1112,18 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 72. Tiebreaker Uses Championship Finalists' PPG (Non-MVP) ✅ — Epic: Auto-Fill Bracket
+
+**As a** pool member, **I want** the auto-fill tiebreaker score to be based on the championship finalists' PPG regardless of which auto-fill strategy I use **so that** the tiebreaker prediction is realistic and tailored to my bracket picks.
+
+**Acceptance Criteria:**
+
+- Auto-fill tiebreaker uses the sum of championship finalists' PPG when stats are available, for all strategies (chalk, random, weighted random, stats custom)
+- Falls back to a random value in the 100-180 range only when finalist PPG stats are unavailable
+- No change to manual tiebreaker entry behavior
+
+---
+
 ### 69. Enrich My Brackets Section Post-Tournament Start (Non-MVP) ✅ — Epic: Tournament Experience
 
 **As a** pool member, **I want to** see my placement, points, and potential points in the "My Brackets" section once the tournament starts **so that** I can quickly check how my brackets are performing without scanning the full standings table.
@@ -1204,5 +1216,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 68  | Upset Notifications                    | Tournament Experience   | No  |        |
 | 70  | Allow Picking Known R64 Team During FF | Bug Fixes               | No  | Done   |
 | 71  | Additional Auto-Fill Presets (BPI/SOS) | Auto-Fill Bracket       | No  | Done   |
+| 72  | Tiebreaker Uses Finalist PPG           | Auto-Fill Bracket       | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 49 stories (36 done, 13 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 50 stories (37 done, 13 remaining)**
