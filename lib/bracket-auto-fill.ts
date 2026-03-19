@@ -304,13 +304,16 @@ export function autoFillBracket(
     const team1 = resolveTeam(game, "team1", pickMap, games, teamMap);
     const team2 = resolveTeam(game, "team2", pickMap, games, teamMap);
 
-    // Both teams must be available to make a pick
-    if (!team1 || !team2) continue;
+    // If only one team is available (e.g. other slot is TBD from an
+    // in-progress First Four game), auto-pick the known team.
+    if (!team1 && !team2) continue;
 
     const winner =
-      strategy === "stats_custom" && statsConfig
-        ? pickWinnerByStats(team1, team2, statsConfig)
-        : pickWinner(team1, team2, strategy);
+      team1 && team2
+        ? strategy === "stats_custom" && statsConfig
+          ? pickWinnerByStats(team1, team2, statsConfig)
+          : pickWinner(team1, team2, strategy)
+        : (team1 ?? team2)!;
     pickMap.set(game.id, winner.id);
     newPicks.push({ tournamentGameId: game.id, pickedTeamId: winner.id });
   }
