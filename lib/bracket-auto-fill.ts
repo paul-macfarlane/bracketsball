@@ -380,12 +380,7 @@ export function autoFillBracket(
   }
 
   // Generate tiebreaker: use championship finalists' PPG if available, else random
-  const tiebreakerScore = generateTiebreaker(
-    sortedGames,
-    pickMap,
-    teamMap,
-    strategy,
-  );
+  const tiebreakerScore = generateTiebreaker(sortedGames, pickMap, teamMap);
 
   return { picks: newPicks, tiebreakerScore };
 }
@@ -398,30 +393,27 @@ function generateTiebreaker(
   sortedGames: BracketGame[],
   pickMap: Map<string, string>,
   teamMap: Map<string, BracketTeam>,
-  strategy: AutoFillStrategy,
 ): number {
-  if (strategy === "stats_custom") {
-    const champGame = sortedGames.find((g) => g.round === "championship");
-    if (champGame) {
-      const team1 = resolveTeam(
-        champGame,
-        "team1",
-        pickMap,
-        sortedGames,
-        teamMap,
-      );
-      const team2 = resolveTeam(
-        champGame,
-        "team2",
-        pickMap,
-        sortedGames,
-        teamMap,
-      );
-      const ppg1 = team1?.stats?.ppg;
-      const ppg2 = team2?.stats?.ppg;
-      if (ppg1 != null && ppg2 != null) {
-        return Math.round(ppg1 + ppg2);
-      }
+  const champGame = sortedGames.find((g) => g.round === "championship");
+  if (champGame) {
+    const team1 = resolveTeam(
+      champGame,
+      "team1",
+      pickMap,
+      sortedGames,
+      teamMap,
+    );
+    const team2 = resolveTeam(
+      champGame,
+      "team2",
+      pickMap,
+      sortedGames,
+      teamMap,
+    );
+    const ppg1 = team1?.stats?.ppg;
+    const ppg2 = team2?.stats?.ppg;
+    if (ppg1 != null && ppg2 != null) {
+      return Math.round(ppg1 + ppg2);
     }
   }
   // Random fallback in a realistic championship total range (100-180)
