@@ -462,7 +462,7 @@ export function TeamComparison({
                   value2={formatNum(s2?.bpiDefense)}
                   raw1={s1?.bpiDefense}
                   raw2={s2?.bpiDefense}
-                  better="lower"
+                  better="higher"
                 />
                 {(s1?.bpiDefenseRank != null || s2?.bpiDefenseRank != null) && (
                   <StatRow

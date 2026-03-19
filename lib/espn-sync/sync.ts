@@ -503,7 +503,10 @@ function findPositionalMatch(
         }
       }
     }
-    return candidates[0];
+    // Don't fall back to candidates[0] when multiple candidates exist —
+    // without team data we can't disambiguate and would risk locking
+    // the wrong espnEventId. A future sync with teams will match correctly.
+    return candidates.length === 1 ? candidates[0] : undefined;
   }
 
   if (!espnGame.region) return undefined;
@@ -586,8 +589,10 @@ function findPositionalMatch(
     }
   }
 
-  // Fallback: return first unmatched candidate
-  return candidates[0];
+  // Don't fall back to candidates[0] when multiple candidates exist —
+  // without team data we can't disambiguate and would risk locking
+  // the wrong espnEventId. A future sync with teams will match correctly.
+  return candidates.length === 1 ? candidates[0] : undefined;
 }
 
 /**

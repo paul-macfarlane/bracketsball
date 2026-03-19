@@ -295,7 +295,14 @@ export function MatchupCard({
             isFinal && "font-medium",
           )}
         >
-          {headerContent}
+          <div>{headerContent}</div>
+          {venueName && (
+            <div className="truncate text-[9px]">
+              {venueCity && venueState
+                ? `${venueCity}, ${venueState}`
+                : venueName}
+            </div>
+          )}
         </div>
 
         {/* Pick indicator (ESPN-style, shown once tournament starts) */}
