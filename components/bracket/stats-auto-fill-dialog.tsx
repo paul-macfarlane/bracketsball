@@ -50,6 +50,9 @@ const VALID_PRESETS = new Set<string>([
   "defense_heavy",
   "balanced",
   "rebounding_hustle",
+  "bpi_focused",
+  "strength_focused",
+  "analytics_combined",
   "custom",
 ]);
 const VALID_CHAOS_LEVELS = new Set<string>(["none", "low", "medium", "high"]);
@@ -233,14 +236,7 @@ export function StatsAutoFillDialog({
               {cats.map((cat) => (
                 <div key={cat.key} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
-                    <span>
-                      {cat.fullLabel}
-                      {cat.inverted && cat.invertedHint && (
-                        <span className="ml-1 text-xs text-muted-foreground">
-                          ({cat.invertedHint})
-                        </span>
-                      )}
-                    </span>
+                    <span>{cat.fullLabel}</span>
                     <span className="w-6 text-right tabular-nums text-muted-foreground">
                       {weights[cat.key]}
                     </span>

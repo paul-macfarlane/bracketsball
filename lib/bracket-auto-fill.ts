@@ -42,8 +42,6 @@ export const STAT_CATEGORIES: {
   label: string;
   fullLabel: string;
   inverted: boolean;
-  /** Shown in the auto-fill dialog to clarify what "better" means for inverted stats */
-  invertedHint?: string;
   group: string;
 }[] = [
   {
@@ -65,7 +63,7 @@ export const STAT_CATEGORIES: {
     label: "Opp PPG",
     fullLabel: "Opponent Points Per Game",
     inverted: true,
-    invertedHint: "fewer = better",
+
     group: "Offense",
   },
   {
@@ -122,7 +120,7 @@ export const STAT_CATEGORIES: {
     label: "TOPG",
     fullLabel: "Turnovers Per Game",
     inverted: true,
-    invertedHint: "fewer = better",
+
     group: "Defense",
   },
   {
@@ -137,7 +135,7 @@ export const STAT_CATEGORIES: {
     label: "BPI Defense",
     fullLabel: "BPI Defense",
     inverted: true,
-    invertedHint: "lower = better",
+
     group: "BPI",
   },
   {
@@ -145,7 +143,7 @@ export const STAT_CATEGORIES: {
     label: "SOS",
     fullLabel: "Strength of Schedule",
     inverted: true,
-    invertedHint: "tougher = better",
+
     group: "Strength",
   },
   {
@@ -153,7 +151,7 @@ export const STAT_CATEGORIES: {
     label: "SOR",
     fullLabel: "Strength of Record",
     inverted: true,
-    invertedHint: "tougher = better",
+
     group: "Strength",
   },
 ];
@@ -162,7 +160,10 @@ export type PresetName =
   | "offense_heavy"
   | "defense_heavy"
   | "balanced"
-  | "rebounding_hustle";
+  | "rebounding_hustle"
+  | "bpi_focused"
+  | "strength_focused"
+  | "analytics_combined";
 
 export const PRESETS: Record<
   PresetName,
@@ -246,6 +247,66 @@ export const PRESETS: Record<
       bpiDefense: 3,
       strengthOfSchedule: 3,
       strengthOfRecord: 3,
+    },
+  },
+  bpi_focused: {
+    label: "BPI-Focused",
+    weights: {
+      winPct: 3,
+      ppg: 2,
+      oppPpg: 2,
+      fgPct: 1,
+      threePtPct: 1,
+      ftPct: 1,
+      reboundsPerGame: 1,
+      assistsPerGame: 1,
+      stealsPerGame: 1,
+      blocksPerGame: 1,
+      turnoversPerGame: 2,
+      bpiOffense: 9,
+      bpiDefense: 9,
+      strengthOfSchedule: 3,
+      strengthOfRecord: 3,
+    },
+  },
+  strength_focused: {
+    label: "Strength of Schedule & Record",
+    weights: {
+      winPct: 4,
+      ppg: 1,
+      oppPpg: 1,
+      fgPct: 1,
+      threePtPct: 1,
+      ftPct: 1,
+      reboundsPerGame: 1,
+      assistsPerGame: 1,
+      stealsPerGame: 1,
+      blocksPerGame: 1,
+      turnoversPerGame: 1,
+      bpiOffense: 2,
+      bpiDefense: 2,
+      strengthOfSchedule: 9,
+      strengthOfRecord: 9,
+    },
+  },
+  analytics_combined: {
+    label: "Analytics (BPI + SOS/SOR)",
+    weights: {
+      winPct: 4,
+      ppg: 1,
+      oppPpg: 1,
+      fgPct: 1,
+      threePtPct: 1,
+      ftPct: 1,
+      reboundsPerGame: 1,
+      assistsPerGame: 1,
+      stealsPerGame: 1,
+      blocksPerGame: 1,
+      turnoversPerGame: 1,
+      bpiOffense: 8,
+      bpiDefense: 8,
+      strengthOfSchedule: 8,
+      strengthOfRecord: 8,
     },
   },
 };
