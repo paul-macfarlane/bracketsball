@@ -10,6 +10,7 @@ import {
   Copy,
   MoreHorizontal,
   Trash2,
+  X,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,7 @@ interface BracketEntryRowProps {
     teamLogoUrl: string | null;
     teamDarkLogoUrl: string | null;
   } | null;
+  isChampionEliminated?: boolean;
   isEliminated?: boolean | null;
   standingsInfo?: {
     rank: number;
@@ -69,6 +71,7 @@ export function BracketEntryRow({
   tournamentStarted,
   canDuplicate,
   championPick,
+  isChampionEliminated = false,
   isEliminated,
   standingsInfo,
   totalBrackets,
@@ -123,13 +126,19 @@ export function BracketEntryRow({
           <AlertTriangle className="h-4 w-4 shrink-0 text-warning-foreground" />
         )}
         {championPick && (
-          <span className="shrink-0">
+          <span className="relative shrink-0">
             <TeamLogo
               logoUrl={championPick.teamLogoUrl}
               darkLogoUrl={championPick.teamDarkLogoUrl}
               alt={championAlt}
-              className="h-6 w-6 object-contain"
+              className={`h-6 w-6 object-contain ${isChampionEliminated ? "opacity-40 grayscale" : ""}`}
             />
+            {isChampionEliminated && (
+              <X
+                className="absolute -inset-0.5 h-7 w-7 text-destructive"
+                strokeWidth={3}
+              />
+            )}
           </span>
         )}
         <span className="truncate font-medium">{entry.name}</span>

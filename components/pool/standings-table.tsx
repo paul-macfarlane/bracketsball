@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ChevronRight, ArrowUpDown, Trophy } from "lucide-react";
+import { ChevronRight, ArrowUpDown, Trophy, X } from "lucide-react";
 
 import {
   Table,
@@ -33,6 +33,7 @@ interface StandingsEntry {
     teamLogoUrl: string | null;
     teamDarkLogoUrl: string | null;
   } | null;
+  isChampionEliminated: boolean;
 }
 
 type SortField = "rank" | "points" | "potential";
@@ -163,7 +164,10 @@ export function StandingsTable({
                     />
                   </TableCell>
                   <TableCell className="text-center">
-                    <ChampionDisplay championPick={entry.championPick} />
+                    <ChampionDisplay
+                      championPick={entry.championPick}
+                      isEliminated={entry.isChampionEliminated}
+                    />
                   </TableCell>
                   <TableCell className="text-right font-semibold">
                     {entry.totalPoints}
@@ -198,7 +202,10 @@ export function StandingsTable({
               <span className="w-6 shrink-0 text-center text-sm font-bold text-muted-foreground">
                 {entry.rank}
               </span>
-              <ChampionDisplay championPick={entry.championPick} />
+              <ChampionDisplay
+                championPick={entry.championPick}
+                isEliminated={entry.isChampionEliminated}
+              />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-medium">{entry.name}</div>
                 <div className="flex items-center gap-1.5">
@@ -227,8 +234,10 @@ export function StandingsTable({
 
 function ChampionDisplay({
   championPick,
+  isEliminated,
 }: {
   championPick: StandingsEntry["championPick"];
+  isEliminated: boolean;
 }) {
   if (!championPick) {
     return <span className="text-xs text-muted-foreground">&mdash;</span>;
@@ -238,12 +247,20 @@ function ChampionDisplay({
     : championPick.teamShortName;
   if (championPick.teamLogoUrl) {
     return (
-      <TeamLogo
-        logoUrl={championPick.teamLogoUrl}
-        darkLogoUrl={championPick.teamDarkLogoUrl}
-        alt={displayName}
-        className="h-6 w-6 object-contain"
-      />
+      <span className="relative inline-flex">
+        <TeamLogo
+          logoUrl={championPick.teamLogoUrl}
+          darkLogoUrl={championPick.teamDarkLogoUrl}
+          alt={displayName}
+          className={`h-6 w-6 object-contain ${isEliminated ? "opacity-40 grayscale" : ""}`}
+        />
+        {isEliminated && (
+          <X
+            className="absolute -inset-0.5 h-7 w-7 text-destructive"
+            strokeWidth={3}
+          />
+        )}
+      </span>
     );
   }
   return <Trophy className="h-4 w-4 text-muted-foreground" />;

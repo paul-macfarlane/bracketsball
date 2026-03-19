@@ -440,6 +440,19 @@ export async function getPoolStandings(
     championPicks.map((cp) => [cp.bracketEntryId, cp]),
   );
 
+  // Build set of eliminated teams (lost in a completed game)
+  const eliminatedTeamIds = new Set<string>();
+  for (const game of games) {
+    if (game.status === "final" && game.winnerTeamId) {
+      if (game.team1Id && game.team1Id !== game.winnerTeamId) {
+        eliminatedTeamIds.add(game.team1Id);
+      }
+      if (game.team2Id && game.team2Id !== game.winnerTeamId) {
+        eliminatedTeamIds.add(game.team2Id);
+      }
+    }
+  }
+
   // Calculate actual championship total score if game is final
   const actualChampionshipTotal =
     championshipGame?.status === "final" &&
@@ -456,11 +469,15 @@ export async function getPoolStandings(
       entryPicks,
       poolScoring,
     );
+    const champPick = championPickMap.get(entry.id) ?? null;
     return {
       ...entry,
       totalPoints,
       potentialPoints,
-      championPick: championPickMap.get(entry.id) ?? null,
+      championPick: champPick,
+      isChampionEliminated: champPick
+        ? eliminatedTeamIds.has(champPick.pickedTeamId)
+        : false,
       tiebreakerDiff:
         actualChampionshipTotal !== null && entry.tiebreakerScore !== null
           ? Math.abs(entry.tiebreakerScore - actualChampionshipTotal)

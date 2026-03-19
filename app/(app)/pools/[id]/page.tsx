@@ -185,6 +185,7 @@ export default async function PoolDetailPage({
 
   // Compute elimination status and standings info for user's brackets
   const myBracketElimination = new Map<string, boolean>();
+  const myChampionElimination = new Map<string, boolean>();
   const myBracketStandings = new Map<
     string,
     { rank: number; totalPoints: number; potentialPoints: number }
@@ -196,6 +197,7 @@ export default async function PoolDetailPage({
       // Only set for user's brackets
       if (bracketEntries.some((e) => e.id === s.id)) {
         myBracketElimination.set(s.id, isEliminated);
+        myChampionElimination.set(s.id, s.isChampionEliminated);
         myBracketStandings.set(s.id, {
           rank: s.rank,
           totalPoints: s.totalPoints,
@@ -312,6 +314,9 @@ export default async function PoolDetailPage({
                   tournamentStarted={tournamentStarted}
                   canDuplicate={canCreateBracket}
                   championPick={championPicks.get(entry.id) ?? null}
+                  isChampionEliminated={
+                    myChampionElimination.get(entry.id) ?? false
+                  }
                   isEliminated={myBracketElimination.get(entry.id) ?? null}
                   standingsInfo={myBracketStandings.get(entry.id) ?? null}
                   totalBrackets={standings.length}
