@@ -1098,6 +1098,20 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 71. Additional Auto-Fill Presets (BPI, SOS/SOR) (Non-MVP) ✅ — Epic: Auto-Fill Bracket
+
+**As a** pool member, **I want** additional auto-fill presets that emphasize BPI and strength of schedule/record metrics **so that** I can generate analytics-driven brackets without manually configuring stat weights.
+
+**Acceptance Criteria:**
+
+- New "BPI-Focused" preset heavily weights BPI Offense and BPI Defense, with minimal weight on box score stats
+- New "Strength of Schedule & Record" preset heavily weights SOS and SOR
+- New "Analytics (BPI + SOS/SOR)" preset combines BPI, SOS, and SOR at high weights for a holistic advanced metrics approach
+- All new presets appear in the Custom Stats auto-fill dialog preset dropdown
+- Remove "inverted hint" labels (e.g., "lower = better") from stat categories in the dialog — they are more confusing than helpful
+
+---
+
 ### 69. Enrich My Brackets Section Post-Tournament Start (Non-MVP) ✅ — Epic: Tournament Experience
 
 **As a** pool member, **I want to** see my placement, points, and potential points in the "My Brackets" section once the tournament starts **so that** I can quickly check how my brackets are performing without scanning the full standings table.
@@ -1189,5 +1203,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 67  | Aggregate Pick Percentages             | Pool Social             | No  |        |
 | 68  | Upset Notifications                    | Tournament Experience   | No  |        |
 | 70  | Allow Picking Known R64 Team During FF | Bug Fixes               | No  | Done   |
+| 71  | Additional Auto-Fill Presets (BPI/SOS) | Auto-Fill Bracket       | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 48 stories (35 done, 13 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 49 stories (36 done, 13 remaining)**
