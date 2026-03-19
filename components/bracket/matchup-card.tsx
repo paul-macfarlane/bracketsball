@@ -198,7 +198,9 @@ export function MatchupCard({
   const isInProgress = gameStatus === "in_progress";
   const isLive = isFinal || isInProgress;
   const isGameStarted = isLive;
-  const canPick = !disabled && !isGameStarted && !!team1 && !!team2;
+  const canPickBase = !disabled && !isGameStarted;
+  const canPickTeam1 = canPickBase && !!team1;
+  const canPickTeam2 = canPickBase && !!team2;
   const hasBothTeams = !!team1 && !!team2;
   // View mode: when the game has started OR when the bracket is globally locked
   const viewMode = isGameStarted || disabled;
@@ -305,7 +307,7 @@ export function MatchupCard({
         <TeamSlot
           team={team1}
           isSelected={!!team1 && pickedTeamId === team1.id}
-          isClickable={canPick}
+          isClickable={canPickTeam1}
           onClick={() => team1 && onPick(gameId, team1.id)}
           position="top"
           score={displayTeam1Score}
@@ -317,7 +319,7 @@ export function MatchupCard({
         <TeamSlot
           team={team2}
           isSelected={!!team2 && pickedTeamId === team2.id}
-          isClickable={canPick}
+          isClickable={canPickTeam2}
           onClick={() => team2 && onPick(gameId, team2.id)}
           position="bottom"
           score={displayTeam2Score}
