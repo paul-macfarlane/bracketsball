@@ -53,18 +53,18 @@ You don't need to manually create the tournament, seed teams, or generate the br
 
 All crontab expressions below are in **America/New_York (ET)**. Configure your cron-job.org jobs with this timezone.
 
-| Phase        | Dates             | Suggested cron (ET)       | crontab expression (ET)    |
-| ------------ | ----------------- | ------------------------- | -------------------------- |
-| First Four   | Tue-Wed Mar 17-18 | Every 15 min, 6pm-1am ET  | `*/15 18-23,0-1 17-18 3 *` |
-| Round of 64  | Thu-Fri Mar 19-20 | Every 10 min, 12pm-1am ET | `*/10 12-23,0-1 19-20 3 *` |
-| Round of 32  | Sat-Sun Mar 21-22 | Every 10 min, 12pm-1am ET | `*/10 12-23,0-1 21-22 3 *` |
-| Sweet 16     | Thu-Fri Mar 26-27 | Every 10 min, 7pm-1am ET  | `*/10 19-23,0-1 26-27 3 *` |
-| Elite 8      | Sat-Sun Mar 28-29 | Every 10 min, 2pm-1am ET  | `*/10 14-23,0-1 28-29 3 *` |
-| Final Four   | Sat Apr 4         | Every 5 min, 6pm-1am ET   | `*/5 18-23,0-1 4 4 *`      |
-| Championship | Mon Apr 6         | Every 5 min, 8pm-1am ET   | `*/5 20-23,0-1 6 4 *`      |
-| Off days     | Any non-game day  | Once daily or skip        | `0 8 * * *`                |
+| Phase        | Dates             | Suggested cron (ET)      | crontab expression (ET)   |
+| ------------ | ----------------- | ------------------------ | ------------------------- |
+| First Four   | Tue-Wed Mar 17-18 | Every 5 min, 6pm-1am ET  | `*/5 18-23,0-1 17-18 3 *` |
+| Round of 64  | Thu-Fri Mar 19-20 | Every 5 min, 12pm-1am ET | `*/5 12-23,0-1 19-20 3 *` |
+| Round of 32  | Sat-Sun Mar 21-22 | Every 5 min, 12pm-1am ET | `*/5 12-23,0-1 21-22 3 *` |
+| Sweet 16     | Thu-Fri Mar 26-27 | Every 5 min, 7pm-1am ET  | `*/5 19-23,0-1 26-27 3 *` |
+| Elite 8      | Sat-Sun Mar 28-29 | Every 5 min, 2pm-1am ET  | `*/5 14-23,0-1 28-29 3 *` |
+| Final Four   | Sat Apr 4         | Every 5 min, 6pm-1am ET  | `*/5 18-23,0-1 4 4 *`     |
+| Championship | Mon Apr 6         | Every 5 min, 8pm-1am ET  | `*/5 20-23,0-1 6 4 *`     |
+| Off days     | Any non-game day  | Once daily or skip       | `0 8 * * *`               |
 
-A simpler approach: **every 15 minutes from noon to 1am ET during the tournament window (Mar 17 – Apr 6)** covers all scenarios without over-complicating the schedule. In crontab: `*/15 12-23,0-1 * 3-4 *` (filter active dates via cron-job.org's date settings).
+A simpler approach: **every 5 minutes from noon to 1am ET during the tournament window (Mar 17 – Apr 6)** covers all scenarios without over-complicating the schedule. In crontab: `*/5 12-23,0-1 * 3-4 *` (filter active dates via cron-job.org's date settings).
 
 Set these up at [cron-job.org](https://cron-job.org):
 
