@@ -170,6 +170,8 @@ export function StatsAutoFillDialog({
     [],
   );
 
+  const allWeightsZero = WEIGHT_KEYS.every((k) => weights[k] === 0);
+
   function handleGenerate() {
     const config: StatsAutoFillConfig = { weights, chaosLevel };
     saveConfig({ preset, weights, chaosLevel });
@@ -254,17 +256,27 @@ export function StatsAutoFillDialog({
           ))}
         </div>
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isPending}
-          >
-            Cancel
-          </Button>
-          <Button onClick={handleGenerate} disabled={isPending}>
-            {isPending ? "Generating..." : "Generate Bracket"}
-          </Button>
+        <DialogFooter className="flex-col gap-2 sm:flex-col">
+          {allWeightsZero && (
+            <p className="text-sm text-destructive">
+              At least one stat weight must be greater than 0.
+            </p>
+          )}
+          <div className="flex w-full justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleGenerate}
+              disabled={isPending || allWeightsZero}
+            >
+              {isPending ? "Generating..." : "Generate Bracket"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

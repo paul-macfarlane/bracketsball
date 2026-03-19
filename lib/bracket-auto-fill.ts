@@ -346,6 +346,13 @@ export function autoFillBracket(
     (a, b) => (roundIndex.get(a.round) ?? 0) - (roundIndex.get(b.round) ?? 0),
   );
 
+  // Pre-compute global stat ranges across all teams so that per-matchup
+  // normalization preserves actual magnitude differences between teams.
+  const globalStatRanges =
+    strategy === "stats_custom" && statsConfig
+      ? computeGlobalStatRanges(teams)
+      : new Map();
+
   const newPicks: BracketPick[] = [];
 
   for (const game of sortedGames) {
@@ -372,7 +379,7 @@ export function autoFillBracket(
     const winner =
       team1 && team2
         ? strategy === "stats_custom" && statsConfig
-          ? pickWinnerByStats(team1, team2, statsConfig)
+          ? pickWinnerByStats(team1, team2, statsConfig, globalStatRanges)
           : pickWinner(team1, team2, strategy)
         : (team1 ?? team2)!;
     pickMap.set(game.id, winner.id);
@@ -521,20 +528,22 @@ function getStatValue(
 }
 
 /**
- * Computes stat ranges (min/max) across two teams for min-max normalization.
- * This ensures all stats are on a 0-1 scale before weights are applied,
- * preventing stats with larger magnitudes (e.g., PPG ~80) from dominating
- * over smaller-scale stats (e.g., SPG ~1.5).
+ * Computes stat ranges (min/max) across ALL tournament teams for min-max
+ * normalization. Using global ranges (instead of per-matchup ranges) preserves
+ * the actual magnitude of differences between teams. Without this, a 0.1 PPG
+ * difference would look identical to a 20 PPG difference in the composite
+ * score, and the chaos closeness metric would be unreliable.
  */
-function computeStatRanges(
-  stats1: TeamStats | undefined,
-  stats2: TeamStats | undefined,
+function computeGlobalStatRanges(
+  teams: BracketTeam[],
 ): Map<keyof StatWeights, { min: number; max: number }> {
   const ranges = new Map<keyof StatWeights, { min: number; max: number }>();
   for (const cat of STAT_CATEGORIES) {
-    const v1 = getStatValue(stats1, cat.key);
-    const v2 = getStatValue(stats2, cat.key);
-    const values = [v1, v2].filter((v): v is number => v != null);
+    const values: number[] = [];
+    for (const team of teams) {
+      const v = getStatValue(team.stats, cat.key);
+      if (v != null) values.push(v);
+    }
     if (values.length > 0) {
       ranges.set(cat.key, {
         min: Math.min(...values),
@@ -604,14 +613,23 @@ function pickWinnerByStats(
   team1: BracketTeam,
   team2: BracketTeam,
   config: StatsAutoFillConfig,
+  globalStatRanges: Map<keyof StatWeights, { min: number; max: number }>,
 ): BracketTeam {
-  const statRanges = computeStatRanges(team1.stats, team2.stats);
-  const score1 = computeTeamScore(team1.stats, config.weights, statRanges);
-  const score2 = computeTeamScore(team2.stats, config.weights, statRanges);
+  const score1 = computeTeamScore(
+    team1.stats,
+    config.weights,
+    globalStatRanges,
+  );
+  const score2 = computeTeamScore(
+    team2.stats,
+    config.weights,
+    globalStatRanges,
+  );
 
   // Fall back to seed-based if no stats for either team
   if (score1 === null && score2 === null) {
-    return team1.seed <= team2.seed ? team1 : team2;
+    if (team1.seed === team2.seed) return Math.random() < 0.5 ? team1 : team2;
+    return team1.seed < team2.seed ? team1 : team2;
   }
 
   // Determine stats-favored team (coin flip on ties)

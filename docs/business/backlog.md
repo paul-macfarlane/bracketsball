@@ -1124,6 +1124,18 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 73. Auto-Fill Algorithm Audit & Fixes (Non-MVP) ✅ — Epic: Auto-Fill Bracket
+
+**As a** pool member, **I want** the stats-based auto-fill algorithm to produce accurate, well-differentiated brackets **so that** my stat weight configuration meaningfully influences the generated picks.
+
+**Acceptance Criteria:**
+
+- All-zero stat weights are prevented in the UI — the Generate button is disabled with a validation message when every weight slider is set to 0
+- Equal-seed fallback in the stats path uses a coin flip (consistent with the chalk strategy) instead of always favoring team1
+- Stat normalization uses global ranges across all tournament teams instead of per-matchup min-max, so that actual magnitude differences between teams are preserved in the composite score and the chaos closeness metric is reliable
+
+---
+
 ### 69. Enrich My Brackets Section Post-Tournament Start (Non-MVP) ✅ — Epic: Tournament Experience
 
 **As a** pool member, **I want to** see my placement, points, and potential points in the "My Brackets" section once the tournament starts **so that** I can quickly check how my brackets are performing without scanning the full standings table.
@@ -1217,5 +1229,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 70  | Allow Picking Known R64 Team During FF | Bug Fixes               | No  | Done   |
 | 71  | Additional Auto-Fill Presets (BPI/SOS) | Auto-Fill Bracket       | No  | Done   |
 | 72  | Tiebreaker Uses Finalist PPG           | Auto-Fill Bracket       | No  | Done   |
+| 73  | Auto-Fill Algorithm Audit & Fixes      | Auto-Fill Bracket       | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 50 stories (37 done, 13 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 51 stories (38 done, 13 remaining)**
