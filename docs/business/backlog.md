@@ -1136,6 +1136,20 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 - BPI Defense auto-fill weight is corrected: not inverted (was incorrectly set)
 - One-off cleanup script (`scripts/cleanup-espn-matches.ts`) clears incorrectly matched espnEventId/venue/startTime on R32+ games so re-sync can fix them
 
+### 75. Eliminated Champion Red X Indicator (Non-MVP) ✅ — Epic: Tournament Experience
+
+**As a** pool member, **I want to** see a red "X" drawn through the champion pick icon when that team has been eliminated **so that** I can quickly see which brackets have a busted champion without opening each one.
+
+**Acceptance Criteria:**
+
+- On the pool standings table, if a bracket's champion pick has been eliminated, the team logo shows a red X overlay using the `destructive` CSS variable
+- On the "My Brackets" section, the same red X overlay appears on eliminated champion picks
+- The team logo is dimmed (reduced opacity + grayscale) to make the X more visually distinct
+- The X is slightly larger than the logo for clear visibility
+- No indicator is shown when the champion is still alive or pre-tournament
+
+---
+
 ### 73. Auto-Fill Algorithm Audit & Fixes (Non-MVP) ✅ — Epic: Auto-Fill Bracket
 
 **As a** pool member, **I want** the stats-based auto-fill algorithm to produce accurate, well-differentiated brackets **so that** my stat weight configuration meaningfully influences the generated picks.
@@ -1243,5 +1257,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 72  | Tiebreaker Uses Finalist PPG           | Auto-Fill Bracket       | No  | Done   |
 | 73  | Auto-Fill Algorithm Audit & Fixes      | Auto-Fill Bracket       | No  | Done   |
 | 74  | Fix ESPN Sync Matching & Venue Display | Bug Fixes               | No  | Done   |
+| 75  | Eliminated Champion Red X Indicator    | Tournament Experience   | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 52 stories (39 done, 13 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 53 stories (40 done, 13 remaining)**
