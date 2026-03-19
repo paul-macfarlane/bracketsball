@@ -134,7 +134,7 @@ export const STAT_CATEGORIES: {
     key: "bpiDefense",
     label: "BPI Defense",
     fullLabel: "BPI Defense",
-    inverted: true,
+    inverted: false,
 
     group: "BPI",
   },

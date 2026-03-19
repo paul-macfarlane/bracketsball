@@ -1124,6 +1124,18 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 74. Fix ESPN Sync Game Matching & Venue Display (Non-MVP) ✅ — Epic: Bug Fixes
+
+**As a** user, **I want** game venues and start times to be correctly assigned to the right bracket slots **so that** the schedule and location info I see is accurate.
+
+**Acceptance Criteria:**
+
+- ESPN sync no longer falls back to arbitrary `candidates[0]` matching when multiple candidate games exist and no team data is available to disambiguate — skips the match instead, letting a future sync with teams match correctly
+- Venue/city/state is displayed on matchup cards for all games (not just games with both teams assigned)
+- BPI Defense stat direction is corrected: higher is better (was incorrectly inverted)
+- BPI Defense auto-fill weight is corrected: not inverted (was incorrectly set)
+- One-off cleanup script (`scripts/cleanup-espn-matches.ts`) clears incorrectly matched espnEventId/venue/startTime on R32+ games so re-sync can fix them
+
 ### 73. Auto-Fill Algorithm Audit & Fixes (Non-MVP) ✅ — Epic: Auto-Fill Bracket
 
 **As a** pool member, **I want** the stats-based auto-fill algorithm to produce accurate, well-differentiated brackets **so that** my stat weight configuration meaningfully influences the generated picks.
@@ -1230,5 +1242,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 71  | Additional Auto-Fill Presets (BPI/SOS) | Auto-Fill Bracket       | No  | Done   |
 | 72  | Tiebreaker Uses Finalist PPG           | Auto-Fill Bracket       | No  | Done   |
 | 73  | Auto-Fill Algorithm Audit & Fixes      | Auto-Fill Bracket       | No  | Done   |
+| 74  | Fix ESPN Sync Matching & Venue Display | Bug Fixes               | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 51 stories (38 done, 13 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 52 stories (39 done, 13 remaining)**
