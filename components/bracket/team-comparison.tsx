@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { formatGameDateTime } from "@/lib/date-utils";
 import { TeamLogo } from "@/components/team-logo";
 import type { BracketTeam, TeamStats } from "./types";
 
@@ -197,16 +198,7 @@ export function TeamComparison({
           <div className="rounded-md bg-muted/50 p-3 text-center text-sm">
             {startTime && (
               <div>
-                {new Date(startTime).toLocaleDateString("en-US", {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                })}{" "}
-                at{" "}
-                {new Date(startTime).toLocaleTimeString("en-US", {
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
+                {formatGameDateTime(startTime, { includeWeekday: true })}
               </div>
             )}
             {venueName && (

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Info, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { formatGameDateTime } from "@/lib/date-utils";
 import type { BracketTeam } from "./types";
 import { TeamComparison } from "./team-comparison";
 import { TeamLogo } from "@/components/team-logo";
@@ -262,16 +263,7 @@ export function MatchupCard({
     headerContent = statusDetail ?? "In Progress";
   } else {
     if (startTime) {
-      const d = new Date(startTime);
-      const date = d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
-      const time = d.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-      });
-      headerContent = `${date} · ${time}`;
+      headerContent = formatGameDateTime(startTime);
     } else {
       headerContent = "TBD";
     }

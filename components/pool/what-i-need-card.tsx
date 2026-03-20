@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { formatGameDateTime } from "@/lib/date-utils";
 
 import {
   Card,
@@ -25,16 +26,6 @@ import {
   type WhatINeedRoundGroup,
 } from "@/lib/what-i-need";
 import type { PoolScoring } from "@/lib/scoring";
-
-function formatGameTime(startTime: string): string {
-  const date = new Date(startTime);
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
 
 interface BracketOption {
   id: string;
@@ -275,7 +266,7 @@ function DesktopGameRow({ game }: { game: WhatINeedGame }) {
         )}
         {!isInProgress && !isNoStake && game.startTime && (
           <span className="text-[10px] text-muted-foreground">
-            {formatGameTime(game.startTime)}
+            {formatGameDateTime(game.startTime)}
           </span>
         )}
       </div>
@@ -304,7 +295,7 @@ function MobileGameCard({ game }: { game: WhatINeedGame }) {
         )}
         {!isInProgress && !isNoStake && game.startTime && (
           <span className="mb-2 text-[10px] text-muted-foreground">
-            {formatGameTime(game.startTime)}
+            {formatGameDateTime(game.startTime)}
           </span>
         )}
         {isNoStake && (

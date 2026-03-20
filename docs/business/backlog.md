@@ -1150,6 +1150,20 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 78. Show TBD for Unknown Game Times (Non-MVP) ✅ — Epic: Tournament Experience
+
+**As a** pool member, **I want** games with undetermined start times to show "TBD" instead of "12:00 AM" **so that** I'm not confused by a misleading midnight time that ESPN uses as a placeholder.
+
+**Acceptance Criteria:**
+
+- Games where ESPN has set the start time to midnight ET (their placeholder for "time not yet determined") display the date with "TBD" instead of the formatted time (e.g., "Mar 19 · TBD")
+- This applies consistently across all game time displays: bracket matchup cards, team comparison dialog, and "What I Need" section
+- A shared `formatGameDateTime` utility centralizes all game time formatting to enforce consistency
+- Once ESPN updates the game with a real start time, it displays normally on the next sync
+- No database schema changes required — detection happens at display time
+
+---
+
 ### 76. Fix My Brackets Mobile Responsive Layout (Non-MVP) — Epic: Bug Fixes
 
 **As a** pool member on mobile, **I want** the "My Brackets" section to display without overlapping text when the tournament has started **so that** I can read my bracket placement, points, and status clearly on small screens.
@@ -1290,5 +1304,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 75  | Eliminated Champion Red X Indicator    | Tournament Experience   | No  | Done   |
 | 76  | Fix My Brackets Mobile Responsive      | Bug Fixes               | No  | Done   |
 | 77  | Show Game Time Info on "What I Need"   | Tournament Experience   | No  | Done   |
+| 78  | Show TBD for Unknown Game Times        | Tournament Experience   | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 55 stories (41 done, 14 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 56 stories (42 done, 14 remaining)**
