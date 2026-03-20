@@ -158,6 +158,9 @@ export function computeWhatINeed(
       };
     };
 
+    // Skip games where the user has no stake
+    if (rootFor === "none") continue;
+
     resultGames.push({
       gameId: game.id,
       round: game.round,

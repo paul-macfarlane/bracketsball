@@ -92,7 +92,7 @@ describe("computeWhatINeed", () => {
     expect(result[0].games[0].team2Impact).toBe(2);
   });
 
-  it("shows 'none' when neither team is picked", () => {
+  it("excludes games when neither team is picked (no stake)", () => {
     const games = [
       {
         id: "g1",
@@ -111,11 +111,10 @@ describe("computeWhatINeed", () => {
 
     const result = computeWhatINeed(games, picks, defaultScoring, teamMap);
 
-    expect(result[0].games[0].rootFor).toBe("none");
-    expect(result[0].games[0].totalImpact).toBe(0);
+    expect(result).toHaveLength(0);
   });
 
-  it("shows 0 impact for eliminated team", () => {
+  it("excludes game when only picked team is eliminated (no stake)", () => {
     const games = [
       // Completed game where team 'a' lost
       {
@@ -150,9 +149,8 @@ describe("computeWhatINeed", () => {
 
     const result = computeWhatINeed(games, picks, defaultScoring, teamMap);
 
-    expect(result).toHaveLength(1);
-    expect(result[0].games[0].team1Impact).toBe(0); // eliminated
-    expect(result[0].games[0].rootFor).toBe("none");
+    // Game is excluded because the only picked team (a) is eliminated, so rootFor would be "none"
+    expect(result).toHaveLength(0);
   });
 
   it("computes cumulative impact through multiple rounds", () => {
@@ -242,11 +240,12 @@ describe("computeWhatINeed", () => {
         winnerTeamId: null,
       },
     ];
-    // Pick team 'c' in multiple rounds for higher impact, team 'a' in just one
+    // Pick team 'c' in multiple rounds for higher impact, team 'a' in just one, team 'e' in elite_8 for stake
     const picks = [
       { tournamentGameId: "g1", pickedTeamId: "a" },
       { tournamentGameId: "g2", pickedTeamId: "c" },
       { tournamentGameId: "g3", pickedTeamId: "c" },
+      { tournamentGameId: "g3", pickedTeamId: "e" },
     ];
     const teamMap = makeTeamMap(["a", "b", "c", "d", "e", "f"]);
 
