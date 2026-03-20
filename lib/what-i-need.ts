@@ -16,6 +16,7 @@ export interface WhatINeedGame {
   gameId: string;
   round: string;
   status: "scheduled" | "in_progress";
+  statusDetail: string | null;
   startTime: string | null;
   team1: WhatINeedTeamInfo | null;
   team2: WhatINeedTeamInfo | null;
@@ -45,6 +46,7 @@ interface GameInput {
   team1Score: number | null;
   team2Score: number | null;
   winnerTeamId: string | null;
+  statusDetail?: string | null;
 }
 
 interface PickInput {
@@ -160,6 +162,7 @@ export function computeWhatINeed(
       gameId: game.id,
       round: game.round,
       status: game.status as WhatINeedGame["status"],
+      statusDetail: game.statusDetail ?? null,
       startTime: game.startTime
         ? typeof game.startTime === "string"
           ? game.startTime
