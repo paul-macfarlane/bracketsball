@@ -15,6 +15,7 @@ import {
 import { UserDisplay } from "@/components/user-display";
 import { TeamLogo } from "@/components/team-logo";
 import { EliminationBadge } from "@/components/pool/elimination-badge";
+import { MovementIndicator } from "@/components/pool/movement-indicator";
 import { getEliminationStatus } from "@/lib/scoring";
 
 interface StandingsEntry {
@@ -38,16 +39,23 @@ interface StandingsEntry {
 
 type SortField = "rank" | "points" | "potential";
 
+interface MovementData {
+  previousRank: number | null;
+  isNew: boolean;
+}
+
 interface StandingsTableProps {
   standings: StandingsEntry[];
   poolId: string;
   tournamentStarted?: boolean;
+  movement?: Record<string, MovementData>;
 }
 
 export function StandingsTable({
   standings,
   poolId,
   tournamentStarted = false,
+  movement,
 }: StandingsTableProps) {
   const [sortField, setSortField] = useState<SortField>("rank");
   const [topN, setTopN] = useState<1 | 2 | 3>(1);
@@ -108,6 +116,9 @@ export function StandingsTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">#</TableHead>
+              {movement && (
+                <TableHead className="w-12 text-center">+/-</TableHead>
+              )}
               <TableHead>Bracket</TableHead>
               <TableHead>Owner</TableHead>
               <TableHead className="w-16 text-center">Champ</TableHead>
@@ -147,6 +158,17 @@ export function StandingsTable({
                   <TableCell className="font-medium text-muted-foreground">
                     {entry.rank}
                   </TableCell>
+                  {movement && (
+                    <TableCell className="text-center">
+                      {movement[entry.id] ? (
+                        <MovementIndicator
+                          previousRank={movement[entry.id].previousRank}
+                          currentRank={entry.rank}
+                          isNew={movement[entry.id].isNew}
+                        />
+                      ) : null}
+                    </TableCell>
+                  )}
                   <TableCell>
                     <Link
                       href={`/pools/${poolId}/brackets/${entry.id}`}
@@ -199,9 +221,18 @@ export function StandingsTable({
                 isEliminated ? "opacity-60" : ""
               }`}
             >
-              <span className="w-6 shrink-0 text-center text-sm font-bold text-muted-foreground">
-                {entry.rank}
-              </span>
+              <div className="flex w-10 shrink-0 flex-col items-center">
+                <span className="text-sm font-bold text-muted-foreground">
+                  {entry.rank}
+                </span>
+                {movement && movement[entry.id] && (
+                  <MovementIndicator
+                    previousRank={movement[entry.id].previousRank}
+                    currentRank={entry.rank}
+                    isNew={movement[entry.id].isNew}
+                  />
+                )}
+              </div>
               <ChampionDisplay
                 championPick={entry.championPick}
                 isEliminated={entry.isChampionEliminated}

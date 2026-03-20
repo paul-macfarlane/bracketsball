@@ -968,7 +968,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
-### 63. Standings Movement Tracker (Non-MVP) — Epic: Tournament Experience
+### 63. Standings Movement Tracker (Non-MVP) ✅ — Epic: Tournament Experience
 
 **As a** pool member, **I want to** see how standings positions have changed over time **so that** I can track momentum and see who is surging or falling.
 
@@ -1164,6 +1164,30 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 80. Bracket Connector Lines (Non-MVP) — Epic: Bracket UX Enhancements
+
+**As a** pool member, **I want to** see classic bracket connector lines between games across rounds **so that** the tournament path is visually clear and I can trace how teams advance through the bracket.
+
+**Acceptance Criteria:**
+
+- **Classic "L" connector lines** are drawn between each pair of feeder games and the game they feed into (e.g., two R64 games connect to their R32 game)
+- Lines use the classic bracket style: horizontal line from the source game → vertical line joining the pair → horizontal line into the destination game
+- **Color coding based on prediction correctness** (post-tournament start, viewer and editor):
+  - **Green** (`success` CSS variable): the user's picked team won and advanced along this path (correct prediction)
+  - **Red** (`failure` CSS variable): the user's picked team lost — the path is broken (incorrect prediction)
+  - **Neutral/gray** (`muted-foreground` CSS variable): the game hasn't been played yet (pending)
+- **Pre-tournament (editor picking mode):** all connector lines are neutral/gray since there are no results yet
+- **Both bracket editor and bracket viewer** render connector lines
+- **First Four → R64 connections** are included — First Four games connect into their corresponding R64 slots
+- **Right-side regions** mirror the line direction (lines flow right-to-left toward the center, matching the existing RTL region layout)
+- **All four regions** converge with lines through Final Four to the Championship game
+- Lines are implemented via CSS (pseudo-elements or borders) rather than SVG/Canvas to stay consistent with the existing Tailwind/flexbox approach
+- Lines do not interfere with existing matchup card click targets or hover states
+- Lines render correctly at the existing `min-w-[1400px]` bracket width and with horizontal scroll on mobile
+- Line thickness and color contrast meet accessibility standards (sufficient contrast against both light and dark theme backgrounds)
+
+---
+
 ### 76. Fix My Brackets Mobile Responsive Layout (Non-MVP) — Epic: Bug Fixes
 
 **As a** pool member on mobile, **I want** the "My Brackets" section to display without overlapping text when the tournament has started **so that** I can read my bracket placement, points, and status clearly on small screens.
@@ -1304,7 +1328,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 60  | Pool Notifications                     | Pool Social             | No  |        |
 | 61  | Pool History / Past Seasons            | Multi-Season Support    | No  |        |
 | 62  | Pool Awards / Badges                   | Pool Social             | No  |        |
-| 63  | Standings Movement Tracker             | Tournament Experience   | No  |        |
+| 63  | Standings Movement Tracker             | Tournament Experience   | No  | Done   |
 | 64  | Side-by-Side Bracket Comparison        | Bracket UX Enhancements | No  |        |
 | 65  | Round Recap Digest                     | Tournament Experience   | No  |        |
 | 66  | Pick Confidence Indicator              | Bracket Creation        | No  |        |
@@ -1320,5 +1344,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 77  | Show Game Time Info on "What I Need"   | Tournament Experience   | No  | Done   |
 | 78  | Show TBD for Unknown Game Times        | Tournament Experience   | No  | Done   |
 | 79  | Hide No-Stake Games in What I Need     | Tournament Experience   | No  | Done   |
+| 80  | Bracket Connector Lines                | Bracket UX Enhancements | No  |        |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 57 stories (43 done, 14 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 58 stories (43 done, 15 remaining)**

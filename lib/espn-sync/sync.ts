@@ -7,7 +7,10 @@ import {
   tournamentGame,
   tournament,
 } from "@/lib/db/schema";
-import { syncStandingsForTournament } from "@/lib/db/queries/standings";
+import {
+  syncStandingsForTournament,
+  detectAndSnapshotCompletedRounds,
+} from "@/lib/db/queries/standings";
 import type { SyncGame, SyncResult, TournamentDataSource } from "./types";
 
 // Standard NCAA bracket seeding matchups for R64
@@ -292,6 +295,14 @@ async function syncGamesToDB(
   result.timing!.standingsRecalcMs = Math.round(
     performance.now() - standingsStart,
   );
+
+  // Snapshot standings for any newly completed rounds
+  try {
+    await detectAndSnapshotCompletedRounds(tournamentId);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    result.errors.push(`Standings snapshot error: ${message}`);
+  }
 
   // Auto-update bracket lock time from earliest R64 start time
   await updateBracketLockTimeFromSchedule(tournamentId);
