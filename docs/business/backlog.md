@@ -1150,6 +1150,19 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 76. Fix My Brackets Mobile Responsive Layout (Non-MVP) — Epic: Bug Fixes
+
+**As a** pool member on mobile, **I want** the "My Brackets" section to display without overlapping text when the tournament has started **so that** I can read my bracket placement, points, and status clearly on small screens.
+
+**Acceptance Criteria:**
+
+- The elimination badge ("Alive"/"Eliminated") does not overlap with the ranking text on mobile
+- Standings info (rank, points, potential) is readable without being clipped or overlapping other elements
+- On small screens, the layout stacks the standings info below the bracket name/champion row rather than cramming everything into a single line
+- Desktop layout remains unchanged (single row with all info inline)
+
+---
+
 ### 73. Auto-Fill Algorithm Audit & Fixes (Non-MVP) ✅ — Epic: Auto-Fill Bracket
 
 **As a** pool member, **I want** the stats-based auto-fill algorithm to produce accurate, well-differentiated brackets **so that** my stat weight configuration meaningfully influences the generated picks.
@@ -1258,5 +1271,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 73  | Auto-Fill Algorithm Audit & Fixes      | Auto-Fill Bracket       | No  | Done   |
 | 74  | Fix ESPN Sync Matching & Venue Display | Bug Fixes               | No  | Done   |
 | 75  | Eliminated Champion Red X Indicator    | Tournament Experience   | No  | Done   |
+| 76  | Fix My Brackets Mobile Responsive      | Bug Fixes               | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 53 stories (40 done, 13 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 54 stories (40 done, 14 remaining)**
