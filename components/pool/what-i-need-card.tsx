@@ -35,6 +35,7 @@ interface GameInput {
   id: string;
   round: string;
   status: string;
+  statusDetail: string | null;
   startTime: string | null;
   team1Id: string | null;
   team2Id: string | null;
@@ -251,9 +252,16 @@ function DesktopGameRow({ game }: { game: WhatINeedGame }) {
           <span className="text-xs text-muted-foreground">No stake</span>
         )}
         {isInProgress && (
-          <Badge variant="outline" className="text-[10px]">
-            Live
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <Badge variant="outline" className="text-[10px]">
+              Live
+            </Badge>
+            {game.statusDetail && (
+              <span className="text-[10px] text-muted-foreground">
+                {game.statusDetail}
+              </span>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -268,9 +276,16 @@ function MobileGameCard({ game }: { game: WhatINeedGame }) {
     <div className={`rounded-md border p-3 ${isNoStake ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         {isInProgress && (
-          <Badge variant="outline" className="mb-2 text-[10px]">
-            Live
-          </Badge>
+          <div className="mb-2 flex items-center gap-1.5">
+            <Badge variant="outline" className="text-[10px]">
+              Live
+            </Badge>
+            {game.statusDetail && (
+              <span className="text-[10px] text-muted-foreground">
+                {game.statusDetail}
+              </span>
+            )}
+          </div>
         )}
         {isNoStake && (
           <span className="mb-2 text-xs text-muted-foreground">No stake</span>

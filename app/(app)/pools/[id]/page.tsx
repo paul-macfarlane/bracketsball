@@ -175,6 +175,7 @@ export default async function PoolDetailPage({
     id: g.id,
     round: g.round,
     status: g.status,
+    statusDetail: g.statusDetail ?? null,
     startTime: g.startTime ? g.startTime.toISOString() : null,
     team1Id: g.team1Id,
     team2Id: g.team2Id,
