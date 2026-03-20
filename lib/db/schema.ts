@@ -43,3 +43,8 @@ export {
   bracketEntryRelations,
   bracketPickRelations,
 } from "./bracket-entry-schema";
+
+export {
+  standingsSnapshot,
+  standingsSnapshotRelations,
+} from "./standings-snapshot-schema";

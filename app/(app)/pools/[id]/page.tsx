@@ -23,6 +23,7 @@ import {
   hasTournamentStarted,
   getBracketLockTime,
 } from "@/lib/db/queries/pools";
+import { getStandingsMovement } from "@/lib/db/queries/standings";
 import { CountdownTimer } from "@/components/countdown-timer";
 import {
   canAccessPoolPage,
@@ -121,6 +122,15 @@ export default async function PoolDetailPage({
   const standings = activeTournament
     ? await getPoolStandings(id, activeTournament.id, poolScoring)
     : [];
+
+  // Movement data for standings (only when tournament has started)
+  const movementMap =
+    activeTournament && tournamentStarted
+      ? await getStandingsMovement(id, activeTournament.id)
+      : null;
+  const movementData = movementMap?.size
+    ? Object.fromEntries(movementMap)
+    : undefined;
 
   // What I Need data: games, teams, and picks for submitted brackets
   const submittedEntries = bracketEntries.filter(
@@ -267,6 +277,7 @@ export default async function PoolDetailPage({
               standings={standings}
               poolId={id}
               tournamentStarted={tournamentStarted}
+              movement={movementData}
             />
           </CardContent>
         </Card>
