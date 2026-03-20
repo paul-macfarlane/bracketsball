@@ -1,8 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { MatchupCard } from "./matchup-card";
+import {
+  BracketConnector,
+  CrossRegionConnector,
+  HorizontalConnector,
+  getConnectorColor,
+  type ConnectorColor,
+} from "./bracket-connector";
 import type { BracketGame, BracketTeam } from "./types";
 import { ROUND_LABELS } from "./types";
 
@@ -273,85 +280,164 @@ export function BracketFullView({
     );
   }
 
+  // Compute cross-region connector colors (E8 → Final Four)
+  const leftE8Colors = useMemo((): [ConnectorColor, ConnectorColor] => {
+    const topE8Games =
+      gamesByRegionAndRound.get(`${bracketPositions.topLeft}-elite_8`) ?? [];
+    const bottomE8Games =
+      gamesByRegionAndRound.get(`${bracketPositions.bottomLeft}-elite_8`) ?? [];
+    return [
+      topE8Games[0]
+        ? getConnectorColor(topE8Games[0], picks, eliminatedTeamIds)
+        : "muted",
+      bottomE8Games[0]
+        ? getConnectorColor(bottomE8Games[0], picks, eliminatedTeamIds)
+        : "muted",
+    ];
+  }, [gamesByRegionAndRound, bracketPositions, picks, eliminatedTeamIds]);
+
+  const rightE8Colors = useMemo((): [ConnectorColor, ConnectorColor] => {
+    const topE8Games =
+      gamesByRegionAndRound.get(`${bracketPositions.topRight}-elite_8`) ?? [];
+    const bottomE8Games =
+      gamesByRegionAndRound.get(`${bracketPositions.bottomRight}-elite_8`) ??
+      [];
+    return [
+      topE8Games[0]
+        ? getConnectorColor(topE8Games[0], picks, eliminatedTeamIds)
+        : "muted",
+      bottomE8Games[0]
+        ? getConnectorColor(bottomE8Games[0], picks, eliminatedTeamIds)
+        : "muted",
+    ];
+  }, [gamesByRegionAndRound, bracketPositions, picks, eliminatedTeamIds]);
+
+  // FF → Championship connector colors
+  const leftFFColor = useMemo(
+    (): ConnectorColor =>
+      leftFinalFour
+        ? getConnectorColor(leftFinalFour, picks, eliminatedTeamIds)
+        : "muted",
+    [leftFinalFour, picks, eliminatedTeamIds],
+  );
+  const rightFFColor = useMemo(
+    (): ConnectorColor =>
+      rightFinalFour
+        ? getConnectorColor(rightFinalFour, picks, eliminatedTeamIds)
+        : "muted",
+    [rightFinalFour, picks, eliminatedTeamIds],
+  );
+
   return (
     <div className="overflow-x-auto pb-4">
-      <div className="flex min-w-[1400px] items-stretch gap-0">
+      <div className="flex min-w-[1700px] items-stretch gap-0">
         {/* Left regions */}
-        <div className="flex flex-col gap-8">
-          {LEFT_REGIONS.map((region) => (
-            <RegionBracket
-              key={region}
-              region={region}
-              rounds={REGION_ROUNDS}
-              gamesByRegionAndRound={gamesByRegionAndRound}
-              firstFourByR64Game={firstFourByR64Game}
-              picks={picks}
-              getTeamsForGame={getTeamsForGame}
-              getTeamById={getTeamById}
-              onPick={onPick}
-              disabled={disabled}
-              direction="ltr"
-              sideHasFirstFour={sideHasFirstFour.left}
-              roundPointsMap={roundPointsMap}
-              eliminatedTeamIds={eliminatedTeamIds}
-              roundSummaries={roundSummaries}
-            />
+        <div className="flex flex-col">
+          {LEFT_REGIONS.map((region, i) => (
+            <Fragment key={region}>
+              {i > 0 && <div className="h-8" />}
+              <RegionBracket
+                region={region}
+                rounds={REGION_ROUNDS}
+                gamesByRegionAndRound={gamesByRegionAndRound}
+                firstFourByR64Game={firstFourByR64Game}
+                picks={picks}
+                getTeamsForGame={getTeamsForGame}
+                getTeamById={getTeamById}
+                onPick={onPick}
+                disabled={disabled}
+                direction="ltr"
+                sideHasFirstFour={sideHasFirstFour.left}
+                roundPointsMap={roundPointsMap}
+                eliminatedTeamIds={eliminatedTeamIds}
+                roundSummaries={roundSummaries}
+              />
+            </Fragment>
           ))}
         </div>
 
-        {/* Left Final Four: centered between South and East E8 */}
-        {leftFinalFour && (
-          <div className="flex flex-col items-center justify-center px-1">
-            <RoundHeader
-              round="final_four"
-              summary={roundSummaries.get("final_four")}
-            />
-            {renderMatchup(leftFinalFour)}
-          </div>
-        )}
+        {/* Connector: left E8 → left Final Four */}
+        <CrossRegionConnector
+          topColor={leftE8Colors[0]}
+          bottomColor={leftE8Colors[1]}
+          direction="ltr"
+        />
 
-        {/* Championship: centered between the two Final Four games */}
-        {championshipGame && (
-          <div className="flex flex-col items-center justify-center px-1">
-            <RoundHeader
-              round="championship"
-              summary={roundSummaries.get("championship")}
-            />
-            {renderMatchup(championshipGame)}
-          </div>
-        )}
+        {/* Center section: Final Four + Connectors + Championship.
+            RoundHeaders are absolutely positioned above cards so that
+            items-center aligns connectors to the card center, not
+            the header+card group center. */}
+        <div className="flex items-center">
+          {leftFinalFour && (
+            <div className="relative px-1">
+              <div className="absolute bottom-full left-0 right-0">
+                <RoundHeader
+                  round="final_four"
+                  summary={roundSummaries.get("final_four")}
+                />
+              </div>
+              {renderMatchup(leftFinalFour)}
+            </div>
+          )}
 
-        {/* Right Final Four: centered between West and Midwest E8 */}
-        {rightFinalFour && (
-          <div className="flex flex-col items-center justify-center px-1">
-            <RoundHeader
-              round="final_four"
-              summary={roundSummaries.get("final_four")}
-            />
-            {renderMatchup(rightFinalFour)}
-          </div>
-        )}
+          <HorizontalConnector color={leftFFColor} />
+
+          {championshipGame && (
+            <div className="relative px-1">
+              <div className="absolute bottom-full left-0 right-0">
+                <RoundHeader
+                  round="championship"
+                  summary={roundSummaries.get("championship")}
+                />
+              </div>
+              {renderMatchup(championshipGame)}
+            </div>
+          )}
+
+          <HorizontalConnector color={rightFFColor} />
+
+          {rightFinalFour && (
+            <div className="relative px-1">
+              <div className="absolute bottom-full left-0 right-0">
+                <RoundHeader
+                  round="final_four"
+                  summary={roundSummaries.get("final_four")}
+                />
+              </div>
+              {renderMatchup(rightFinalFour)}
+            </div>
+          )}
+        </div>
+
+        {/* Connector: right E8 → right Final Four */}
+        <CrossRegionConnector
+          topColor={rightE8Colors[0]}
+          bottomColor={rightE8Colors[1]}
+          direction="rtl"
+        />
 
         {/* Right regions */}
-        <div className="flex flex-col gap-8">
-          {RIGHT_REGIONS.map((region) => (
-            <RegionBracket
-              key={region}
-              region={region}
-              rounds={REGION_ROUNDS}
-              gamesByRegionAndRound={gamesByRegionAndRound}
-              firstFourByR64Game={firstFourByR64Game}
-              picks={picks}
-              getTeamsForGame={getTeamsForGame}
-              getTeamById={getTeamById}
-              onPick={onPick}
-              disabled={disabled}
-              direction="rtl"
-              sideHasFirstFour={sideHasFirstFour.right}
-              roundPointsMap={roundPointsMap}
-              eliminatedTeamIds={eliminatedTeamIds}
-              roundSummaries={roundSummaries}
-            />
+        <div className="flex flex-col">
+          {RIGHT_REGIONS.map((region, i) => (
+            <Fragment key={region}>
+              {i > 0 && <div className="h-8" />}
+              <RegionBracket
+                region={region}
+                rounds={REGION_ROUNDS}
+                gamesByRegionAndRound={gamesByRegionAndRound}
+                firstFourByR64Game={firstFourByR64Game}
+                picks={picks}
+                getTeamsForGame={getTeamsForGame}
+                getTeamById={getTeamById}
+                onPick={onPick}
+                disabled={disabled}
+                direction="rtl"
+                sideHasFirstFour={sideHasFirstFour.right}
+                roundPointsMap={roundPointsMap}
+                eliminatedTeamIds={eliminatedTeamIds}
+                roundSummaries={roundSummaries}
+              />
+            </Fragment>
           ))}
         </div>
       </div>
@@ -434,50 +520,89 @@ function RegionBracket({
   const hasFirstFour = r64Games.some((g) => firstFourByR64Game.has(g.id));
   const showFirstFourColumn = hasFirstFour || sideHasFirstFour;
 
+  // Compute connector colors between each pair of adjacent rounds
+  const connectorData = useMemo(() => {
+    const data: [ConnectorColor, ConnectorColor][][] = [];
+    for (let i = 0; i < orderedRounds.length - 1; i++) {
+      // Source round is the one with more games (earlier tournament round)
+      const sourceRoundKey =
+        direction === "ltr" ? orderedRounds[i] : orderedRounds[i + 1];
+      const sourceGames =
+        gamesByRegionAndRound.get(`${region}-${sourceRoundKey}`) ?? [];
+      const pairCount = Math.floor(sourceGames.length / 2);
+      const colors: [ConnectorColor, ConnectorColor][] = [];
+      for (let j = 0; j < pairCount; j++) {
+        const topGame = sourceGames[j * 2];
+        const bottomGame = sourceGames[j * 2 + 1];
+        colors.push([
+          topGame
+            ? getConnectorColor(topGame, picks, eliminatedTeamIds)
+            : "muted",
+          bottomGame
+            ? getConnectorColor(bottomGame, picks, eliminatedTeamIds)
+            : "muted",
+        ]);
+      }
+      data.push(colors);
+    }
+    return data;
+  }, [
+    orderedRounds,
+    direction,
+    region,
+    gamesByRegionAndRound,
+    picks,
+    eliminatedTeamIds,
+  ]);
+
   return (
-    <div>
+    <div className="flex-1">
       <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {region}
       </div>
       <div className="flex items-stretch gap-0">
-        {orderedRounds.map((round) => {
+        {orderedRounds.map((round, i) => {
           const roundGames =
             gamesByRegionAndRound.get(`${region}-${round}`) ?? [];
 
-          if (round === "round_of_64") {
-            return (
-              <R64WithFirstFour
-                key={round}
-                r64Games={roundGames}
-                firstFourByR64Game={firstFourByR64Game}
-                picks={picks}
-                getTeamsForGame={getTeamsForGame}
-                getTeamById={getTeamById}
-                onPick={onPick}
-                disabled={disabled}
-                direction={direction}
-                showFirstFourColumn={showFirstFourColumn}
-                roundPointsMap={roundPointsMap}
-                eliminatedTeamIds={eliminatedTeamIds}
-                roundSummaries={roundSummaries}
-              />
-            );
-          }
-
           return (
-            <RoundColumn
-              key={round}
-              round={round}
-              games={roundGames}
-              picks={picks}
-              getTeamsForGame={getTeamsForGame}
-              getTeamById={getTeamById}
-              onPick={onPick}
-              disabled={disabled}
-              roundPointsMap={roundPointsMap}
-              eliminatedTeamIds={eliminatedTeamIds}
-              roundSummary={roundSummaries.get(round)}
-            />
+            <Fragment key={round}>
+              {round === "round_of_64" ? (
+                <R64WithFirstFour
+                  r64Games={roundGames}
+                  firstFourByR64Game={firstFourByR64Game}
+                  picks={picks}
+                  getTeamsForGame={getTeamsForGame}
+                  getTeamById={getTeamById}
+                  onPick={onPick}
+                  disabled={disabled}
+                  direction={direction}
+                  showFirstFourColumn={showFirstFourColumn}
+                  roundPointsMap={roundPointsMap}
+                  eliminatedTeamIds={eliminatedTeamIds}
+                  roundSummaries={roundSummaries}
+                />
+              ) : (
+                <RoundColumn
+                  round={round}
+                  games={roundGames}
+                  picks={picks}
+                  getTeamsForGame={getTeamsForGame}
+                  getTeamById={getTeamById}
+                  onPick={onPick}
+                  disabled={disabled}
+                  roundPointsMap={roundPointsMap}
+                  eliminatedTeamIds={eliminatedTeamIds}
+                  roundSummary={roundSummaries.get(round)}
+                />
+              )}
+              {i < orderedRounds.length - 1 && connectorData[i] && (
+                <BracketConnector
+                  colors={connectorData[i]}
+                  direction={direction}
+                />
+              )}
+            </Fragment>
           );
         })}
       </div>
@@ -534,42 +659,42 @@ function R64WithFirstFour({
   const hasAnyFirstFour = r64Games.some((g) => firstFourByR64Game.has(g.id));
 
   return (
-    <div className="flex flex-col items-center px-1">
+    <div className="flex flex-1 flex-col items-center px-1">
       {/* Column headers */}
       <div className="mb-1 flex gap-0">
         {showFirstFourColumn && (
           <div
-            className={cn(
-              "w-44 px-1",
-              direction === "rtl" ? "order-2" : "order-1",
-            )}
+            className={cn("px-1", direction === "rtl" ? "order-3" : "order-1")}
           >
-            {hasAnyFirstFour ? (
-              <RoundHeader
-                round="first_four"
-                summary={roundSummaries.get("first_four")}
-              />
-            ) : (
-              <div className="text-center text-[10px] font-medium text-muted-foreground">
-                &nbsp;
-              </div>
-            )}
+            <div className="w-44">
+              {hasAnyFirstFour ? (
+                <RoundHeader
+                  round="first_four"
+                  summary={roundSummaries.get("first_four")}
+                />
+              ) : (
+                <div className="text-center text-[10px] font-medium text-muted-foreground">
+                  &nbsp;
+                </div>
+              )}
+            </div>
           </div>
         )}
+        {/* FF→R64 connector header spacer */}
+        {showFirstFourColumn && <div className="order-2 w-10" />}
         <div
-          className={cn(
-            "w-44 px-1",
-            direction === "rtl" ? "order-1" : "order-2",
-          )}
+          className={cn("px-1", direction === "rtl" ? "order-1" : "order-3")}
         >
-          <RoundHeader
-            round="round_of_64"
-            summary={roundSummaries.get("round_of_64")}
-          />
+          <div className="w-44">
+            <RoundHeader
+              round="round_of_64"
+              summary={roundSummaries.get("round_of_64")}
+            />
+          </div>
         </div>
       </div>
       {/* Game rows */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-1 flex-col">
         {r64Games.map((r64Game) => {
           const ffGame = firstFourByR64Game.get(r64Game.id);
           const [r64Team1, r64Team2] = getTeamsForGame(r64Game.id);
@@ -578,13 +703,21 @@ function R64WithFirstFour({
           const ffTeams = ffGame ? getTeamsForGame(ffGame.id) : null;
           const ffPickedId = ffGame ? (picks.get(ffGame.id) ?? null) : null;
 
+          // FF→R64 connector color
+          const ffConnectorColor: ConnectorColor = ffGame
+            ? getConnectorColor(ffGame, picks, eliminatedTeamIds)
+            : "muted";
+
           return (
-            <div key={r64Game.id} className="flex items-center gap-0">
+            <div
+              key={r64Game.id}
+              className="flex flex-1 items-center gap-0 py-1"
+            >
               {showFirstFourColumn && (
                 <div
                   className={cn(
                     "px-1",
-                    direction === "rtl" ? "order-2" : "order-1",
+                    direction === "rtl" ? "order-3" : "order-1",
                   )}
                 >
                   {ffGame && ffTeams ? (
@@ -620,10 +753,19 @@ function R64WithFirstFour({
                   )}
                 </div>
               )}
+              {/* FF→R64 horizontal connector */}
+              {showFirstFourColumn && ffGame && (
+                <div className="order-2">
+                  <HorizontalConnector color={ffConnectorColor} />
+                </div>
+              )}
+              {showFirstFourColumn && !ffGame && (
+                <div className="order-2 w-10" />
+              )}
               <div
                 className={cn(
                   "px-1",
-                  direction === "rtl" ? "order-1" : "order-2",
+                  direction === "rtl" ? "order-1" : "order-3",
                 )}
               >
                 <MatchupCard
@@ -690,39 +832,43 @@ function RoundColumn({
   return (
     <div className="flex flex-1 flex-col px-1">
       <RoundHeader round={round} summary={roundSummary} />
-      <div className="flex flex-1 flex-col justify-around">
+      <div className="flex flex-1 flex-col">
         {games.map((game) => {
           const [team1, team2] = getTeamsForGame(game.id);
           const pickedId = picks.get(game.id) ?? null;
           return (
-            <MatchupCard
+            <div
               key={game.id}
-              gameId={game.id}
-              team1={team1}
-              team2={team2}
-              pickedTeamId={pickedId}
-              pickedTeamData={resolvePickedTeam(
-                pickedId,
-                team1,
-                team2,
-                getTeamById,
-              )}
-              onPick={onPick}
-              disabled={disabled}
-              winnerTeamId={game.winnerTeamId}
-              gameStatus={game.status}
-              statusDetail={game.statusDetail}
-              roundPoints={roundPointsMap?.get(round) ?? 0}
-              team1Score={game.team1Score}
-              team2Score={game.team2Score}
-              startTime={game.startTime}
-              venueName={game.venueName}
-              venueCity={game.venueCity}
-              venueState={game.venueState}
-              eliminatedTeamIds={eliminatedTeamIds}
-              actualTeam1Id={game.team1Id}
-              actualTeam2Id={game.team2Id}
-            />
+              className="flex flex-1 items-center justify-center py-1"
+            >
+              <MatchupCard
+                gameId={game.id}
+                team1={team1}
+                team2={team2}
+                pickedTeamId={pickedId}
+                pickedTeamData={resolvePickedTeam(
+                  pickedId,
+                  team1,
+                  team2,
+                  getTeamById,
+                )}
+                onPick={onPick}
+                disabled={disabled}
+                winnerTeamId={game.winnerTeamId}
+                gameStatus={game.status}
+                statusDetail={game.statusDetail}
+                roundPoints={roundPointsMap?.get(round) ?? 0}
+                team1Score={game.team1Score}
+                team2Score={game.team2Score}
+                startTime={game.startTime}
+                venueName={game.venueName}
+                venueCity={game.venueCity}
+                venueState={game.venueState}
+                eliminatedTeamIds={eliminatedTeamIds}
+                actualTeam1Id={game.team1Id}
+                actualTeam2Id={game.team2Id}
+              />
+            </div>
           );
         })}
       </div>
