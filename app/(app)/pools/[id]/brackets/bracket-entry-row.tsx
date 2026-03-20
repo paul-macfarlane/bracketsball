@@ -113,110 +113,119 @@ export function BracketEntryRow({
     : "";
 
   return (
-    <div
-      className={`flex items-center gap-2 rounded-md border p-3 transition-colors hover:bg-muted ${
-        isDraft ? "border-warning bg-warning/10" : ""
-      }`}
-    >
+    <>
       <Link
         href={`/pools/${poolId}/brackets/${entry.id}`}
-        className="flex min-w-0 flex-1 items-center gap-2"
+        className={`flex items-center gap-2 rounded-md border p-3 transition-colors hover:bg-muted ${
+          isDraft ? "border-warning bg-warning/10" : ""
+        }`}
       >
-        {isDraft && (
-          <AlertTriangle className="h-4 w-4 shrink-0 text-warning-foreground" />
-        )}
-        {championPick && (
-          <span className="relative shrink-0">
-            <TeamLogo
-              logoUrl={championPick.teamLogoUrl}
-              darkLogoUrl={championPick.teamDarkLogoUrl}
-              alt={championAlt}
-              className={`h-6 w-6 object-contain ${isChampionEliminated ? "opacity-40 grayscale" : ""}`}
-            />
-            {isChampionEliminated && (
-              <X
-                className="absolute -inset-0.5 h-7 w-7 text-destructive"
-                strokeWidth={3}
-              />
+        <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            {isDraft && (
+              <AlertTriangle className="h-4 w-4 shrink-0 text-warning-foreground" />
             )}
-          </span>
-        )}
-        <span className="truncate font-medium">{entry.name}</span>
-        {isEliminated !== null && isEliminated !== undefined && (
-          <span className="shrink-0">
-            <EliminationBadge isEliminated={isEliminated} />
-          </span>
-        )}
-      </Link>
-      <div className="flex shrink-0 items-center gap-2">
-        {tournamentStarted && standingsInfo && (
-          <div className="flex items-center gap-3 text-sm">
-            <span className="font-medium text-muted-foreground">
-              {formatOrdinal(standingsInfo.rank)} of {totalBrackets}
-            </span>
-            <span>
-              <span className="font-semibold">{standingsInfo.totalPoints}</span>
-              <span className="text-muted-foreground"> pts</span>
-            </span>
-            <span className="text-muted-foreground">
-              {standingsInfo.potentialPoints} potential
-            </span>
+            {championPick && (
+              <span className="relative shrink-0">
+                <TeamLogo
+                  logoUrl={championPick.teamLogoUrl}
+                  darkLogoUrl={championPick.teamDarkLogoUrl}
+                  alt={championAlt}
+                  className={`h-6 w-6 object-contain ${isChampionEliminated ? "opacity-40 grayscale" : ""}`}
+                />
+                {isChampionEliminated && (
+                  <X
+                    className="absolute -inset-0.5 h-7 w-7 text-destructive"
+                    strokeWidth={3}
+                  />
+                )}
+              </span>
+            )}
+            {isEliminated !== null && isEliminated !== undefined && (
+              <span className="shrink-0">
+                <EliminationBadge isEliminated={isEliminated} />
+              </span>
+            )}
+            <span className="truncate font-medium">{entry.name}</span>
           </div>
-        )}
-        {!tournamentStarted && (
-          <Badge
-            variant={entry.status === "submitted" ? "default" : "outline"}
-            className={
-              entry.status === "submitted"
-                ? ""
-                : "border-warning bg-warning/10 text-warning-foreground"
-            }
-          >
-            {entry.status === "submitted" ? "Submitted" : "Not Submitted"}
-          </Badge>
-        )}
-        {!tournamentStarted && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                disabled={isPending}
-                onClick={(e) => e.preventDefault()}
+          {tournamentStarted && standingsInfo && (
+            <div className="flex items-center gap-3 text-sm sm:ml-auto">
+              <span className="font-medium text-muted-foreground">
+                {formatOrdinal(standingsInfo.rank)} of {totalBrackets}
+              </span>
+              <span>
+                <span className="font-semibold">
+                  {standingsInfo.totalPoints}
+                </span>
+                <span className="text-muted-foreground"> pts</span>
+              </span>
+              <span className="text-muted-foreground">
+                {standingsInfo.potentialPoints} potential
+              </span>
+            </div>
+          )}
+          {!tournamentStarted && (
+            <div className="flex items-center gap-2 sm:ml-auto">
+              <Badge
+                variant={entry.status === "submitted" ? "default" : "outline"}
+                className={
+                  entry.status === "submitted"
+                    ? ""
+                    : "border-warning bg-warning/10 text-warning-foreground"
+                }
               >
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Actions</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={handleDuplicate}
-                disabled={!canDuplicate || isPending}
-              >
-                <Copy className="mr-2 h-4 w-4" />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setShowDeleteDialog(true)}
-                disabled={isPending}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        <Link
-          href={`/pools/${poolId}/brackets/${entry.id}`}
-          className="flex h-8 w-8 items-center justify-center text-muted-foreground"
-          aria-label={`View ${entry.name}`}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Link>
-      </div>
+                {entry.status === "submitted" ? "Submitted" : "Not Submitted"}
+              </Badge>
+            </div>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {!tournamentStarted && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  disabled={isPending}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">Actions</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDuplicate();
+                  }}
+                  disabled={!canDuplicate || isPending}
+                >
+                  <Copy className="mr-2 h-4 w-4" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowDeleteDialog(true);
+                  }}
+                  disabled={isPending}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+        </div>
+      </Link>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
@@ -233,6 +242,6 @@ export function BracketEntryRow({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }
