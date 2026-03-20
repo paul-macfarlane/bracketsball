@@ -62,7 +62,7 @@ All crontab expressions below are in **America/New_York (ET)**. Configure your c
 | Elite 8      | Sat-Sun Mar 28-29 | Every 5 min, 2pm-1am ET  | `*/5 14-23,0-1 28-29 3 *` |
 | Final Four   | Sat Apr 4         | Every 5 min, 6pm-1am ET  | `*/5 18-23,0-1 4 4 *`     |
 | Championship | Mon Apr 6         | Every 5 min, 8pm-1am ET  | `*/5 20-23,0-1 6 4 *`     |
-| Off days     | Any non-game day  | Once daily or skip       | `0 8 * * *`               |
+| Off days     | Any non-game day  | Skip (full sync covers)  | —                         |
 
 A simpler approach: **every 5 minutes from noon to 1am ET during the tournament window (Mar 17 – Apr 6)** covers all scenarios without over-complicating the schedule. In crontab: `*/5 12-23,0-1 * 3-4 *` (filter active dates via cron-job.org's date settings).
 
@@ -80,9 +80,13 @@ Set these up at [cron-job.org](https://cron-job.org):
 - URL: `https://your-domain.com/api/sync-espn-full`
 - Method: GET
 - Header: `Authorization: Bearer <your-CRON_SECRET>`
-- Schedule: Once daily at 2 AM ET (`0 2 * * *` ET) during the tournament window (Mar 17 – Apr 6)
+- Schedule: Every 2 hours during the tournament window (Mar 17 – Apr 6): `0 */2 * 3-4 *` ET
 
-The full sync is especially useful in the days between Selection Sunday and the First Four, when ESPN is still publishing game times and venue assignments. It derives the date range from the tournament's existing game start times, so no configuration is needed. It does not delete or recreate the tournament — safe to run with existing picks.
+Running the full sync every 2 hours ensures that when a game goes final and the winner advances, the next-round matchup (which may be days away) gets populated with team assignments, venue info, and start times promptly. This keeps the "What I Need" section and bracket views up to date with upcoming game details rather than waiting until the next day.
+
+The full sync completes in 2–4 seconds even for the entire tournament date range (50ms delay per date fetch), well within the 120-second timeout. It derives the date range from the tournament's existing game start times, so no configuration is needed. It does not delete or recreate the tournament — safe to run with existing picks.
+
+The full sync is also especially useful in the days between Selection Sunday and the First Four, when ESPN is still publishing game times and venue assignments.
 
 ### What Each Sync Does
 
