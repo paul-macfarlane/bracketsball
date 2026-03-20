@@ -21,7 +21,7 @@
 - `docs/business/backlog.md`: Added story #77 with acceptance criteria and summary table entry
 - `lib/what-i-need.ts`: Added `statusDetail` to `WhatINeedGame` interface and `GameInput` interface; pass it through in `computeWhatINeed`
 - `app/(app)/pools/[id]/page.tsx`: Include `statusDetail` in serialized game data passed to client
-- `components/pool/what-i-need-card.tsx`: Added `statusDetail` to `GameInput` interface; display it next to the "Live" badge in both `DesktopGameRow` and `MobileGameCard` layouts
+- `components/pool/what-i-need-card.tsx`: Added `statusDetail` to `GameInput` interface; display it next to the "Live" badge in both `DesktopGameRow` and `MobileGameCard` layouts; added `formatGameTime` helper and display of scheduled game date/time for upcoming games
 
 ## Notes
 
