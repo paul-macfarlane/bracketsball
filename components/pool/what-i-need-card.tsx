@@ -26,6 +26,16 @@ import {
 } from "@/lib/what-i-need";
 import type { PoolScoring } from "@/lib/scoring";
 
+function formatGameTime(startTime: string): string {
+  const date = new Date(startTime);
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 interface BracketOption {
   id: string;
   name: string;
@@ -263,6 +273,11 @@ function DesktopGameRow({ game }: { game: WhatINeedGame }) {
             )}
           </div>
         )}
+        {!isInProgress && !isNoStake && game.startTime && (
+          <span className="text-[10px] text-muted-foreground">
+            {formatGameTime(game.startTime)}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -286,6 +301,11 @@ function MobileGameCard({ game }: { game: WhatINeedGame }) {
               </span>
             )}
           </div>
+        )}
+        {!isInProgress && !isNoStake && game.startTime && (
+          <span className="mb-2 text-[10px] text-muted-foreground">
+            {formatGameTime(game.startTime)}
+          </span>
         )}
         {isNoStake && (
           <span className="mb-2 text-xs text-muted-foreground">No stake</span>
