@@ -214,15 +214,10 @@ function TeamDisplay({
 }
 
 function DesktopGameRow({ game }: { game: WhatINeedGame }) {
-  const isNoStake = game.rootFor === "none";
   const isInProgress = game.status === "in_progress";
 
   return (
-    <div
-      className={`flex items-center gap-4 rounded-md border p-3 ${
-        isNoStake ? "opacity-50" : ""
-      }`}
-    >
+    <div className="flex items-center gap-4 rounded-md border p-3">
       <div className="flex min-w-0 flex-1 items-center gap-6">
         <div className="min-w-0 flex-1">
           <TeamDisplay
@@ -249,9 +244,6 @@ function DesktopGameRow({ game }: { game: WhatINeedGame }) {
         </div>
       </div>
       <div className="shrink-0 text-right">
-        {isNoStake && (
-          <span className="text-xs text-muted-foreground">No stake</span>
-        )}
         {isInProgress && (
           <div className="flex items-center gap-1.5">
             <Badge variant="outline" className="text-[10px]">
@@ -264,7 +256,7 @@ function DesktopGameRow({ game }: { game: WhatINeedGame }) {
             )}
           </div>
         )}
-        {!isInProgress && !isNoStake && game.startTime && (
+        {!isInProgress && game.startTime && (
           <span className="text-[10px] text-muted-foreground">
             {formatGameDateTime(game.startTime)}
           </span>
@@ -275,11 +267,10 @@ function DesktopGameRow({ game }: { game: WhatINeedGame }) {
 }
 
 function MobileGameCard({ game }: { game: WhatINeedGame }) {
-  const isNoStake = game.rootFor === "none";
   const isInProgress = game.status === "in_progress";
 
   return (
-    <div className={`rounded-md border p-3 ${isNoStake ? "opacity-50" : ""}`}>
+    <div className="rounded-md border p-3">
       <div className="flex items-center justify-between">
         {isInProgress && (
           <div className="mb-2 flex items-center gap-1.5">
@@ -293,13 +284,10 @@ function MobileGameCard({ game }: { game: WhatINeedGame }) {
             )}
           </div>
         )}
-        {!isInProgress && !isNoStake && game.startTime && (
+        {!isInProgress && game.startTime && (
           <span className="mb-2 text-[10px] text-muted-foreground">
             {formatGameDateTime(game.startTime)}
           </span>
-        )}
-        {isNoStake && (
-          <span className="mb-2 text-xs text-muted-foreground">No stake</span>
         )}
       </div>
       <div className="space-y-2">

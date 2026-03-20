@@ -1223,6 +1223,20 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 79. Hide No-Stake Games in "What I Need" (Non-MVP) ✅ — Epic: Tournament Experience
+
+**As a** pool member, **I want** the "What I Need" section to only show games where I have a stake **so that** the section is focused and every game listed is one I actually need a result from.
+
+**Acceptance Criteria:**
+
+- Games where `rootFor` is `"none"` (neither team was picked to advance) are excluded from the "What I Need" results entirely
+- The filtering happens in `computeWhatINeed` so the data layer is clean — no UI-level filtering needed
+- All "No stake" UI handling (opacity, labels) is removed from the component since those games will never appear
+- Existing tests are updated to reflect the new filtering behavior
+- If all games in a round are no-stake, that round group is omitted entirely
+
+---
+
 ## Summary
 
 | #   | Story                                  | Epic                    | MVP | Status |
@@ -1305,5 +1319,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 76  | Fix My Brackets Mobile Responsive      | Bug Fixes               | No  | Done   |
 | 77  | Show Game Time Info on "What I Need"   | Tournament Experience   | No  | Done   |
 | 78  | Show TBD for Unknown Game Times        | Tournament Experience   | No  | Done   |
+| 79  | Hide No-Stake Games in What I Need     | Tournament Experience   | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 56 stories (42 done, 14 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 57 stories (43 done, 14 remaining)**
