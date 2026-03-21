@@ -1164,7 +1164,7 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
-### 80. Bracket Connector Lines (Non-MVP) — Epic: Bracket UX Enhancements
+### 80. Bracket Connector Lines (Non-MVP) ✅ — Epic: Bracket UX Enhancements
 
 **As a** pool member, **I want to** see classic bracket connector lines between games across rounds **so that** the tournament path is visually clear and I can trace how teams advance through the bracket.
 
@@ -1344,6 +1344,6 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 | 77  | Show Game Time Info on "What I Need"   | Tournament Experience   | No  | Done   |
 | 78  | Show TBD for Unknown Game Times        | Tournament Experience   | No  | Done   |
 | 79  | Hide No-Stake Games in What I Need     | Tournament Experience   | No  | Done   |
-| 80  | Bracket Connector Lines                | Bracket UX Enhancements | No  |        |
+| 80  | Bracket Connector Lines                | Bracket UX Enhancements | No  | Done   |
 
 **MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 58 stories (43 done, 15 remaining)**
