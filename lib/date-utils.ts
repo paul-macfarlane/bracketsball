@@ -18,17 +18,28 @@ function isMidnightET(date: Date): boolean {
 }
 
 /**
- * Format a game start time for display. Returns e.g. "Mar 19 · 7:10 PM",
- * or "Mar 19 · TBD" when ESPN has the time set to midnight ET (meaning
- * the actual time hasn't been determined yet).
- *
- * Pass `includeWeekday: true` for a longer format: "Fri, Mar 19 · 7:10 PM".
+ * Return "Today", "Tomorrow", or a formatted date string (e.g. "Mar 19" or
+ * "Fri, Mar 19") depending on whether the game date matches the local
+ * calendar day.
  */
-export function formatGameDateTime(
-  startTime: Date | string,
+function getRelativeDatePart(
+  d: Date,
   opts?: { includeWeekday?: boolean },
 ): string {
-  const d = typeof startTime === "string" ? new Date(startTime) : startTime;
+  const now = new Date();
+
+  const toDateKey = (dt: Date) =>
+    `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}`;
+
+  const gameKey = toDateKey(d);
+  const todayKey = toDateKey(now);
+
+  if (gameKey === todayKey) return "Today";
+
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (gameKey === toDateKey(tomorrow)) return "Tomorrow";
+
   const dateOptions: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
@@ -36,7 +47,22 @@ export function formatGameDateTime(
   if (opts?.includeWeekday) {
     dateOptions.weekday = "short";
   }
-  const datePart = d.toLocaleDateString("en-US", dateOptions);
+  return d.toLocaleDateString("en-US", dateOptions);
+}
+
+/**
+ * Format a game start time for display. Returns e.g. "Today · 7:10 PM",
+ * "Tomorrow · TBD", or "Mar 19 · 7:10 PM".
+ *
+ * Games today or tomorrow use relative labels instead of the calendar date.
+ * Pass `includeWeekday: true` to include the weekday for non-relative dates.
+ */
+export function formatGameDateTime(
+  startTime: Date | string,
+  opts?: { includeWeekday?: boolean },
+): string {
+  const d = typeof startTime === "string" ? new Date(startTime) : startTime;
+  const datePart = getRelativeDatePart(d, opts);
   if (isMidnightET(d)) {
     return `${datePart} · TBD`;
   }
