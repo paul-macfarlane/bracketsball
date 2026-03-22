@@ -278,6 +278,7 @@ export default async function PoolDetailPage({
               poolId={id}
               tournamentStarted={tournamentStarted}
               movement={movementData}
+              currentUserId={session.user.id}
             />
           </CardContent>
         </Card>
