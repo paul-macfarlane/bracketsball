@@ -535,58 +535,61 @@ export function BracketEditor({
         disabled={isDisabled}
         bracketPositions={bracketPositions}
         roundPointsMap={roundPointsMap}
+        tiebreakerScore={isLocked ? tiebreakerValue : undefined}
       />
 
-      {/* Tiebreaker + Submit — sticky at the bottom */}
-      <div className="sticky bottom-0 z-30 mt-6 border-t border-border bg-card p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-        <div className="flex flex-wrap items-end gap-4">
-          <div className="flex-1">
-            <label
-              htmlFor="tiebreaker"
-              className="mb-1 block text-sm font-medium"
-            >
-              Tiebreaker: Predicted Championship Total Score
-            </label>
-            <p className="mb-2 text-xs text-muted-foreground">
-              Predict the combined score of both teams in the championship game.
-              Used to break ties in the standings.
-            </p>
-            <Input
-              id="tiebreaker"
-              type="number"
-              min={0}
-              max={500}
-              placeholder="e.g. 145"
-              value={tiebreaker}
-              onChange={(e) => setTiebreaker(e.target.value)}
-              onBlur={handleTiebreakerBlur}
-              disabled={isDisabled}
-              className="w-32"
-            />
+      {/* Tiebreaker + Submit — sticky at the bottom (hidden when tournament is active) */}
+      {!isLocked && (
+        <div className="sticky bottom-0 z-30 mt-6 border-t border-border bg-card p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="flex-1">
+              <label
+                htmlFor="tiebreaker"
+                className="mb-1 block text-sm font-medium"
+              >
+                Tiebreaker: Predicted Championship Total Score
+              </label>
+              <p className="mb-2 text-xs text-muted-foreground">
+                Predict the combined score of both teams in the championship
+                game. Used to break ties in the standings.
+              </p>
+              <Input
+                id="tiebreaker"
+                type="number"
+                min={0}
+                max={500}
+                placeholder="e.g. 145"
+                value={tiebreaker}
+                onChange={(e) => setTiebreaker(e.target.value)}
+                onBlur={handleTiebreakerBlur}
+                disabled={isDisabled}
+                className="w-32"
+              />
+            </div>
+            {!isLocked && (
+              <Button
+                onClick={handleSubmit}
+                disabled={!isComplete || isSubmitting || isSubmitted}
+                size="lg"
+                className={!isSubmitted && isComplete ? "animate-pulse" : ""}
+              >
+                {isSubmitting
+                  ? "Submitting..."
+                  : isSubmitted
+                    ? "Submitted"
+                    : "Submit Bracket"}
+              </Button>
+            )}
           </div>
-          {!isLocked && (
-            <Button
-              onClick={handleSubmit}
-              disabled={!isComplete || isSubmitting || isSubmitted}
-              size="lg"
-              className={!isSubmitted && isComplete ? "animate-pulse" : ""}
-            >
-              {isSubmitting
-                ? "Submitting..."
-                : isSubmitted
-                  ? "Submitted"
-                  : "Submit Bracket"}
-            </Button>
+          {!isComplete && !isDisabled && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {pickedGames < totalGames && `Pick all ${totalGames} games. `}
+              {(tiebreakerValue === null || isNaN(tiebreakerValue)) &&
+                "Enter a tiebreaker score. "}
+            </p>
           )}
         </div>
-        {!isComplete && !isDisabled && (
-          <p className="mt-2 text-xs text-muted-foreground">
-            {pickedGames < totalGames && `Pick all ${totalGames} games. `}
-            {(tiebreakerValue === null || isNaN(tiebreakerValue)) &&
-              "Enter a tiebreaker score. "}
-          </p>
-        )}
-      </div>
+      )}
 
       {/* Stats-based auto-fill dialog */}
       <StatsAutoFillDialog

@@ -221,6 +221,7 @@ export default async function BracketPage({
           poolName={poolData.pool.name}
           rankInfo={rankInfo}
           eliminationInfo={eliminationInfo}
+          tiebreakerScore={entry.tiebreakerScore}
         />
       )}
     </div>

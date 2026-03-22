@@ -42,6 +42,7 @@ interface BracketFullViewProps {
   disabled?: boolean;
   bracketPositions?: BracketPositions;
   roundPointsMap?: Map<string, number>;
+  tiebreakerScore?: number | null;
 }
 
 // Bracket converges from both sides toward the center:
@@ -67,6 +68,7 @@ export function BracketFullView({
   disabled = false,
   bracketPositions = DEFAULT_BRACKET_POSITIONS,
   roundPointsMap,
+  tiebreakerScore,
 }: BracketFullViewProps) {
   // Compute eliminated team IDs: any team that lost a completed game
   const eliminatedTeamIds = useMemo(() => {
@@ -391,6 +393,12 @@ export function BracketFullView({
                 />
               </div>
               {renderMatchup(championshipGame)}
+              {tiebreakerScore != null && (
+                <div className="mt-2 text-center text-xs text-muted-foreground">
+                  <span className="font-medium">Tiebreaker:</span>{" "}
+                  {tiebreakerScore}
+                </div>
+              )}
             </div>
           )}
 
