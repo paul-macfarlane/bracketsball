@@ -1,7 +1,7 @@
 # Task: Bracket Connector Lines
 
 **Story:** #80 from backlog.md
-**Status:** ready-for-review
+**Status:** done
 **Branch:** feat/bracket-connector-lines
 
 ## Plan

@@ -1,7 +1,7 @@
 # Task: Remove "Brackets are locked" banner after tournament starts
 
 **Story:** UI improvement (not a backlog story)
-**Status:** in-progress
+**Status:** done
 **Branch:** feat/tiebreaker-inline-championship (existing branch)
 
 ## Plan

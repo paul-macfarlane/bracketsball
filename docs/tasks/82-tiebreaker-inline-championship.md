@@ -1,14 +1,14 @@
 # Task: Move tiebreaker display inline under championship game when tournament is active
 
 **Story:** Ad-hoc UX improvement (not from backlog)
-**Status:** ready-for-review
+**Status:** done
 **Branch:** feat/tiebreaker-inline-championship
 
 ## Plan
 
 - [x] Modify `BracketFullView` to accept optional tiebreaker props and render inline under championship game
 - [x] Modify `BracketEditor` to conditionally hide sticky bottom bar when locked, pass tiebreaker to `BracketFullView`
-- [ ] Run pre-review checks
+- [X] Run pre-review checks
 
 ## Decisions
 

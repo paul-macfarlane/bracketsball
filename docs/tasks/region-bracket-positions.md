@@ -1,7 +1,7 @@
 # Task: Configurable Region Bracket Positions
 
 **Story:** N/A — Enhancement to support historical tournament variation
-**Status:** in-progress
+**Status:** done
 **Branch:** main
 
 ## Context
@@ -10,14 +10,14 @@ NCAA tournament Final Four matchups are not always the same (e.g., sometimes Eas
 
 ## Plan
 
-- [ ] Add 4 bracket position columns to tournament table
-- [ ] Generate migration
-- [ ] Add validation for bracket positions
-- [ ] Update tournament queries to return new columns
-- [ ] Add admin UI for configuring bracket positions
-- [ ] Update bracket generation to use configured positions
-- [ ] Update bracket display to use configured positions
-- [ ] Update seed script
+- [X] Add 4 bracket position columns to tournament table
+- [X] Generate migration
+- [X] Add validation for bracket positions
+- [X] Update tournament queries to return new columns
+- [X] Add admin UI for configuring bracket positions
+- [X] Update bracket generation to use configured positions
+- [X] Update bracket display to use configured positions
+- [X] Update seed script
 
 ## Decisions
 

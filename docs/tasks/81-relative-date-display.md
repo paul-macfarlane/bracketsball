@@ -1,7 +1,7 @@
 # Task: Relative Date Display for Game Times
 
 **Story:** N/A (UX improvement)
-**Status:** ready-for-review
+**Status:** done
 **Branch:** feat/relative-date-display
 
 ## Plan
