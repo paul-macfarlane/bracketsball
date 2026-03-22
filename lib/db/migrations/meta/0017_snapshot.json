@@ -110,12 +110,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -261,12 +257,8 @@
           "name": "bracket_entry_pool_id_pool_id_fk",
           "tableFrom": "bracket_entry",
           "tableTo": "pool",
-          "columnsFrom": [
-            "pool_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pool_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -274,12 +266,8 @@
           "name": "bracket_entry_user_id_user_id_fk",
           "tableFrom": "bracket_entry",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -287,12 +275,8 @@
           "name": "bracket_entry_tournament_id_tournament_id_fk",
           "tableFrom": "bracket_entry",
           "tableTo": "tournament",
-          "columnsFrom": [
-            "tournament_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tournament_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -389,12 +373,8 @@
           "name": "bracket_pick_bracket_entry_id_bracket_entry_id_fk",
           "tableFrom": "bracket_pick",
           "tableTo": "bracket_entry",
-          "columnsFrom": [
-            "bracket_entry_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bracket_entry_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -402,12 +382,8 @@
           "name": "bracket_pick_tournament_game_id_tournament_game_id_fk",
           "tableFrom": "bracket_pick",
           "tableTo": "tournament_game",
-          "columnsFrom": [
-            "tournament_game_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tournament_game_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -415,12 +391,8 @@
           "name": "bracket_pick_picked_team_id_team_id_fk",
           "tableFrom": "bracket_pick",
           "tableTo": "team",
-          "columnsFrom": [
-            "picked_team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["picked_team_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -647,12 +619,8 @@
           "name": "pool_invite_pool_id_pool_id_fk",
           "tableFrom": "pool_invite",
           "tableTo": "pool",
-          "columnsFrom": [
-            "pool_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pool_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -660,12 +628,8 @@
           "name": "pool_invite_created_by_user_id_fk",
           "tableFrom": "pool_invite",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -751,12 +715,8 @@
           "name": "pool_member_pool_id_pool_id_fk",
           "tableFrom": "pool_member",
           "tableTo": "pool",
-          "columnsFrom": [
-            "pool_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pool_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -764,12 +724,8 @@
           "name": "pool_member_user_id_user_id_fk",
           "tableFrom": "pool_member",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -890,12 +846,8 @@
           "name": "pool_user_invite_pool_id_pool_id_fk",
           "tableFrom": "pool_user_invite",
           "tableTo": "pool",
-          "columnsFrom": [
-            "pool_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pool_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -903,12 +855,8 @@
           "name": "pool_user_invite_invited_by_user_id_fk",
           "tableFrom": "pool_user_invite",
           "tableTo": "user",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -916,12 +864,8 @@
           "name": "pool_user_invite_invited_user_id_user_id_fk",
           "tableFrom": "pool_user_invite",
           "tableTo": "user",
-          "columnsFrom": [
-            "invited_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1008,12 +952,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1023,9 +963,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -1148,12 +1086,8 @@
           "name": "standings_snapshot_bracket_entry_id_bracket_entry_id_fk",
           "tableFrom": "standings_snapshot",
           "tableTo": "bracket_entry",
-          "columnsFrom": [
-            "bracket_entry_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bracket_entry_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1161,12 +1095,8 @@
           "name": "standings_snapshot_pool_id_pool_id_fk",
           "tableFrom": "standings_snapshot",
           "tableTo": "pool",
-          "columnsFrom": [
-            "pool_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pool_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1174,12 +1104,8 @@
           "name": "standings_snapshot_tournament_id_tournament_id_fk",
           "tableFrom": "standings_snapshot",
           "tableTo": "tournament",
-          "columnsFrom": [
-            "tournament_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tournament_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1585,12 +1511,8 @@
           "name": "tournament_game_tournament_id_tournament_id_fk",
           "tableFrom": "tournament_game",
           "tableTo": "tournament",
-          "columnsFrom": [
-            "tournament_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tournament_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1598,12 +1520,8 @@
           "name": "tournament_game_team1_id_team_id_fk",
           "tableFrom": "tournament_game",
           "tableTo": "team",
-          "columnsFrom": [
-            "team1_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team1_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1611,12 +1529,8 @@
           "name": "tournament_game_team2_id_team_id_fk",
           "tableFrom": "tournament_game",
           "tableTo": "team",
-          "columnsFrom": [
-            "team2_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team2_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1624,12 +1538,8 @@
           "name": "tournament_game_winner_team_id_team_id_fk",
           "tableFrom": "tournament_game",
           "tableTo": "team",
-          "columnsFrom": [
-            "winner_team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["winner_team_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1881,12 +1791,8 @@
           "name": "tournament_team_tournament_id_tournament_id_fk",
           "tableFrom": "tournament_team",
           "tableTo": "tournament",
-          "columnsFrom": [
-            "tournament_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tournament_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1894,12 +1800,8 @@
           "name": "tournament_team_team_id_team_id_fk",
           "tableFrom": "tournament_team",
           "tableTo": "team",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["team_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1981,9 +1883,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -2062,54 +1962,32 @@
     "public.app_role": {
       "name": "app_role",
       "schema": "public",
-      "values": [
-        "user",
-        "admin"
-      ]
+      "values": ["user", "admin"]
     },
     "public.bracket_entry_status": {
       "name": "bracket_entry_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "submitted"
-      ]
+      "values": ["draft", "submitted"]
     },
     "public.game_status": {
       "name": "game_status",
       "schema": "public",
-      "values": [
-        "scheduled",
-        "in_progress",
-        "final"
-      ]
+      "values": ["scheduled", "in_progress", "final"]
     },
     "public.pool_user_invite_status": {
       "name": "pool_user_invite_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "accepted",
-        "declined"
-      ]
+      "values": ["pending", "accepted", "declined"]
     },
     "public.pool_visibility": {
       "name": "pool_visibility",
       "schema": "public",
-      "values": [
-        "private",
-        "public"
-      ]
+      "values": ["private", "public"]
     },
     "public.tournament_region": {
       "name": "tournament_region",
       "schema": "public",
-      "values": [
-        "south",
-        "east",
-        "west",
-        "midwest"
-      ]
+      "values": ["south", "east", "west", "midwest"]
     },
     "public.tournament_round": {
       "name": "tournament_round",

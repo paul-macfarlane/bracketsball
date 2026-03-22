@@ -29,6 +29,7 @@ interface BracketViewerProps {
   poolName?: string;
   rankInfo?: { rank: number; totalEntries: number } | null;
   eliminationInfo?: EliminationInfo | null;
+  tiebreakerScore?: number | null;
 }
 
 export function BracketViewer({
@@ -45,6 +46,7 @@ export function BracketViewer({
   poolName,
   rankInfo,
   eliminationInfo,
+  tiebreakerScore,
 }: BracketViewerProps) {
   const picks = useMemo(
     () => new Map(picksList.map((p) => [p.tournamentGameId, p.pickedTeamId])),
@@ -171,6 +173,7 @@ export function BracketViewer({
         disabled={true}
         bracketPositions={bracketPositions}
         roundPointsMap={roundPointsMap}
+        tiebreakerScore={tiebreakerScore}
       />
     </div>
   );
