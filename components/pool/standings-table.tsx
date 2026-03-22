@@ -49,6 +49,7 @@ interface StandingsTableProps {
   poolId: string;
   tournamentStarted?: boolean;
   movement?: Record<string, MovementData>;
+  currentUserId?: string;
 }
 
 export function StandingsTable({
@@ -56,6 +57,7 @@ export function StandingsTable({
   poolId,
   tournamentStarted = false,
   movement,
+  currentUserId,
 }: StandingsTableProps) {
   const [sortField, setSortField] = useState<SortField>("rank");
   const [topN, setTopN] = useState<1 | 2 | 3>(1);
@@ -150,10 +152,11 @@ export function StandingsTable({
           <TableBody>
             {sorted.map((entry, i) => {
               const isEliminated = eliminationMap?.get(i) ?? false;
+              const isCurrentUser = currentUserId === entry.userId;
               return (
                 <TableRow
                   key={entry.id}
-                  className={isEliminated ? "opacity-60" : ""}
+                  className={`${isEliminated ? "opacity-60" : ""} ${isCurrentUser ? "bg-primary/5" : ""}`}
                 >
                   <TableCell className="font-medium text-muted-foreground">
                     {entry.rank}
@@ -213,13 +216,14 @@ export function StandingsTable({
       <div className="space-y-1 md:hidden">
         {sorted.map((entry, i) => {
           const isEliminated = eliminationMap?.get(i) ?? false;
+          const isCurrentUser = currentUserId === entry.userId;
           return (
             <Link
               key={entry.id}
               href={`/pools/${poolId}/brackets/${entry.id}`}
               className={`flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors active:bg-muted ${
                 isEliminated ? "opacity-60" : ""
-              }`}
+              } ${isCurrentUser ? "bg-primary/5" : ""}`}
             >
               <div className="flex w-10 shrink-0 flex-col items-center">
                 <span className="text-sm font-bold text-muted-foreground">
