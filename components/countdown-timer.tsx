@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock, Lock } from "lucide-react";
+import { Clock } from "lucide-react";
 
 interface CountdownTimerProps {
   lockTime: string;
@@ -45,12 +45,7 @@ export function CountdownTimer({ lockTime }: CountdownTimerProps) {
   }, [lockTime]);
 
   if (timeRemaining.total <= 0) {
-    return (
-      <div className="flex items-center gap-2 rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
-        <Lock className="h-4 w-4" />
-        Brackets are locked
-      </div>
-    );
+    return null;
   }
 
   const parts: string[] = [];

@@ -312,12 +312,6 @@ export function BracketEditor({
           <CountdownTimer lockTime={bracketLockTime} />
         </div>
       )}
-      {isLocked && !bracketLockTime && (
-        <div className="mb-4 rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
-          The tournament has started. Bracket editing is locked.
-        </div>
-      )}
-
       {/* Draft warning banner */}
       {!isSubmitted && !isLocked && (
         <div className="mb-4 flex items-center gap-2 rounded-lg border border-warning bg-warning/10 p-3 text-sm font-medium text-warning-foreground">
