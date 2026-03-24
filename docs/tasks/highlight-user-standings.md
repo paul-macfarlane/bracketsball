@@ -6,9 +6,9 @@
 
 ## Plan
 
-- [X] Pass `currentUserId` from pool page to `StandingsTable`
-- [X] Add subtle background highlight to rows matching current user
-- [X] Apply to both desktop table and mobile list views
+- [x] Pass `currentUserId` from pool page to `StandingsTable`
+- [x] Add subtle background highlight to rows matching current user
+- [x] Apply to both desktop table and mobile list views
 
 ## Changes Made
 

@@ -332,7 +332,7 @@ export function BracketFullView({
 
   return (
     <div className="overflow-x-auto pb-4">
-      <div className="flex min-w-[1700px] items-stretch gap-0">
+      <div className="flex min-w-425 items-stretch gap-0">
         {/* Left regions */}
         <div className="flex flex-col">
           {LEFT_REGIONS.map((region, i) => (

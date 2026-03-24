@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
+
+const emptySubscribe = () => () => {};
+const getTrue = () => true;
+const getFalse = () => false;
 
 interface TeamLogoProps {
   logoUrl: string | null;
@@ -17,10 +21,8 @@ export function TeamLogo({
   className,
 }: TeamLogoProps) {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, getTrue, getFalse);
   const [useFallback, setUseFallback] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   const src =
     mounted && resolvedTheme === "dark" && darkLogoUrl && !useFallback

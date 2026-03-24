@@ -8,7 +8,7 @@
 
 - [x] Modify `BracketFullView` to accept optional tiebreaker props and render inline under championship game
 - [x] Modify `BracketEditor` to conditionally hide sticky bottom bar when locked, pass tiebreaker to `BracketFullView`
-- [X] Run pre-review checks
+- [x] Run pre-review checks
 
 ## Decisions
 
