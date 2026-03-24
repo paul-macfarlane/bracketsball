@@ -10,14 +10,14 @@ NCAA tournament Final Four matchups are not always the same (e.g., sometimes Eas
 
 ## Plan
 
-- [X] Add 4 bracket position columns to tournament table
-- [X] Generate migration
-- [X] Add validation for bracket positions
-- [X] Update tournament queries to return new columns
-- [X] Add admin UI for configuring bracket positions
-- [X] Update bracket generation to use configured positions
-- [X] Update bracket display to use configured positions
-- [X] Update seed script
+- [x] Add 4 bracket position columns to tournament table
+- [x] Generate migration
+- [x] Add validation for bracket positions
+- [x] Update tournament queries to return new columns
+- [x] Add admin UI for configuring bracket positions
+- [x] Update bracket generation to use configured positions
+- [x] Update bracket display to use configured positions
+- [x] Update seed script
 
 ## Decisions
 
