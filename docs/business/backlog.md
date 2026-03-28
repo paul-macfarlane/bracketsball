@@ -1188,6 +1188,18 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ---
 
+### 81. Fix "Picked to" Off-by-One in What I Need (Non-MVP) ✅ — Epic: Bug Fixes
+
+**As a** pool member, **I want** the "Picked to" label in the What I Need section to show the correct round a team is picked to reach **so that** I can accurately see how far I expect each team to go.
+
+**Acceptance Criteria:**
+
+- "Picked to" displays the round the team advances TO (e.g., "Final Four") rather than the round of the game they win (e.g., "Elite 8")
+- If a team is picked to win the Championship game, the label reads "Picked to win Championship"
+- Existing unit tests are updated to reflect the corrected behavior
+
+---
+
 ### 76. Fix My Brackets Mobile Responsive Layout (Non-MVP) — Epic: Bug Fixes
 
 **As a** pool member on mobile, **I want** the "My Brackets" section to display without overlapping text when the tournament has started **so that** I can read my bracket placement, points, and status clearly on small screens.
@@ -1263,87 +1275,88 @@ Stories below are ordered by priority. Completed stories are grouped at the end.
 
 ## Summary
 
-| #   | Story                                  | Epic                    | MVP | Status |
-| --- | -------------------------------------- | ----------------------- | --- | ------ |
-| 0   | Tech Stack Setup                       | Tech Stack Setup        | Yes | Done   |
-| 1   | Social Login                           | Auth                    | Yes | Done   |
-| 2   | Profile Management                     | Profile                 | Yes | Done   |
-| 3   | Account Deletion                       | Account                 | Yes | Done   |
-| 4   | Create Bracket Pool                    | Pools Setup             | Yes | Done   |
-| 5   | Manage Bracket Pool Settings           | Pool Settings           | Yes | Done   |
-| 6a  | Admin Tournament Management            | Sports Data             | Yes | Done   |
-| 6b  | ESPN Data Sync                         | Sports Data             | Yes | Done   |
-| 7   | Bracket Pool Invite Links              | Pool Members            | Yes | Done   |
-| 8   | Manage Pool Members                    | Pool Members            | Yes | Done   |
-| 9   | Create Bracket Entry                   | Bracket Creation        | Yes | Done   |
-| 10  | Edit Bracket Entry                     | Bracket Creation        | Yes | Done   |
-| 11  | View Own Brackets                      | Bracket Visibility      | Yes | Done   |
-| 12  | View Other Members' Brackets           | Bracket Visibility      | Yes | Done   |
-| 13  | View Pool Standings                    | Bracket Visibility      | Yes | Done   |
-| 14  | View Individual Bracket Detail         | Bracket Visibility      | Yes | Done   |
-| 15  | Live Bracket Scoring & Standings       | Scoring & Standings     | Yes | Done   |
-| 46  | Bracket Lock at R64 Start              | Tournament Lock         | Yes | Done   |
-| 34  | Configure ESPN Sync Cron Jobs          | Pre-Tournament Setup    | Yes | Done   |
-| 39  | Validate Cron Sync Performance         | Pre-Tournament Setup    | Yes | Done   |
-| 32  | Update External Services Branding      | Branding                | Yes | Done   |
-| 26  | Fix Bracket Submit Double-Click        | Bug Fixes               | No  | Done   |
-| 25  | Auto-Fill Bracket Picks                | Auto-Fill Bracket       | No  | Done   |
-| 21  | Transaction Audit                      | Tech Debt               | No  | Done   |
-| 16  | Manage Bracket Scoring Settings        | Pool Settings           | No  | Done   |
-| 33  | Team & Game Info in Bracket Builder    | Bracket UX Enhancements | No  | Done   |
-| 28  | SEO Plan & Implementation              | Branding                | No  | Done   |
-| 18  | Bracket Pool Public/Private Toggle     | Public Pools            | No  | Done   |
-| 20  | Public Pool Search                     | Public Pools            | No  | Done   |
-| 35  | Sticky Page Headers                    | Navigation UX           | No  | Done   |
-| 36  | Breadcrumb Navigation                  | Navigation UX           | No  | Done   |
-| 37  | Team Mascot / Nickname Display         | Bracket UX Enhancements | No  | Done   |
-| 38  | Admin Manual Team & Game Data Entry    | Bracket UX Enhancements | No  | Done   |
-| 40  | GitHub Repo Link in Footer             | Branding                | No  | Done   |
-| 41  | Unused Code Enforcement & Cleanup      | Tech Debt               | No  | Done   |
-| 42  | Codebase Standards Audit               | Tech Debt               | No  | Done   |
-| 43  | Improved Delete Confirmations          | UX                      | No  | Done   |
-| 44  | Stats-Based Bracket Generation         | Auto-Fill Bracket       | No  | Done   |
-| 45  | Dark/Light Mode Team Icons             | Bracket UX Enhancements | No  | Done   |
-| 47  | Filter Pool Data by Active Tournament  | Multi-Season Support    | No  | Done   |
-| 17  | In-App User Invites                    | Pool Members            | No  | Done   |
-| 19  | Theme Toggle                           | UX                      | No  | Done   |
-| 22  | Remove User Dashboard                  | UX Cleanup              | No  | Done   |
-| 23  | Remove Admin Dashboard                 | UX Cleanup              | No  | Done   |
-| 24  | Auto-Determine Game Winner             | UX Cleanup              | No  | Done   |
-| 27  | Splash / Marketing Page                | Branding                | No  | Done   |
-| 29  | App Theme & Design System              | Branding                | No  | Done   |
-| 30  | Icon Pack (Favicon, App, OAuth)        | Branding                | No  | Done   |
-| 31  | Legal & Contact Pages                  | Branding                | No  | Done   |
-| 49  | Splash Page Differentiation            | Branding                | No  | Done   |
-| 50  | Seamless Invite Flow for Unauthed      | Pool Members            | No  | Done   |
-| 51  | ESPN Sync & Dark Mode Bug Fixes        | Bug Fixes               | No  | Done   |
-| 52  | Unit Test Standings Sorting & Ranking  | Testing                 | No  | Done   |
-| 53  | Full Tournament Scenario Tests         | Testing                 | No  | Done   |
-| 54  | Tiebreaker Edge Cases & Integration    | Testing                 | No  |        |
-| 55  | Per-Game & Round-Level Potential Pts   | Bracket UX Enhancements | No  | Done   |
-| 56  | "What I Need" Rooting Guide            | Tournament Experience   | No  | Done   |
-| 57  | Bracket Copy / Duplicate               | Bracket Creation        | No  | Done   |
-| 58  | Elimination Tracker                    | Tournament Experience   | No  | Done   |
-| 59  | Pool Activity Feed                     | Pool Social             | No  |        |
-| 60  | Pool Notifications                     | Pool Social             | No  |        |
-| 61  | Pool History / Past Seasons            | Multi-Season Support    | No  |        |
-| 62  | Pool Awards / Badges                   | Pool Social             | No  |        |
-| 63  | Standings Movement Tracker             | Tournament Experience   | No  | Done   |
-| 64  | Side-by-Side Bracket Comparison        | Bracket UX Enhancements | No  |        |
-| 65  | Round Recap Digest                     | Tournament Experience   | No  |        |
-| 66  | Pick Confidence Indicator              | Bracket Creation        | No  |        |
-| 67  | Aggregate Pick Percentages             | Pool Social             | No  |        |
-| 68  | Upset Notifications                    | Tournament Experience   | No  |        |
-| 70  | Allow Picking Known R64 Team During FF | Bug Fixes               | No  | Done   |
-| 71  | Additional Auto-Fill Presets (BPI/SOS) | Auto-Fill Bracket       | No  | Done   |
-| 72  | Tiebreaker Uses Finalist PPG           | Auto-Fill Bracket       | No  | Done   |
-| 73  | Auto-Fill Algorithm Audit & Fixes      | Auto-Fill Bracket       | No  | Done   |
-| 74  | Fix ESPN Sync Matching & Venue Display | Bug Fixes               | No  | Done   |
-| 75  | Eliminated Champion Red X Indicator    | Tournament Experience   | No  | Done   |
-| 76  | Fix My Brackets Mobile Responsive      | Bug Fixes               | No  | Done   |
-| 77  | Show Game Time Info on "What I Need"   | Tournament Experience   | No  | Done   |
-| 78  | Show TBD for Unknown Game Times        | Tournament Experience   | No  | Done   |
-| 79  | Hide No-Stake Games in What I Need     | Tournament Experience   | No  | Done   |
-| 80  | Bracket Connector Lines                | Bracket UX Enhancements | No  | Done   |
+| #   | Story                                     | Epic                    | MVP | Status |
+| --- | ----------------------------------------- | ----------------------- | --- | ------ |
+| 0   | Tech Stack Setup                          | Tech Stack Setup        | Yes | Done   |
+| 1   | Social Login                              | Auth                    | Yes | Done   |
+| 2   | Profile Management                        | Profile                 | Yes | Done   |
+| 3   | Account Deletion                          | Account                 | Yes | Done   |
+| 4   | Create Bracket Pool                       | Pools Setup             | Yes | Done   |
+| 5   | Manage Bracket Pool Settings              | Pool Settings           | Yes | Done   |
+| 6a  | Admin Tournament Management               | Sports Data             | Yes | Done   |
+| 6b  | ESPN Data Sync                            | Sports Data             | Yes | Done   |
+| 7   | Bracket Pool Invite Links                 | Pool Members            | Yes | Done   |
+| 8   | Manage Pool Members                       | Pool Members            | Yes | Done   |
+| 9   | Create Bracket Entry                      | Bracket Creation        | Yes | Done   |
+| 10  | Edit Bracket Entry                        | Bracket Creation        | Yes | Done   |
+| 11  | View Own Brackets                         | Bracket Visibility      | Yes | Done   |
+| 12  | View Other Members' Brackets              | Bracket Visibility      | Yes | Done   |
+| 13  | View Pool Standings                       | Bracket Visibility      | Yes | Done   |
+| 14  | View Individual Bracket Detail            | Bracket Visibility      | Yes | Done   |
+| 15  | Live Bracket Scoring & Standings          | Scoring & Standings     | Yes | Done   |
+| 46  | Bracket Lock at R64 Start                 | Tournament Lock         | Yes | Done   |
+| 34  | Configure ESPN Sync Cron Jobs             | Pre-Tournament Setup    | Yes | Done   |
+| 39  | Validate Cron Sync Performance            | Pre-Tournament Setup    | Yes | Done   |
+| 32  | Update External Services Branding         | Branding                | Yes | Done   |
+| 26  | Fix Bracket Submit Double-Click           | Bug Fixes               | No  | Done   |
+| 25  | Auto-Fill Bracket Picks                   | Auto-Fill Bracket       | No  | Done   |
+| 21  | Transaction Audit                         | Tech Debt               | No  | Done   |
+| 16  | Manage Bracket Scoring Settings           | Pool Settings           | No  | Done   |
+| 33  | Team & Game Info in Bracket Builder       | Bracket UX Enhancements | No  | Done   |
+| 28  | SEO Plan & Implementation                 | Branding                | No  | Done   |
+| 18  | Bracket Pool Public/Private Toggle        | Public Pools            | No  | Done   |
+| 20  | Public Pool Search                        | Public Pools            | No  | Done   |
+| 35  | Sticky Page Headers                       | Navigation UX           | No  | Done   |
+| 36  | Breadcrumb Navigation                     | Navigation UX           | No  | Done   |
+| 37  | Team Mascot / Nickname Display            | Bracket UX Enhancements | No  | Done   |
+| 38  | Admin Manual Team & Game Data Entry       | Bracket UX Enhancements | No  | Done   |
+| 40  | GitHub Repo Link in Footer                | Branding                | No  | Done   |
+| 41  | Unused Code Enforcement & Cleanup         | Tech Debt               | No  | Done   |
+| 42  | Codebase Standards Audit                  | Tech Debt               | No  | Done   |
+| 43  | Improved Delete Confirmations             | UX                      | No  | Done   |
+| 44  | Stats-Based Bracket Generation            | Auto-Fill Bracket       | No  | Done   |
+| 45  | Dark/Light Mode Team Icons                | Bracket UX Enhancements | No  | Done   |
+| 47  | Filter Pool Data by Active Tournament     | Multi-Season Support    | No  | Done   |
+| 17  | In-App User Invites                       | Pool Members            | No  | Done   |
+| 19  | Theme Toggle                              | UX                      | No  | Done   |
+| 22  | Remove User Dashboard                     | UX Cleanup              | No  | Done   |
+| 23  | Remove Admin Dashboard                    | UX Cleanup              | No  | Done   |
+| 24  | Auto-Determine Game Winner                | UX Cleanup              | No  | Done   |
+| 27  | Splash / Marketing Page                   | Branding                | No  | Done   |
+| 29  | App Theme & Design System                 | Branding                | No  | Done   |
+| 30  | Icon Pack (Favicon, App, OAuth)           | Branding                | No  | Done   |
+| 31  | Legal & Contact Pages                     | Branding                | No  | Done   |
+| 49  | Splash Page Differentiation               | Branding                | No  | Done   |
+| 50  | Seamless Invite Flow for Unauthed         | Pool Members            | No  | Done   |
+| 51  | ESPN Sync & Dark Mode Bug Fixes           | Bug Fixes               | No  | Done   |
+| 52  | Unit Test Standings Sorting & Ranking     | Testing                 | No  | Done   |
+| 53  | Full Tournament Scenario Tests            | Testing                 | No  | Done   |
+| 54  | Tiebreaker Edge Cases & Integration       | Testing                 | No  |        |
+| 55  | Per-Game & Round-Level Potential Pts      | Bracket UX Enhancements | No  | Done   |
+| 56  | "What I Need" Rooting Guide               | Tournament Experience   | No  | Done   |
+| 57  | Bracket Copy / Duplicate                  | Bracket Creation        | No  | Done   |
+| 58  | Elimination Tracker                       | Tournament Experience   | No  | Done   |
+| 59  | Pool Activity Feed                        | Pool Social             | No  |        |
+| 60  | Pool Notifications                        | Pool Social             | No  |        |
+| 61  | Pool History / Past Seasons               | Multi-Season Support    | No  |        |
+| 62  | Pool Awards / Badges                      | Pool Social             | No  |        |
+| 63  | Standings Movement Tracker                | Tournament Experience   | No  | Done   |
+| 64  | Side-by-Side Bracket Comparison           | Bracket UX Enhancements | No  |        |
+| 65  | Round Recap Digest                        | Tournament Experience   | No  |        |
+| 66  | Pick Confidence Indicator                 | Bracket Creation        | No  |        |
+| 67  | Aggregate Pick Percentages                | Pool Social             | No  |        |
+| 68  | Upset Notifications                       | Tournament Experience   | No  |        |
+| 70  | Allow Picking Known R64 Team During FF    | Bug Fixes               | No  | Done   |
+| 71  | Additional Auto-Fill Presets (BPI/SOS)    | Auto-Fill Bracket       | No  | Done   |
+| 72  | Tiebreaker Uses Finalist PPG              | Auto-Fill Bracket       | No  | Done   |
+| 73  | Auto-Fill Algorithm Audit & Fixes         | Auto-Fill Bracket       | No  | Done   |
+| 74  | Fix ESPN Sync Matching & Venue Display    | Bug Fixes               | No  | Done   |
+| 75  | Eliminated Champion Red X Indicator       | Tournament Experience   | No  | Done   |
+| 76  | Fix My Brackets Mobile Responsive         | Bug Fixes               | No  | Done   |
+| 77  | Show Game Time Info on "What I Need"      | Tournament Experience   | No  | Done   |
+| 78  | Show TBD for Unknown Game Times           | Tournament Experience   | No  | Done   |
+| 79  | Hide No-Stake Games in What I Need        | Tournament Experience   | No  | Done   |
+| 80  | Bracket Connector Lines                   | Bracket UX Enhancements | No  | Done   |
+| 81  | Fix "Picked to" Off-by-One in What I Need | Bug Fixes               | No  | Done   |
 
-**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 58 stories (43 done, 15 remaining)**
+**MVP Total: 21 stories (21 done, 0 remaining)** | **Post-MVP: 59 stories (44 done, 15 remaining)**
