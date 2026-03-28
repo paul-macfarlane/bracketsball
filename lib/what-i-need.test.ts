@@ -201,7 +201,8 @@ describe("computeWhatINeed", () => {
 
     // For the sweet_16 game (g1), cumulative = sweet_16(4) + elite_8(8) + final_four(16) = 28
     expect(result[0].games[0].team1Impact).toBe(28);
-    expect(result[0].games[0].team1FurthestRound).toBe("final_four");
+    // Winning final_four game means advancing to championship
+    expect(result[0].games[0].team1FurthestRound).toBe("championship");
   });
 
   it("groups by round and sorts within round by totalImpact desc", () => {

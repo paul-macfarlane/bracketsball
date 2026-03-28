@@ -119,7 +119,12 @@ export function computeWhatINeed(
           impact += getPointsForRound(pick.round, poolScoring);
           if (pickRoundIdx > furthestRoundIdx) {
             furthestRoundIdx = pickRoundIdx;
-            furthestRound = pick.round;
+            // Winning a game in round X means advancing to round X+1
+            const nextRoundIdx = pickRoundIdx + 1;
+            furthestRound =
+              nextRoundIdx < ROUND_ORDER.length
+                ? ROUND_ORDER[nextRoundIdx]
+                : "champion";
           }
         }
       }

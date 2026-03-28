@@ -203,7 +203,9 @@ function TeamDisplay({
             </Badge>
             {furthestRound && (
               <span className="text-[10px] text-muted-foreground">
-                Picked to {ROUND_LABELS[furthestRound] ?? furthestRound}
+                {furthestRound === "champion"
+                  ? "Picked to win Championship"
+                  : `Picked to ${ROUND_LABELS[furthestRound] ?? furthestRound}`}
               </span>
             )}
           </div>
